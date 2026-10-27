@@ -1,12 +1,44 @@
 import { Routes } from '@angular/router';
+import { LandingPageComponent } from './components/landing-pageComponent/landing-pageComponent';
+import { DashboardMainComponent } from './components/dashboard-main/dashboard-main';
+import { DashboardHomeComponent } from './components/dashboard-main/dashboard-home';
+import { ClienteComponent } from './components/cliente-component/cliente-component';
+import { ExpedienteComponent } from './components/expediente-component/expediente-component';
+import { DocumentoComponent } from './components/documento-component/documento-component';
+import { ChatIaComponent } from './components/chat-ia-component/chat-ia-component';
+import { BorradorComponent } from './components/borrador-component/borrador-component';
+import { ResumenComponent } from './components/resumen-component/resumen-component';
+import { CitacionesIaComponent } from './components/citaciones-ia-component/citaciones-ia-component';
+import { UsuarioComponent } from './components/usuario-component/usuario-component';
+import { UsuarioInsertComponent } from './components/usuario-component/usuario-insert/usuario-insert';
+import { UsuarioLoginComponent } from './components/usuario-component/usuario-login/usuario-login';
+import { RolComponent } from './components/rol-component/rol-component';
+import { AuditoriaComponent } from './components/auditoria-component/auditoria-component';
+import { NotFoundComponent } from './components/errors/not-found/not-found';
 
 export const routes: Routes = [
-  { path: 'login', loadComponent: () => import('./features/auth/login.component').then((m) => m.LoginComponent) },
-  { path: '', loadComponent: () => import('./core/layout/main-layout/main-layout.component').then((m) => m.MainLayoutComponent), children: [
-    { path: '', pathMatch: 'full', loadComponent: () => import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent) },
-    ...[
-      ['clientes', 'Clientes', 'Gestión y seguimiento de clientes.'], ['expedientes', 'Expedientes', 'Organización de asuntos y procesos legales.'], ['documentos', 'Documentos', 'Repositorio central de documentos legales.'], ['chat-ia', 'Asistente IA', 'Espacio para asistencia legal inteligente.'], ['borradores', 'Borradores', 'Creación y revisión de documentos en borrador.'], ['resumenes', 'Resúmenes', 'Síntesis y consulta de información jurídica.'], ['citaciones-ia', 'Citaciones IA', 'Apoyo inteligente para citaciones legales.'], ['usuarios', 'Usuarios', 'Administración de usuarios de la plataforma.'], ['roles', 'Roles', 'Configuración de roles y permisos.'], ['auditoria', 'Auditoría', 'Registro y consulta de actividad del sistema.'],
-    ].map(([path, title, description]) => ({ path, data: { title, description }, loadComponent: () => import('./shared/components/placeholder-page.component').then((m) => m.PlaceholderPageComponent) })),
-  ] },
-  { path: '**', loadComponent: () => import('./shared/components/not-found.component').then((m) => m.NotFoundComponent) },
+  { path: '', redirectTo: 'landing', pathMatch: 'full' },
+  { path: 'landing', component: LandingPageComponent },
+  {
+    path: '', component: DashboardMainComponent, children: [
+      { path: 'dashboard', component: DashboardHomeComponent },
+      { path: 'clientes', component: ClienteComponent },
+      { path: 'expedientes', component: ExpedienteComponent },
+      { path: 'documentos', component: DocumentoComponent },
+      { path: 'chat-ia', component: ChatIaComponent },
+      { path: 'borradores', component: BorradorComponent },
+      { path: 'resumenes', component: ResumenComponent },
+      { path: 'citaciones-ia', component: CitacionesIaComponent },
+      { path: 'gestionusuarios', component: UsuarioComponent },
+      { path: 'roles', component: RolComponent },
+      { path: 'auditoria', component: AuditoriaComponent },
+    ],
+  },
+  {
+    path: 'usuarios', component: UsuarioComponent, children: [
+      { path: 'registrar', component: UsuarioInsertComponent },
+      { path: 'login', component: UsuarioLoginComponent },
+    ],
+  },
+  { path: '**', component: NotFoundComponent },
 ];

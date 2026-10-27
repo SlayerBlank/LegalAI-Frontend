@@ -1,12 +1,13 @@
 # LegalAI Frontend
 
-Placeholder visual y estructural para la plataforma de gestión legal LegalAI. Esta primera versión es una SPA independiente, preparada para que el equipo incorpore funcionalidades por módulo sin implementar todavía lógica de negocio, autenticación ni llamadas al backend.
+Placeholder visual y estructural para la plataforma de gestión legal LegalAI. Incluye Landing pública, formularios provisionales de Login/Registro y una SPA administrativa preparada para crecer sin implementar todavía autenticación real ni lógica de negocio.
 
 ## Tecnologías y requisitos
 
 - Angular 22.2.3 con Standalone Components.
 - TypeScript estricto, HTML y SCSS.
 - Angular Router, Signals y componentes nativos.
+- Angular Reactive Forms y HttpClient preparado.
 - Node.js 24.16.0 o compatible con Angular 22.
 - npm 11.13.0 o compatible.
 
@@ -29,25 +30,30 @@ npm run build
 
 ```text
 src/app/
-├── core/              # Layout, navegación, tema y configuración transversal
-│   ├── http/          # URL base para la futura integración HTTP
-│   ├── layout/        # Sidebar, header y layout compartido
-│   └── theme/         # ThemeService basado en Signals
-├── features/          # Páginas por área funcional
-│   ├── auth/          # Login provisional
-│   └── dashboard/     # Dashboard inicial
-└── shared/            # Componentes reutilizables y página 404
+├── components/        # Componentes organizados por módulo
+│   ├── dashboard-main/ # Layout administrativo, navbar y sidebar
+│   ├── usuario-component/ # Gestión, login y registro provisional
+│   ├── landing-pageComponent/
+│   └── <modulo>-component/
+├── models/            # dtos/, request/ y response/ para Swagger futuro
+├── services/          # Servicios esqueleto por módulo y tema
+├── core/, features/, shared/ # Compatibilidad temporal de la implementación previa
+└── app.routes.ts, app.config.ts, app.ts, app.html, app.css
 ```
 
 Los módulos funcionales usan `PlaceholderPageComponent` mientras el equipo define sus contratos con el Swagger real del backend.
 
 ## Rutas disponibles
 
-`/`, `/login`, `/clientes`, `/expedientes`, `/documentos`, `/chat-ia`, `/borradores`, `/resumenes`, `/citaciones-ia`, `/usuarios`, `/roles` y `/auditoria`. Las rutas de módulos se cargan de forma diferida; las rutas inexistentes muestran una página 404.
+`/` redirige a `/landing`; también están disponibles `/dashboard`, `/clientes`, `/expedientes`, `/documentos`, `/chat-ia`, `/borradores`, `/resumenes`, `/citaciones-ia`, `/gestionusuarios`, `/roles`, `/auditoria`, `/usuarios/registrar`, `/usuarios/login` y `/**`. Landing, Login y Registro son públicos; las rutas internas comparten el layout administrativo. El Dashboard es accesible provisionalmente para desarrollo y deberá protegerse al integrar JWT.
 
 ## Tema claro y oscuro
 
-`ThemeService` mantiene el estado con Angular Signals, aplica `data-theme` al elemento raíz, guarda la elección en `localStorage` y usa la preferencia del sistema cuando no existe una elección guardada. El botón está disponible en el header.
+`ThemeService` en `src/app/services/theme.service.ts` mantiene el estado con Angular Signals, aplica `data-theme` al elemento raíz, guarda la elección en `localStorage` y usa la preferencia del sistema cuando no existe una elección guardada. El selector está disponible en Landing, Login, Registro y el header administrativo.
+
+## Formularios provisionales
+
+Login y Registro usan `ReactiveFormsModule`, validan campos obligatorios, correo electrónico y coincidencia de contraseñas. No realizan llamadas HTTP, no crean JWT y no simulan sesiones; muestran únicamente mensajes de validación e integración pendiente.
 
 ## Añadir una página o módulo
 
@@ -62,7 +68,11 @@ Usar `main` como rama estable y ramas `feature/<modulo>-<tarea>`. Cada cambio de
 
 ## Preparación para Spring Boot
 
-La URL base futura está centralizada en `src/environments/environment.ts` y expuesta mediante `src/app/core/http/api.config.ts`. Todavía no hay endpoints, DTOs, guards, JWT, interceptores ni tokens simulados. Los contratos deberán obtenerse del Swagger real de LegalAI.
+`provideHttpClient()` está configurado para la futura integración. La URL base está centralizada en `src/environments/environment.ts` y expuesta mediante `src/app/core/http/api.config.ts`. `AuthService` documenta la integración futura sin endpoints, DTOs, guards, JWT, interceptores ni tokens simulados. Los contratos deberán obtenerse del Swagger real de LegalAI.
+
+## Reorganización y trabajo colaborativo
+
+La arquitectura activa sigue `components/`, `models/` y `services/`, con archivos separados `.ts`, `.html` y `.css` por componente. Cada integrante puede trabajar principalmente en su carpeta de componente, su servicio y sus futuros modelos. El navbar y sidebar solo se definen en `components/dashboard-main/`. Las carpetas heredadas `core/`, `features/` y `shared/` se conservan temporalmente porque contienen la implementación anterior y no se eliminaron sin confirmación; las rutas nuevas ya no dependen de ellas.
 
 ## Pendientes
 

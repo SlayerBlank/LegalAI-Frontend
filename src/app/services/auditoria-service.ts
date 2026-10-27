@@ -1,0 +1,3 @@
+import { Injectable } from '@angular/core';
+@Injectable({ providedIn: 'root' })
+export class AuditoriaService { readonly integrationPending = true; }
