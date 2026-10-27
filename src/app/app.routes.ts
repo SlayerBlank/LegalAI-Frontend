@@ -12,15 +12,17 @@ import { CitacionesIaComponent } from './components/citaciones-ia-component/cita
 import { UsuarioComponent } from './components/usuario-component/usuario-component';
 import { UsuarioInsertComponent } from './components/usuario-component/usuario-insert/usuario-insert';
 import { UsuarioLoginComponent } from './components/usuario-component/usuario-login/usuario-login';
+import { GestionUsuariosComponent } from './components/gestion-usuarios/gestion-usuarios';
 import { RolComponent } from './components/rol-component/rol-component';
 import { AuditoriaComponent } from './components/auditoria-component/auditoria-component';
 import { NotFoundComponent } from './components/errors/not-found/not-found';
+import { authGuard } from './services/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'landing', pathMatch: 'full' },
   { path: 'landing', component: LandingPageComponent },
   {
-    path: '', component: DashboardMainComponent, children: [
+    path: '', component: DashboardMainComponent, canActivate: [authGuard], children: [
       { path: 'dashboard', component: DashboardHomeComponent },
       { path: 'clientes', component: ClienteComponent },
       { path: 'expedientes', component: ExpedienteComponent },
@@ -29,7 +31,7 @@ export const routes: Routes = [
       { path: 'borradores', component: BorradorComponent },
       { path: 'resumenes', component: ResumenComponent },
       { path: 'citaciones-ia', component: CitacionesIaComponent },
-      { path: 'gestionusuarios', component: UsuarioComponent },
+      { path: 'gestionusuarios', component: GestionUsuariosComponent },
       { path: 'roles', component: RolComponent },
       { path: 'auditoria', component: AuditoriaComponent },
     ],

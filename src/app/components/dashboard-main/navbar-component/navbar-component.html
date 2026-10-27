@@ -1,1 +1,28 @@
-<header><button class="menu" (click)="menuRequested.emit()">☰</button><h1>Panel de LegalAI</h1><div class="actions"><button (click)="theme.toggle()">{{theme.theme()==='light'?'☾':'☀'}}</button><a routerLink="/login">LU</a></div></header>
+<header>
+  <button class="menu" type="button" aria-label="Abrir menú" (click)="menuRequested.emit()">☰</button>
+  <h1>Panel de LegalAI</h1>
+  <div class="actions">
+    <button type="button" aria-label="Cambiar tema" (click)="theme.toggle()">{{ theme.theme() === 'light' ? '☾' : '☀' }}</button>
+    <div class="user-menu">
+      <button class="user-trigger" type="button" aria-haspopup="menu" [attr.aria-expanded]="userMenuOpen" (click)="toggleUserMenu()" (keydown)="onUserMenuKeydown($event)">
+        <span class="avatar" aria-hidden="true">{{ userInitials() }}</span>
+        <span class="user-name">{{ loginService.currentUser()?.fullName ?? 'Usuario' }}</span>
+        <span aria-hidden="true">⌄</span>
+      </button>
+      @if (userMenuOpen) {
+        <div class="user-dropdown" role="menu">
+          <button type="button" role="menuitem" (click)="toggleProfile()">{{ profileOpen ? 'Ocultar mi perfil' : 'Ver mi perfil' }}</button>
+          @if (profileOpen) {
+            <section class="profile" aria-label="Perfil del usuario">
+              <strong>{{ loginService.currentUser()?.fullName ?? 'Usuario' }}</strong>
+              <span>{{ loginService.currentUser()?.email ?? '—' }}</span>
+              <span>Rol: {{ loginService.currentUser()?.roleName ?? '—' }}</span>
+              <span>Estado: {{ loginService.currentUser()?.status ?? '—' }}</span>
+            </section>
+          }
+          <button type="button" role="menuitem" (click)="logout()">Cerrar sesión</button>
+        </div>
+      }
+    </div>
+  </div>
+</header>

@@ -64,6 +64,7 @@
               "buildTarget": "legalai-frontend:build:production"
             },
             "development": {
+              "proxyConfig": "proxy.conf.js",
               "buildTarget": "legalai-frontend:build:development"
             }
           },

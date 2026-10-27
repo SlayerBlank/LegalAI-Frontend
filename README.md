@@ -45,7 +45,7 @@ Los módulos funcionales usan `PlaceholderPageComponent` mientras el equipo defi
 
 ## Rutas disponibles
 
-`/` redirige a `/landing`; también están disponibles `/dashboard`, `/clientes`, `/expedientes`, `/documentos`, `/chat-ia`, `/borradores`, `/resumenes`, `/citaciones-ia`, `/gestionusuarios`, `/roles`, `/auditoria`, `/usuarios/registrar`, `/usuarios/login` y `/**`. Landing, Login y Registro son públicos; las rutas internas comparten el layout administrativo. El Dashboard es accesible provisionalmente para desarrollo y deberá protegerse al integrar JWT.
+`/` redirige a `/landing`; también están disponibles `/dashboard`, `/clientes`, `/expedientes`, `/documentos`, `/chat-ia`, `/borradores`, `/resumenes`, `/citaciones-ia`, `/gestionusuarios`, `/roles`, `/auditoria`, `/usuarios/registrar`, `/usuarios/login` y `/**`. Landing, Login y Registro son públicos; las rutas internas están protegidas por `authGuard` y comparten el layout administrativo.
 
 ## Tema claro y oscuro
 
@@ -53,7 +53,7 @@ Los módulos funcionales usan `PlaceholderPageComponent` mientras el equipo defi
 
 ## Formularios provisionales
 
-Login y Registro usan `ReactiveFormsModule`, validan campos obligatorios, correo electrónico y coincidencia de contraseñas. No realizan llamadas HTTP, no crean JWT y no simulan sesiones; muestran únicamente mensajes de validación e integración pendiente.
+Login y Registro usan `ReactiveFormsModule` y los DTOs reales del contrato. Login envía `email/password`; Registro envía `fullName/email/password`, valida longitud y máximo de 72 bytes UTF-8 de la contraseña, y no permite seleccionar roles. Ambas respuestas guardan la sesión recibida y redirigen al Dashboard.
 
 ## Añadir una página o módulo
 
@@ -68,7 +68,7 @@ Usar `main` como rama estable y ramas `feature/<modulo>-<tarea>`. Cada cambio de
 
 ## Preparación para Spring Boot
 
-`provideHttpClient()` está configurado para la futura integración. La URL base está centralizada en `src/environments/environment.ts` y expuesta mediante `src/app/core/http/api.config.ts`. `AuthService` documenta la integración futura sin endpoints, DTOs, guards, JWT, interceptores ni tokens simulados. Los contratos deberán obtenerse del Swagger real de LegalAI.
+`provideHttpClient(withInterceptors([jwtInterceptor]))` está configurado. La URL base local es `/api` y [proxy.conf.json](./proxy.conf.json) la dirige a `http://localhost:8080` durante `ng serve`. `LoginService` conserva `accessToken` y `tokenType` en `sessionStorage`; esto permite restaurar la sesión, pero deja el token accesible a JavaScript y debe revisarse como decisión de seguridad antes de producción. No hay refresh token ni logout HTTP.
 
 ## Reorganización y trabajo colaborativo
 
@@ -76,7 +76,7 @@ La arquitectura activa sigue `components/`, `models/` y `services/`, con archivo
 
 ## Pendientes
 
-- Integrar autenticación real con Spring Security y JWT.
-- Definir contratos, modelos y servicios HTTP desde Swagger.
+- Revisar la estrategia de almacenamiento de JWT antes de producción.
+- Verificar CORS/origen permitido en despliegues distintos al proxy local.
 - Implementar progresivamente clientes, expedientes, documentos y módulos de IA.
 - Añadir validaciones, manejo de errores, permisos y pruebas conforme se incorporen funcionalidades.
