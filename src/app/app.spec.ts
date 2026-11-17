@@ -70,6 +70,8 @@ describe('Application navigation regressions', () => {
     const f = TestBed.createComponent(App);
     f.detectChanges();
     await TestBed.inject(Router).navigateByUrl('/dashboard');
+    f.detectChanges();
+    TestBed.inject(HttpTestingController).expectOne('/api/clients').flush([]);
     await f.whenStable();
     expect(f.nativeElement.querySelector('app-navbar')).toBeTruthy();
     expect(f.nativeElement.querySelector('app-sidebar')).toBeTruthy();

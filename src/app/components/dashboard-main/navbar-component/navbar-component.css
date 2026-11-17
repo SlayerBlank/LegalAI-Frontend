@@ -1,1 +1,158 @@
-header{height:72px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:1rem;padding:0 2rem;background:var(--surface)}h1{font-size:1.1rem;margin:0}.actions{display:flex;align-items:center;gap:.75rem;margin-left:auto}.actions>button,.menu{border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:.45rem;width:36px;height:36px;cursor:pointer}.menu{display:none}.user-menu{position:relative}.user-trigger{display:flex;align-items:center;gap:.5rem;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:999px;padding:.25rem .65rem .25rem .25rem;cursor:pointer}.avatar{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--primary);color:#fff;font-size:.72rem;font-weight:700}.user-name{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.85rem}.user-dropdown{position:absolute;right:0;top:calc(100% + .6rem);z-index:10;min-width:220px;padding:.45rem;background:var(--surface);border:1px solid var(--border);border-radius:.7rem;box-shadow:var(--shadow)}.user-dropdown>button{display:block;width:100%;padding:.65rem;text-align:left;border:0;border-radius:.4rem;background:transparent;color:var(--text);cursor:pointer}.user-dropdown>button:hover,.user-dropdown>button:focus-visible{background:var(--primary-soft)}.profile{display:grid;gap:.35rem;padding:.7rem;border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:.78rem;color:var(--muted)}.profile strong{color:var(--text);font-size:.85rem}.user-trigger:focus-visible,.actions>button:focus-visible,.menu:focus-visible{outline:2px solid var(--primary);outline-offset:2px}@media(max-width:720px){header{padding:0 1rem}.menu{display:block}.user-name{display:none}.user-dropdown{right:-.25rem;min-width:210px}}
+:host {
+  display: block;
+  min-width: 0;
+}
+header {
+  min-height: 88px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px clamp(24px, 2.6vw, 48px);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.route-area,
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+}
+.route-context {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  min-width: 0;
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+.current-path {
+  overflow-wrap: anywhere;
+}
+.navbar-actions {
+  flex-shrink: 0;
+  gap: 18px;
+}
+.theme-switch {
+  display: flex;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+}
+.theme-switch button {
+  font: inherit;
+  font-size: 12px;
+  padding: 5px 11px;
+  min-height: 28px;
+  color: var(--muted);
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+}
+.theme-switch button[aria-pressed='true'] {
+  background: var(--surface);
+  color: var(--primary);
+  font-weight: 600;
+}
+.notifications,
+.menu-trigger {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 7px;
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  border-radius: 5px;
+}
+.notifications {
+  cursor: not-allowed;
+}
+.menu-trigger {
+  display: none;
+  cursor: pointer;
+}
+.notifications svg,
+.menu-trigger svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+time {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+@media (max-width: 1280px) {
+  header {
+    gap: 14px;
+    padding-inline: 24px;
+  }
+  .route-context {
+    gap: 10px;
+    font-size: 11px;
+  }
+  .navbar-actions {
+    gap: 12px;
+  }
+  .theme-switch button {
+    padding-inline: 8px;
+  }
+  time {
+    font-size: 11px;
+  }
+}
+@media (max-width: 1100px) {
+  .menu-trigger {
+    display: grid;
+  }
+  .route-area {
+    gap: 12px;
+  }
+}
+@media (max-width: 640px) {
+  header {
+    padding: 16px 18px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .route-area {
+    width: 100%;
+  }
+  .route-context {
+    gap: 10px;
+  }
+  .navbar-actions {
+    width: 100%;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .theme-switch button {
+    min-height: 34px;
+    padding-inline: 10px;
+  }
+  .notifications {
+    margin-left: auto;
+  }
+  time {
+    font-size: 10px;
+  }
+  .menu-trigger {
+    flex-shrink: 0;
+  }
+}

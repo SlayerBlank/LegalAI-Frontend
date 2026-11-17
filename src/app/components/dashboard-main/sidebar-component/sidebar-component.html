@@ -1,1 +1,128 @@
-<aside [class.open]="open()"><div class="brand"><span>L</span>Legal<span>AI</span><button (click)="closeRequested.emit()">×</button></div><nav>@for(link of links;track link[1]){<a [routerLink]="link[1]" routerLinkActive="active" (click)="closeRequested.emit()">◆ {{link[0]}}</a>}</nav><small>Frontend inicial · v0.1</small></aside><div class="backdrop" [class.visible]="open()" (click)="closeRequested.emit()"></div>
+<aside
+  id="workspace-sidebar"
+  [class.open]="open()"
+  [attr.inert]="compact() && !open() ? '' : null"
+  [attr.aria-hidden]="compact() && !open() ? 'true' : null"
+  [attr.role]="compact() && open() ? 'dialog' : null"
+  [attr.aria-modal]="compact() && open() ? 'true' : null"
+  aria-label="Navegación del espacio de trabajo"
+>
+  <div class="sidebar-heading">
+    <div class="brand-row">
+      <a
+        class="brand"
+        routerLink="/dashboard"
+        (click)="closeRequested.emit()"
+        aria-label="LegalAI, resumen"
+        ><span class="brand-mark" aria-hidden="true">a</span>LegalAI</a
+      ><button
+        class="close-sidebar"
+        type="button"
+        aria-label="Cerrar navegación"
+        (click)="closeRequested.emit()"
+      >
+        ×
+      </button>
+    </div>
+    <p class="workspace-label">ESPACIO DE TRABAJO</p>
+    <strong class="workspace-name">Mi espacio de trabajo</strong>
+  </div>
+  <div class="sidebar-scroll">
+    <nav aria-label="Navegación principal">
+      <div class="nav-group">
+        @for (link of mainLinks; track link.path) {
+          <a
+            [routerLink]="link.path"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="activeMatch"
+            ariaCurrentWhenActive="page"
+            (click)="closeRequested.emit()"
+            ><app-workspace-icon [name]="link.icon" /><span>{{ link.title }}</span></a
+          >
+        }
+      </div>
+      <p class="group-label">ASISTENCIA INTELIGENTE</p>
+      <div class="nav-group">
+        @for (link of aiLinks; track link.path) {
+          <a
+            [routerLink]="link.path"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="activeMatch"
+            ariaCurrentWhenActive="page"
+            (click)="closeRequested.emit()"
+            ><app-workspace-icon [name]="link.icon" /><span>{{ link.title }}</span></a
+          >
+        }
+      </div>
+      @if (login.currentUser()?.roleName === 'ADMIN') {
+        <p class="group-label">ADMINISTRACIÓN</p>
+        <div class="nav-group">
+          @for (link of adminLinks; track link.path) {
+            <a
+              [routerLink]="link.path"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="activeMatch"
+              ariaCurrentWhenActive="page"
+              (click)="closeRequested.emit()"
+              ><app-workspace-icon [name]="link.icon" /><span>{{ link.title }}</span></a
+            >
+          }
+        </div>
+      }
+    </nav>
+    <section class="help-card" aria-label="Uso responsable de la IA">
+      <h2>Tu criterio, siempre primero.</h2>
+      <p>La IA propone. Tú revisas y decides.</p>
+      <button
+        type="button"
+        disabled
+        title="Centro de ayuda pendiente"
+        aria-label="Centro de ayuda: funcionalidad pendiente"
+      >
+        Centro de ayuda <span aria-hidden="true">↗</span><small>Próximamente</small>
+      </button>
+    </section>
+  </div>
+  <div class="sidebar-user">
+    @if (login.currentUser(); as user) {
+      <button
+        class="profile-trigger"
+        type="button"
+        [attr.aria-expanded]="profileOpen"
+        aria-controls="workspace-profile"
+        aria-label="Ver u ocultar mi perfil"
+        (click)="profileOpen = !profileOpen"
+      >
+        <span class="avatar" aria-hidden="true">{{ userInitials() }}</span
+        ><span class="user-name">{{ user.fullName }}</span>
+      </button>
+      <div class="user-meta">
+        <span>{{
+          user.roleName === 'ADMIN'
+            ? 'Administrador'
+            : user.roleName === 'USER'
+              ? 'Usuario'
+              : user.roleName
+        }}</span
+        ><span aria-hidden="true">·</span
+        ><button type="button" (click)="logout()">Cerrar sesión</button>
+      </div>
+      @if (profileOpen) {
+        <section class="profile-details" id="workspace-profile" aria-label="Mi perfil">
+          <strong>{{ user.fullName }}</strong
+          ><span>{{ user.email }}</span
+          ><span>Rol: {{ user.roleName }}</span
+          ><span>Estado: {{ user.status }}</span>
+        </section>
+      }
+    } @else {
+      <p class="profile-unavailable">Perfil no disponible</p>
+    }
+  </div>
+</aside>
+<div
+  class="backdrop"
+  [class.visible]="open()"
+  aria-hidden="true"
+  (click)="closeRequested.emit()"
+></div>

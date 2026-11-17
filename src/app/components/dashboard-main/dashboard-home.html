@@ -1,1 +1,140 @@
-<section class="dashboard"><p class="eyebrow">PANEL PRINCIPAL</p><h1>Bienvenido{{loginService.currentUser()?.fullName ? ', ' + loginService.currentUser()?.fullName : ' a LegalAI'}}</h1><p class="intro">Plataforma de gestión legal inteligente.</p><div class="cards">@for(card of cards;track card.path){<a class="card" [routerLink]="card.path"><strong>{{card.title}}</strong><span>Módulo pendiente de implementación</span><b>→</b></a>}</div><article class="status"><p class="eyebrow">ESTADO DEL PROYECTO</p><h2>Frontend inicial preparado</h2><p>Frontend inicial de LegalAI. Los módulos serán implementados progresivamente por el equipo.</p></article></section>
+<section class="dashboard" aria-labelledby="dashboard-title">
+  <header class="dashboard-heading">
+    <div>
+      <p class="eyebrow">TU ESPACIO DE TRABAJO</p>
+      <h1 id="dashboard-title">{{ greeting }}{{ firstName ? ', ' + firstName : '' }}.</h1>
+      <p class="intro">Tu despacho, de un vistazo. Esto es lo que necesita tu atención hoy.</p>
+    </div>
+    <div class="header-action">
+      <button class="new-case" type="button" disabled aria-describedby="new-case-note">
+        <span aria-hidden="true">+</span> Nuevo expediente</button
+      ><span id="new-case-note">Creación de expedientes próximamente</span>
+    </div>
+  </header>
+  <div class="metrics" aria-label="Resumen del espacio de trabajo">
+    <article class="metric">
+      <div class="metric-heading">
+        <h2>Expedientes activos</h2>
+        <app-workspace-icon name="cases" />
+      </div>
+      <strong class="metric-value">—</strong>
+      <p>Resumen de expedientes próximamente</p>
+      <a routerLink="/expedientes">Ver expedientes <span aria-hidden="true">↗</span></a>
+    </article>
+    <article class="metric">
+      <div class="metric-heading">
+        <h2>Clientes del despacho</h2>
+        <app-workspace-icon name="clients" />
+      </div>
+      <strong class="metric-value" [attr.aria-busy]="clientStatus === 'loading'">{{
+        clientCount ?? '—'
+      }}</strong>
+      @if (clientStatus === 'loading') {
+        <p role="status">Consultando tus clientes…</p>
+      } @else if (clientStatus === 'error') {
+        <p role="alert">No se pudo consultar el conteo.</p>
+        <button class="text-action" type="button" (click)="loadClients()">Reintentar</button>
+      } @else {
+        <p>En tu espacio de trabajo</p>
+        <a routerLink="/clientes">Ver clientes <span aria-hidden="true">↗</span></a>
+      }
+    </article>
+    <article class="metric">
+      <div class="metric-heading">
+        <h2>Tareas pendientes</h2>
+        <app-workspace-icon name="tasks" />
+      </div>
+      <strong class="metric-value">—</strong>
+      <p>Seguimiento de tareas próximamente</p>
+      <span class="pending-label">Próximamente</span>
+    </article>
+    <article class="metric">
+      <div class="metric-heading">
+        <h2>Propuestas IA por revisar</h2>
+        <app-workspace-icon name="ai" />
+      </div>
+      <strong class="metric-value">—</strong>
+      <p>El resumen aún no está disponible</p>
+      <span class="pending-label">Próximamente</span>
+    </article>
+  </div>
+  <div class="dashboard-grid">
+    <div class="main-column">
+      <section class="panel agenda" aria-labelledby="agenda-title">
+        <div class="panel-heading">
+          <h2 id="agenda-title">Tu agenda de hoy.</h2>
+          <span class="status-tag">Próximamente</span>
+        </div>
+        <div class="empty-state">
+          <span class="empty-icon"><app-workspace-icon name="calendar" /></span>
+          <div>
+            <h3>Tu agenda, en este espacio.</h3>
+            <p>Próximamente podrás consultar tus eventos y citas del día.</p>
+          </div>
+        </div>
+      </section>
+      <section class="panel" aria-labelledby="tasks-title">
+        <div class="panel-heading">
+          <h2 id="tasks-title">Tareas pendientes</h2>
+          <app-workspace-icon name="tasks" />
+        </div>
+        <div class="empty-state">
+          <span class="empty-icon"><app-workspace-icon name="tasks" /></span>
+          <div>
+            <h3>Un lugar para el siguiente paso.</h3>
+            <p>
+              Organiza tus próximos pasos. El seguimiento de tareas estará disponible próximamente.
+            </p>
+          </div>
+        </div>
+      </section>
+      <section class="panel" aria-labelledby="activity-title">
+        <div class="panel-heading">
+          <h2 id="activity-title">Actividad reciente</h2>
+          <app-workspace-icon name="audit" />
+        </div>
+        <div class="empty-state">
+          <span class="empty-icon"><app-workspace-icon name="clock" /></span>
+          <div>
+            <h3>El contexto de lo que cambia.</h3>
+            <p>
+              Aquí podrás seguir los cambios de tu espacio de trabajo. Esta vista estará disponible
+              próximamente.
+            </p>
+            @if (loginService.currentUser()?.roleName === 'ADMIN') {
+              <a class="text-action" routerLink="/auditoria"
+                >Ir al módulo de auditoría <span aria-hidden="true">↗</span></a
+              >
+            }
+          </div>
+        </div>
+      </section>
+    </div>
+    <div class="side-column">
+      <section class="panel" aria-labelledby="case-status-title">
+        <div class="panel-heading"><h2 id="case-status-title">Expedientes por estado</h2></div>
+        <p class="panel-description">El resumen por estado estará disponible próximamente.</p>
+        <dl class="case-states">
+          @for (state of caseStates; track state) {
+            <div>
+              <dt>{{ state }}</dt>
+              <dd aria-label="Dato no disponible">—</dd>
+            </div>
+          }
+        </dl>
+        <p class="data-note">Aún no disponible</p>
+      </section>
+      <section class="ai-card" aria-labelledby="ai-card-title">
+        <span class="ai-icon"><app-workspace-icon name="ai" /></span>
+        <p class="eyebrow">ASISTENCIA INTELIGENTE</p>
+        <h2 id="ai-card-title">Una segunda lectura,<br />a tu disposición.</h2>
+        <p>
+          Reúne el contexto, contrasta las fuentes y prepara tus próximos pasos. La IA propone; tu
+          criterio profesional decide.
+        </p>
+        <a routerLink="/chat-ia">Explorar la asistencia IA <span aria-hidden="true">→</span></a
+        ><small>Las herramientas se incorporan de forma progresiva.</small>
+      </section>
+    </div>
+  </div>
+</section>

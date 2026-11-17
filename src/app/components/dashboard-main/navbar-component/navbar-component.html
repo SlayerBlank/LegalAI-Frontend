@@ -1,28 +1,47 @@
 <header>
-  <button class="menu" type="button" aria-label="Abrir menú" (click)="menuRequested.emit()">☰</button>
-  <h1>Panel de LegalAI</h1>
-  <div class="actions">
-    <button type="button" aria-label="Cambiar tema" (click)="theme.toggle()">{{ theme.theme() === 'light' ? '☾' : '☀' }}</button>
-    <div class="user-menu">
-      <button class="user-trigger" type="button" aria-haspopup="menu" [attr.aria-expanded]="userMenuOpen" (click)="toggleUserMenu()" (keydown)="onUserMenuKeydown($event)">
-        <span class="avatar" aria-hidden="true">{{ userInitials() }}</span>
-        <span class="user-name">{{ loginService.currentUser()?.fullName ?? 'Usuario' }}</span>
-        <span aria-hidden="true">⌄</span>
-      </button>
-      @if (userMenuOpen) {
-        <div class="user-dropdown" role="menu">
-          <button type="button" role="menuitem" (click)="toggleProfile()">{{ profileOpen ? 'Ocultar mi perfil' : 'Ver mi perfil' }}</button>
-          @if (profileOpen) {
-            <section class="profile" aria-label="Perfil del usuario">
-              <strong>{{ loginService.currentUser()?.fullName ?? 'Usuario' }}</strong>
-              <span>{{ loginService.currentUser()?.email ?? '—' }}</span>
-              <span>Rol: {{ loginService.currentUser()?.roleName ?? '—' }}</span>
-              <span>Estado: {{ loginService.currentUser()?.status ?? '—' }}</span>
-            </section>
-          }
-          <button type="button" role="menuitem" (click)="logout()">Cerrar sesión</button>
-        </div>
+  <div class="route-area">
+    <button
+      class="menu-trigger"
+      type="button"
+      [attr.aria-label]="menuOpen() ? 'Cerrar navegación' : 'Abrir navegación'"
+      [attr.aria-expanded]="menuOpen()"
+      aria-controls="workspace-sidebar"
+      (click)="menuRequested.emit()"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+    </button>
+    <p class="route-context">
+      <span class="current-path">{{ currentPath() }}</span
+      ><span class="divider" aria-hidden="true">/</span><span>{{ selectedTheme }}</span
+      ><span class="divider" aria-hidden="true">·</span
+      ><span class="session-state">{{
+        loginService.state() === 'authenticated' ? 'Sesión activa' : 'Comprobando sesión'
+      }}</span>
+    </p>
+  </div>
+  <div class="navbar-actions">
+    <div class="theme-switch" role="group" aria-label="Apariencia">
+      @for (option of options; track option.value) {
+        <button
+          type="button"
+          [attr.aria-pressed]="theme.preference() === option.value"
+          [attr.data-theme-option]="option.value"
+          (click)="theme.setPreference(option.value)"
+        >
+          {{ option.label }}
+        </button>
       }
     </div>
+    <button
+      class="notifications"
+      type="button"
+      disabled
+      aria-label="Notificaciones: funcionalidad pendiente"
+      title="Notificaciones pendientes de integración"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" />
+      </svg></button
+    ><time [attr.datetime]="now().toISOString()">{{ today }}</time>
   </div>
 </header>
