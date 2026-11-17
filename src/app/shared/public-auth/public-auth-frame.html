@@ -1,0 +1,42 @@
+<a class="skip-link" href="#auth-form-content">Saltar al formulario</a
+><app-public-header [pathLabel]="pathLabel()" />
+<main class="auth-layout">
+  <aside class="institution" aria-labelledby="institution-title">
+    <p class="eyebrow">LEGALAI / UN ESPACIO PARA TU PRÁCTICA</p>
+    <h2 id="institution-title">Cada asunto merece<br />una mirada clara.</h2>
+    <p class="institution-copy">
+      Reúne el contexto. Organiza el trabajo.<br />Decide con tu criterio profesional.
+    </p>
+    <article class="example-card" aria-label="Ejemplo ilustrativo de expediente">
+      <div class="example-meta"><span>EXP-2026-042</span><span>EN CURSO</span></div>
+      <h3>Lo importante, conectado.</h3>
+      <dl>
+        <div>
+          <dt>Cliente</dt>
+          <dd>Lucía Martínez</dd>
+        </div>
+        <div>
+          <dt>Responsable</dt>
+          <dd>María Vega</dd>
+        </div>
+        <div>
+          <dt>Documentación</dt>
+          <dd>8 archivos vinculados</dd>
+        </div>
+      </dl>
+      <p class="example-note">
+        ◇ Asistencia IA disponible · Revisión profesional siempre necesaria.
+      </p>
+    </article>
+    <p class="institution-bottom">Clientes · Expedientes · Documentos · Asistencia IA</p>
+  </aside>
+  <section id="auth-form-content" class="form-panel" aria-label="Acceso a LegalAI">
+    <div class="form-inner"><ng-content /></div>
+  </section>
+</main>
+<footer class="auth-footer">
+  <span
+    >© 2026 LegalAI · <span title="Pendiente de publicación">Privacidad</span> ·
+    <span title="Pendiente de publicación">Condiciones</span></span
+  ><span>Tu tema se conserva. Sin elección, se usa el del sistema.</span>
+</footer>

@@ -17,6 +17,7 @@ import { RolComponent } from './components/rol-component/rol-component';
 import { AuditoriaComponent } from './components/auditoria-component/auditoria-component';
 import { NotFoundComponent } from './components/errors/not-found/not-found';
 import { authGuard } from './services/auth.guard';
+import { adminGuard } from './services/admin.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'landing', pathMatch: 'full' },
@@ -31,8 +32,8 @@ export const routes: Routes = [
       { path: 'borradores', component: BorradorComponent },
       { path: 'resumenes', component: ResumenComponent },
       { path: 'citaciones-ia', component: CitacionesIaComponent },
-      { path: 'gestionusuarios', component: GestionUsuariosComponent },
-      { path: 'roles', component: RolComponent },
+      { path: 'gestionusuarios', component: GestionUsuariosComponent, canActivate: [adminGuard] },
+      { path: 'roles', component: RolComponent, canActivate: [adminGuard] },
       { path: 'auditoria', component: AuditoriaComponent },
     ],
   },

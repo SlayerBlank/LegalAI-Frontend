@@ -1,1 +1,348 @@
-<nav><a routerLink="/landing" class="brand"><span>L</span>Legal<span>AI</span></a><div><a href="#features">Características</a><a routerLink="/usuarios/login">Iniciar sesión</a><a routerLink="/usuarios/registrar" class="cta">Registrarse</a><button (click)="theme.toggle()">{{theme.theme()==='light'?'☾':'☀'}}</button></div></nav><main><section class="hero"><p class="eyebrow">PLATAFORMA LEGAL</p><h1>LegalAI — Gestión legal inteligente</h1><p>Organiza tus expedientes, gestiona documentos y accede a herramientas de inteligencia artificial desde una sola plataforma.</p><a routerLink="/usuarios/registrar" class="primary">Comenzar →</a><a routerLink="/usuarios/login" class="secondary">Iniciar sesión</a></section><section id="features" class="features"><p class="eyebrow">CARACTERÍSTICAS</p><h2>Una base para trabajar mejor</h2><div class="grid"><article><b>◆</b><h3>Gestión de expedientes</h3><p>Organiza tus asuntos legales.</p></article><article><b>◆</b><h3>Gestión documental</h3><p>Centraliza tus documentos.</p></article><article><b>◆</b><h3>Asistente legal con IA</h3><p>Prepara herramientas inteligentes.</p></article><article><b>◆</b><h3>Organización de clientes</h3><p>Mantén la información ordenada.</p></article></div></section></main><footer><strong>LegalAI</strong><span>Gestión legal inteligente.</span><span>{{year}}</span></footer>
+﻿<a class="skip-link" href="#contenido">Saltar al contenido</a>
+<svg class="icon-definitions" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <symbol id="landing-clients" viewBox="0 0 24 24">
+      <path
+        d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m20 0v-2a4 4 0 0 0-3-3.87M15 3.13a4 4 0 0 1 0 7.75"
+      />
+      <circle cx="9" cy="7" r="4" />
+    </symbol>
+    <symbol id="landing-case" viewBox="0 0 24 24">
+      <rect x="3" y="7" width="18" height="14" rx="2" />
+      <path d="M8 7V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v3M3 12a24 24 0 0 0 18 0M10 13h4" />
+    </symbol>
+    <symbol id="landing-documents" viewBox="0 0 24 24">
+      <path
+        d="M14 2H8a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Zm0 0v6h6M3 6v14a2 2 0 0 0 2 2h10"
+      />
+    </symbol>
+    <symbol id="landing-sparkle" viewBox="0 0 24 24">
+      <path d="m12 3 2.7 6.3L21 12l-6.3 2.7L12 21l-2.7-6.3L3 12l6.3-2.7Z" />
+    </symbol>
+  </defs>
+</svg>
+<header class="public-header">
+  <div class="nav-shell">
+    <a class="brand" routerLink="/landing" aria-label="LegalAI, inicio"
+      ><span class="brand-mark" aria-hidden="true">a</span>LegalAI</a
+    >
+    <nav class="section-nav" aria-label="Navegación principal">
+      <a href="#plataforma">Plataforma</a
+      ><a href="#inteligencia-artificial">Inteligencia artificial</a
+      ><a href="#confianza">Confianza</a>
+    </nav>
+    <div class="header-actions">
+      <div class="theme-switch" role="group" aria-label="Apariencia">
+        @for (option of themes; track option.value) {
+          <button
+            type="button"
+            [attr.data-theme-option]="option.value"
+            [attr.aria-pressed]="theme.preference() === option.value"
+            (click)="theme.setPreference(option.value)"
+          >
+            {{ option.label }}
+          </button>
+        }
+      </div>
+      <a class="login-link" routerLink="/usuarios/login">Iniciar sesión</a
+      ><a class="button primary header-signup" routerLink="/usuarios/registrar"
+        >Crear cuenta <span aria-hidden="true">→</span></a
+      >
+    </div>
+    <button
+      class="menu-toggle"
+      type="button"
+      [attr.aria-expanded]="menuOpen"
+      aria-controls="mobile-navigation"
+      (click)="menuOpen = !menuOpen"
+    >
+      {{ menuOpen ? 'Cerrar' : 'Menú' }} <span aria-hidden="true">{{ menuOpen ? '×' : '☰' }}</span>
+    </button>
+  </div>
+  @if (menuOpen) {
+    <nav id="mobile-navigation" class="mobile-navigation" aria-label="Navegación móvil">
+      <a href="#plataforma" (click)="closeMenu()">Plataforma</a
+      ><a href="#inteligencia-artificial" (click)="closeMenu()">Inteligencia artificial</a
+      ><a href="#confianza" (click)="closeMenu()">Confianza</a
+      ><a routerLink="/usuarios/login" (click)="closeMenu()">Iniciar sesión</a
+      ><a routerLink="/usuarios/registrar" (click)="closeMenu()">Crear cuenta →</a>
+    </nav>
+  }
+</header>
+<main id="contenido">
+  <div class="page-context container">
+    <span
+      >/landing · {{ theme.theme() === 'dark' ? 'Oscuro' : 'Claro' }}
+      <span class="context-divider">/</span> Acceso público</span
+    ><span>Tu tema se guarda · Sin elección, se usa el del sistema</span>
+  </div>
+  <section class="hero container" aria-labelledby="hero-title">
+    <span class="eyebrow hero-tag">GESTIÓN JURÍDICA · ASISTENCIA IA</span>
+    <h1 id="hero-title">Más claridad para ejercer.<br />Más tiempo para lo esencial.</h1>
+    <p class="hero-description">
+      Clientes, expedientes y documentos en un mismo lugar.<br />Una inteligencia artificial que te
+      asiste, sin sustituir tu criterio.
+    </p>
+    <div class="button-row">
+      <a class="button primary" routerLink="/usuarios/registrar">Crear mi cuenta</a
+      ><a class="button secondary" href="#plataforma"
+        >Conocer la plataforma <span aria-hidden="true">↓</span></a
+      >
+    </div>
+    <p class="hero-note">Tu cuenta abre la puerta a tu espacio de trabajo.</p>
+  </section>
+  <section
+    class="product-preview container"
+    aria-label="Vista de ejemplo de un expediente, sin datos reales"
+  >
+    <div class="product-window">
+      <aside class="preview-sidebar" aria-label="Menú ilustrativo del producto">
+        <span class="brand preview-brand"
+          ><span class="brand-mark" aria-hidden="true">a</span>LegalAI</span
+        >
+        <ul>
+          <li>Resumen</li>
+          <li>Clientes</li>
+          <li class="preview-current">Expedientes</li>
+          <li>Documentos</li>
+          <li>◇ Chat IA</li>
+        </ul>
+      </aside>
+      <div class="preview-content">
+        <div class="preview-topline">
+          <span class="eyebrow">EXPEDIENTES / EXP-2026-042</span><span class="pill">En curso</span>
+        </div>
+        <h2>Un expediente. Toda la perspectiva.</h2>
+        <p class="preview-subtitle">Martínez · Reclamación contractual</p>
+        <div class="preview-columns">
+          <ul class="document-list">
+            <li><span aria-hidden="true">↗</span> Contrato de servicios.pdf</li>
+            <li><span aria-hidden="true">↗</span> Demanda inicial.docx</li>
+            <li><span aria-hidden="true">↗</span> Anexo de comunicaciones.pdf</li>
+          </ul>
+          <aside class="insight">
+            <h3>
+              <svg class="icon" aria-hidden="true"><use href="#landing-sparkle" /></svg>Lo
+              relevante, a la vista
+            </h3>
+            <p>El contrato establece un plazo de 30 días para subsanar el incumplimiento.</p>
+            <small>Fuente: Contrato, p. 4 · Revisar propuesta.</small>
+          </aside>
+        </div>
+      </div>
+    </div>
+    <ol class="preview-caption">
+      <li><span>01</span> Un contexto compartido</li>
+      <li><span>02</span> Documentación conectada</li>
+      <li><span>03</span> Decisiones bajo tu control</li>
+    </ol>
+  </section>
+  <section id="plataforma" class="platform section-surface" aria-labelledby="platform-title">
+    <div class="container platform-intro">
+      <div>
+        <p class="eyebrow">01 / EL DESPACHO, EN ORDEN</p>
+        <h2 id="platform-title">Menos piezas sueltas.<br />Más visión de conjunto.</h2>
+      </div>
+      <div class="platform-description">
+        <p>
+          Cada asunto tiene su historia. LegalAI conecta las personas, los documentos y las tareas
+          que necesitas para entenderla.
+        </p>
+        <p>De la primera consulta al cierre del expediente, sin perder el hilo.</p>
+      </div>
+    </div>
+    <div class="platform-features">
+      <div class="container">
+        <div class="section-heading">
+          <h2>Una base sólida para cada asunto.</h2>
+          <span class="eyebrow">GESTIÓN CENTRALIZADA</span>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card">
+            <svg class="icon" aria-hidden="true"><use href="#landing-clients" /></svg>
+            <h3>Clientes con contexto</h3>
+            <p>
+              Datos de contacto, asuntos vinculados y una historia de relación siempre accesible.
+            </p>
+            <a href="#proceso">Directorio y búsqueda <span aria-hidden="true">↗</span></a>
+          </article>
+          <article class="feature-card">
+            <svg class="icon" aria-hidden="true"><use href="#landing-case" /></svg>
+            <h3>Expedientes en movimiento</h3>
+            <p>Estados, responsables y próximos pasos para saber qué necesita tu atención.</p>
+            <a href="#proceso">Seguimiento del asunto <span aria-hidden="true">↗</span></a>
+          </article>
+          <article class="feature-card">
+            <svg class="icon" aria-hidden="true"><use href="#landing-documents" /></svg>
+            <h3>Documentos localizables</h3>
+            <p>Una biblioteca con versiones, metadatos y vínculos al expediente correspondiente.</p>
+            <a href="#proceso">Biblioteca compartida <span aria-hidden="true">↗</span></a>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section
+    id="inteligencia-artificial"
+    class="ai-section section-accent"
+    aria-labelledby="ai-title"
+  >
+    <div class="container ai-grid">
+      <div class="ai-intro">
+        <p class="eyebrow">02 / INTELIGENCIA QUE ACOMPAÑA</p>
+        <h2 id="ai-title">
+          Un punto de partida.<br />Nunca la última<br class="desktop-break" />
+          palabra.
+        </h2>
+        <p>
+          Consulta tus documentos, prepara borradores, extrae síntesis y organiza citaciones. Recibe
+          propuestas que puedes contrastar, editar y hacer tuyas.
+        </p>
+        <a class="button primary" href="#proceso"
+          >Explorar la asistencia IA <span aria-hidden="true">→</span></a
+        >
+      </div>
+      <article class="ai-example" aria-label="Ejemplo ilustrativo de resumen IA">
+        <div class="pills">
+          <span class="pill">◇ Resumen IA</span><span class="pill">Pendiente de revisión</span>
+        </div>
+        <h3>Contrato de servicios</h3>
+        <p class="example-meta">Síntesis · EXP-2026-042 · 12 páginas</p>
+        <ul>
+          <li>Objeto: prestación de servicios de consultoría.</li>
+          <li>Plazo: 12 meses desde la firma.</li>
+          <li>Revisar: condiciones de resolución anticipada.</li>
+        </ul>
+        <p class="example-disclaimer">
+          Verifica cada conclusión en el documento original. La propuesta no constituye
+          asesoramiento jurídico.
+        </p>
+      </article>
+    </div>
+  </section>
+  <section id="proceso" class="workflow container" aria-labelledby="workflow-title">
+    <p class="eyebrow">03 / DE LA INFORMACIÓN A LA ACCIÓN</p>
+    <h2 id="workflow-title">Tu forma de trabajar. Mejor conectada.</h2>
+    <ol class="workflow-grid">
+      <li>
+        <span class="step-number">01</span>
+        <h3>Reúne el contexto</h3>
+        <p>Vincula al cliente, abre el expediente y organiza sus documentos.</p>
+      </li>
+      <li>
+        <span class="step-number">02</span>
+        <h3>Construye una propuesta</h3>
+        <p>Consulta la documentación y prepara un primer borrador con apoyo de IA.</p>
+      </li>
+      <li>
+        <span class="step-number">03</span>
+        <h3>Revisa y avanza</h3>
+        <p>Contrasta las fuentes, incorpora tu criterio y da el siguiente paso.</p>
+      </li>
+    </ol>
+  </section>
+  <section id="confianza" class="trust section-surface" aria-labelledby="trust-title">
+    <div class="container trust-grid">
+      <img
+        class="office-image"
+        src="/images/legalai-office.png"
+        alt="Sala de reuniones con biblioteca jurídica, mesa de madera y luz natural"
+        width="960"
+        height="720"
+        loading="lazy"
+        decoding="async"
+      />
+      <div>
+        <p class="eyebrow">04 / CONFIANZA POR DISEÑO</p>
+        <h2 id="trust-title">La información importa.<br />Quién accede, también.</h2>
+        <dl class="trust-points">
+          <div>
+            <dt>Acceso con sesión</dt>
+            <dd>Un espacio privado para el trabajo de tu equipo.</dd>
+          </div>
+          <div>
+            <dt>Roles y permisos</dt>
+            <dd>Distingue responsabilidades y gestiona el acceso de los usuarios.</dd>
+          </div>
+          <div>
+            <dt>Trazabilidad</dt>
+            <dd>Consulta el registro de acciones para seguir la actividad del despacho.</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </section>
+  <section class="faq container" aria-labelledby="faq-title">
+    <div>
+      <p class="eyebrow">05 / ANTES DE EMPEZAR</p>
+      <h2 id="faq-title">Respuestas claras.<br />Desde el principio.</h2>
+      <p>Lo esencial sobre tu cuenta y la asistencia jurídica con IA.</p>
+    </div>
+    <div class="faq-list">
+      <article>
+        <h3>¿La IA sustituye la revisión profesional?</h3>
+        <p>
+          No. Sus resultados son propuestas. Debes revisar el contenido y contrastar las fuentes
+          antes de utilizarlo.
+        </p>
+      </article>
+      <article>
+        <h3>¿Qué ocurre al crear mi cuenta?</h3>
+        <p>
+          Accedes al Dashboard. Los permisos de los usuarios se gestionan desde la administración,
+          no en el registro.
+        </p>
+      </article>
+      <article>
+        <h3>¿Puedo cambiar la apariencia?</h3>
+        <p>
+          Sí. Elige Claro, Oscuro o Sistema. Tu preferencia se conserva; sin una elección, se aplica
+          la del sistema.
+        </p>
+      </article>
+      <article>
+        <h3>¿Clientes y usuarios son lo mismo?</h3>
+        <p>
+          No. Los clientes son personas o entidades del despacho. Los usuarios son quienes acceden a
+          la plataforma.
+        </p>
+      </article>
+    </div>
+  </section>
+  <section class="closing-cta section-accent" aria-labelledby="cta-title">
+    <div class="container">
+      <h2 id="cta-title">El siguiente paso de tu despacho,<br />con una perspectiva más clara.</h2>
+      <p>Empieza por lo esencial: un espacio para todo tu trabajo jurídico.</p>
+      <div class="button-row">
+        <a class="button primary" routerLink="/usuarios/registrar"
+          >Crear cuenta <span aria-hidden="true">→</span></a
+        ><a class="button secondary" routerLink="/usuarios/login">Ya tengo cuenta</a>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="public-footer section-surface">
+  <div class="container">
+    <div class="footer-top">
+      <a class="brand" routerLink="/landing" aria-label="LegalAI, inicio"
+        ><span class="brand-mark" aria-hidden="true">a</span>LegalAI</a
+      >
+      <nav aria-label="Navegación del pie">
+        <a href="#plataforma">Plataforma</a
+        ><a href="#inteligencia-artificial">Inteligencia artificial</a
+        ><a href="#confianza">Confianza</a><a routerLink="/usuarios/login">Iniciar sesión</a>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 LegalAI · Gestión jurídica con criterio.</p>
+      <ul aria-label="Información pendiente">
+        <li>Privacidad <span class="sr-only">(pendiente)</span></li>
+        <li>Condiciones <span class="sr-only">(pendiente)</span></li>
+        <li>Contacto <span class="sr-only">(pendiente)</span></li>
+      </ul>
+    </div>
+    <p class="footer-pending">
+      Información de privacidad, condiciones y contacto pendiente de publicación.
+    </p>
+  </div>
+</footer>

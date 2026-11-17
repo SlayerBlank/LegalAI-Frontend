@@ -1,1 +1,61 @@
-<main class="not-found"><strong>404</strong><h1>Página no encontrada</h1><p>La ruta solicitada no existe.</p><a routerLink="/">Volver al inicio</a></main>
+<a class="skip-link" href="#not-found-content">Saltar al contenido</a
+><app-public-header pathLabel="/** · 404" [notFound]="true" [workspace]="hasSession" />
+<main id="not-found-content" class="not-found-main">
+  <div class="error-copy">
+    <p class="eyebrow">FUERA DE RUTA, NO SIN SALIDA</p>
+    <h1>Este asunto no está<br />en esta dirección.</h1>
+    <p class="description">
+      No encontramos la página que buscas. Puede que la dirección haya cambiado o que el enlace ya
+      no esté disponible.
+    </p>
+    <div class="error-actions">
+      <a class="button primary" routerLink="/landing"
+        >Volver al inicio <span aria-hidden="true">→</span></a
+      ><a class="button secondary" [routerLink]="hasSession ? '/dashboard' : '/usuarios/login'">{{
+        hasSession ? 'Ir al Dashboard' : 'Iniciar sesión'
+      }}</a>
+    </div>
+    <p class="destination-note">
+      El inicio te lleva a la Landing Page. Para volver a tu espacio de trabajo,
+      {{ hasSession ? 'accede al Dashboard.' : 'inicia sesión.' }}
+    </p>
+  </div>
+  <aside class="reference-card" aria-label="Error 404, referencia no localizada">
+    <span class="error-number" aria-hidden="true">404</span>
+    <div class="reference-info">
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M15 26H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h8l3 4h11a2 2 0 0 1 2 2v5" />
+        <circle cx="23" cy="23" r="4" />
+        <path d="m26 26 4 4" />
+      </svg>
+      <div>
+        <h2>Referencia no localizada</h2>
+        <p>Revisa la dirección e inténtalo de nuevo.</p>
+      </div>
+    </div>
+  </aside>
+</main>
+<section class="recovery-links" aria-label="Otros destinos públicos">
+  <div class="recovery-inner">
+    <a routerLink="/landing"
+      ><h2>Inicio <span aria-hidden="true">↗</span></h2>
+      <p>Conoce la plataforma</p>
+      <span>/landing</span></a
+    ><a routerLink="/usuarios/login"
+      ><h2>Acceso <span aria-hidden="true">↗</span></h2>
+      <p>Vuelve a tu cuenta</p>
+      <span>/usuarios/login</span></a
+    ><a routerLink="/usuarios/registrar"
+      ><h2>Registro <span aria-hidden="true">↗</span></h2>
+      <p>Crea tu espacio</p>
+      <span>/usuarios/registrar</span></a
+    >
+  </div>
+</section>
+<footer class="error-footer">
+  <p>© 2026 LegalAI · Gestión jurídica con criterio.</p>
+  <div class="footer-settings">
+    <app-public-theme-switcher />
+    <p title="Información pendiente de publicación">Privacidad · Condiciones · Contacto</p>
+  </div>
+</footer>

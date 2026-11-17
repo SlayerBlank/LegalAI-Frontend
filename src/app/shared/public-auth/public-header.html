@@ -1,0 +1,19 @@
+<header class="public-header">
+  <a class="brand" routerLink="/landing" aria-label="LegalAI, inicio"
+    ><span class="brand-mark" aria-hidden="true">a</span>LegalAI</a
+  >
+  <p class="route-context">
+    {{ pathLabel() }} · {{ theme.theme() === 'dark' ? 'Oscuro' : 'Claro' }} · Acceso público
+  </p>
+  <div class="header-actions">
+    @if (notFound()) {
+      <a class="access-button" [routerLink]="workspace() ? '/dashboard' : '/usuarios/login'">{{
+        workspace() ? 'Ir al Dashboard' : 'Iniciar sesión'
+      }}</a>
+    } @else {
+      <a class="home-link" routerLink="/landing"
+        ><span aria-hidden="true">←</span> Volver al inicio</a
+      ><app-public-theme-switcher />
+    }
+  </div>
+</header>

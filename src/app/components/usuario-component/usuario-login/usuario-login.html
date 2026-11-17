@@ -1,1 +1,117 @@
-<main class="auth-page"><div class="card"><button class="back-button" type="button" title="Volver" aria-label="Volver" (click)="goBack()">←</button><div class="head"><a routerLink="/landing" class="brand">Legal<span>AI</span></a><button type="button" aria-label="Cambiar tema" (click)="theme.toggle()">{{theme.theme()==='light'?'☾':'☀'}}</button></div><h1>Iniciar sesión</h1><p>Accede a tu espacio de gestión legal.</p><form [formGroup]="form" (ngSubmit)="submit()"><label>Correo<input type="email" formControlName="email" placeholder="nombre@ejemplo.com">@if(form.controls.email.touched&&form.controls.email.invalid){<small>Introduce un correo válido.</small>}</label><label>Contraseña<div class="password"><input [type]="showPassword?'text':'password'" formControlName="password"><button type="button" (click)="showPassword=!showPassword">{{showPassword?'Ocultar':'Mostrar'}}</button></div>@if(form.controls.password.touched&&form.controls.password.invalid){<small>La contraseña es obligatoria.</small>}</label><button class="submit" type="submit" [disabled]="loading">{{loading?'Iniciando sesión…':'Iniciar sesión'}}</button></form>@if(message){<div class="message" role="alert">{{message}}</div>}<p class="switch">¿No tienes cuenta? <a routerLink="/usuarios/registrar">Regístrate</a></p></div></main>
+<app-public-auth-frame pathLabel="/usuarios/login"
+  ><div class="form-heading">
+    <button
+      class="history-back"
+      type="button"
+      aria-label="Volver a la página anterior"
+      (click)="goBack()"
+    >
+      ← Volver
+    </button>
+    <p class="form-eyebrow">BIENVENIDA DE NUEVO</p>
+    <h1 class="form-title">Vuelve a tu despacho.</h1>
+    <p class="form-intro">Inicia sesión para continuar con tus asuntos.</p>
+  </div>
+  <form
+    [formGroup]="form"
+    (ngSubmit)="submit()"
+    [attr.aria-busy]="loading"
+    aria-label="Iniciar sesión"
+    novalidate
+  >
+    <fieldset [disabled]="loading">
+      <div class="field">
+        <label for="login-email">Email</label
+        ><input
+          id="login-email"
+          type="email"
+          formControlName="email"
+          autocomplete="username"
+          spellcheck="false"
+          autocapitalize="none"
+          required
+          [attr.aria-invalid]="form.controls.email.touched && form.controls.email.invalid"
+          aria-describedby="login-email-note"
+        />
+        @if (form.controls.email.touched && form.controls.email.invalid) {
+          <p id="login-email-note" class="field-error">Introduce un correo válido.</p>
+        } @else if (form.controls.email.valid) {
+          <p id="login-email-note" class="field-note">✓ Formato de email válido</p>
+        }
+      </div>
+      <div class="field">
+        <label for="login-password">Contraseña</label>
+        <div class="password-field">
+          <input
+            id="login-password"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            autocomplete="current-password"
+            required
+            [attr.aria-invalid]="form.controls.password.touched && form.controls.password.invalid"
+            aria-describedby="login-password-note"
+          /><button
+            class="password-toggle"
+            type="button"
+            [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+            [attr.aria-pressed]="showPassword"
+            aria-controls="login-password"
+            (click)="showPassword = !showPassword"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+              <circle cx="12" cy="12" r="3" />
+              @if (showPassword) {
+                <path d="M3 3 21 21" />
+              }
+            </svg>
+          </button>
+        </div>
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <p id="login-password-note" class="field-error">La contraseña es obligatoria.</p>
+        } @else {
+          <p id="login-password-note" class="field-note">
+            {{ passwordBytes }} bytes UTF-8 introducidos.
+          </p>
+        }
+      </div>
+      <p class="password-guidance">
+        La contraseña se comprueba al iniciar sesión. No compartas tus credenciales.
+      </p>
+      <div
+        class="status-panel"
+        [class.has-error]="!!message"
+        [attr.role]="message ? 'alert' : 'status'"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        @if (loading) {
+          <strong>Iniciando sesión…</strong>
+          <p>Estamos validando tus credenciales.</p>
+        } @else if (message) {
+          <strong>No se pudo iniciar sesión</strong>
+          <p>{{ message }}</p>
+        } @else if (form.valid) {
+          <strong>✓ Formulario listo</strong>
+          <p>Cuando se validen tus credenciales, accederás a tu espacio de trabajo.</p>
+        } @else {
+          <strong>Formulario incompleto</strong>
+          <p>Introduce tu email y contraseña para continuar.</p>
+        }
+      </div>
+      <button class="submit" type="submit" [disabled]="loading">
+        {{ loading ? 'Iniciando sesión…' : 'Iniciar sesión →' }}
+      </button>
+    </fieldset>
+  </form>
+  <p class="switch">
+    ¿Es tu primera vez en LegalAI? <a routerLink="/usuarios/registrar">Crea una cuenta</a>
+  </p>
+  <section class="security" aria-labelledby="security-title">
+    <h2 id="security-title">Un espacio privado, una sesión personal.</h2>
+    <p>
+      Clientes, expedientes y documentos requieren autenticación. Cierra la sesión si utilizas un
+      equipo compartido.
+    </p>
+  </section></app-public-auth-frame
+>

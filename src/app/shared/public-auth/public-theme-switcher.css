@@ -1,0 +1,34 @@
+.theme-options {
+  display: flex;
+  padding: 3px;
+  border: 1px solid var(--pub-line);
+  border-radius: 5px;
+  background: var(--pub-bg);
+}
+button {
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--pub-muted);
+  font: inherit;
+  font-size: 11px;
+  min-height: 27px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+button[aria-pressed='true'] {
+  color: var(--pub-blue);
+  background: var(--pub-surface);
+  box-shadow: 0 1px 3px #10233e0c;
+  font-weight: 600;
+}
+button:focus-visible {
+  outline: 2px solid var(--pub-blue);
+  outline-offset: 2px;
+}
+@media (max-width: 640px) {
+  button {
+    min-height: 36px;
+    padding: 7px 12px;
+  }
+}

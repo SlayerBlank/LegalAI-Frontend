@@ -1,1 +1,249 @@
-<section class="module-page"><p class="eyebrow">MÓDULO</p><h1>Clientes</h1><p>Gestión y seguimiento de clientes.</p><div class="notice">Este módulo está pendiente de implementación.</div></section>
+<header>
+  <div>
+    <h1>Clientes</h1>
+    <p>Organiza la información de tus clientes y sus expedientes.</p>
+  </div>
+  <button class="primary" [disabled]="loading || busy" (click)="openForm()">+ Nuevo cliente</button>
+</header>
+@if (notice) {
+  <div class="notice" role="status">{{ notice }}</div>
+}
+@if (loading) {
+  <div class="notice" role="status" aria-live="polite">Cargando datos...</div>
+}
+@if (busy) {
+  <div class="notice" role="status" aria-live="polite">Procesando solicitud...</div>
+}
+@if (error) {
+  <div class="notice error" role="alert">
+    {{ error }}
+    <button type="button" (click)="load()" [disabled]="loading || busy">Volver a cargar</button>
+  </div>
+}
+@if (loaded && !loading) {
+  <section class="stats" aria-label="Estadísticas de clientes">
+    <article class="stat">
+      <span>♙ Total de clientes</span><strong>{{ clients.length }}</strong>
+    </article>
+    <article class="stat">
+      <span>Personas naturales</span><strong>{{ naturalCount }}</strong>
+    </article>
+    <article class="stat">
+      <span>Personas jurídicas</span><strong>{{ clients.length - naturalCount }}</strong>
+    </article>
+  </section>
+  <section class="panel">
+    <div class="toolbar">
+      <input
+        class="search"
+        aria-label="Buscar clientes"
+        placeholder="Buscar por nombre, documento o correo…"
+        [(ngModel)]="query"
+        (ngModelChange)="resetPage()"
+      /><select aria-label="Tipo de cliente" [(ngModel)]="filter" (ngModelChange)="resetPage()">
+        <option value="">Todos los tipos</option>
+        <option value="PERSON">Persona natural</option>
+        <option value="COMPANY">Persona jurídica</option>
+      </select>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Documento</th>
+            <th>Tipo</th>
+            <th>Teléfono</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (client of paginate(filtered); track client.clientId) {
+            <tr>
+              <td class="name">
+                {{ client.fullNameOrCompany }}<small>{{ client.email }}</small>
+              </td>
+              <td>{{ client.documentNumber }}</td>
+              <td>
+                <span class="badge">{{
+                  client.clientType === 'PERSON' ? 'Persona natural' : 'Persona jurídica'
+                }}</span>
+              </td>
+              <td>{{ client.phone }}</td>
+              <td>
+                <div class="row-actions">
+                  <button (click)="showDetail(client)">Ver detalle</button
+                  ><button (click)="openForm(client)">Editar</button
+                  ><button class="danger" (click)="confirmRemove(client)">Eliminar</button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="empty">
+                No se encontraron clientes. Prueba con otra búsqueda.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <footer class="pager">
+      <span>{{ filtered.length }} resultados · Página {{ page }} de {{ pages(filtered) }}</span>
+      <div class="row-actions">
+        <button (click)="page = page - 1" [disabled]="page === 1">← Anterior</button
+        ><button (click)="page = page + 1" [disabled]="page >= pages(filtered)">Siguiente →</button>
+      </div>
+    </footer>
+  </section>
+}
+@if (editing; as client) {
+  <div class="overlay" (click)="close()">
+    <section
+      class="dialog"
+      managementDialog
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="client-form-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="dialog-head">
+        <h2 id="client-form-title">{{ client.clientId ? 'Editar cliente' : 'Nuevo cliente' }}</h2>
+        <button type="button" aria-label="Cerrar diálogo" (click)="close()">×</button>
+      </div>
+      <form #form="ngForm" (ngSubmit)="form.valid && save()">
+        <fieldset [disabled]="busy">
+          <div class="form-grid">
+            <label class="wide"
+              >Tipo de cliente *<select name="clientType" [(ngModel)]="client.clientType" required>
+                <option value="PERSON">Persona natural</option>
+                <option value="COMPANY">Persona jurídica</option>
+              </select></label
+            ><label class="wide"
+              >Nombre completo o razón social *<input
+                name="fullNameOrCompany"
+                [(ngModel)]="client.fullNameOrCompany"
+                required
+                pattern=".*\S.*"
+                maxlength="200" /></label
+            ><label
+              >Número de documento<input
+                name="documentNumber"
+                [(ngModel)]="client.documentNumber"
+                maxlength="50" /></label
+            ><label
+              >Correo electrónico<input
+                type="email"
+                name="email"
+                [(ngModel)]="client.email"
+                maxlength="150"
+                email /></label
+            ><label
+              >Teléfono<input
+                type="tel"
+                name="phone"
+                [(ngModel)]="client.phone"
+                maxlength="30" /></label
+            ><label
+              >Dirección<input name="address" [(ngModel)]="client.address" maxlength="255"
+            /></label>
+          </div>
+          <p class="hint">
+            Los cambios se guardan en el servidor. Los campos sin asterisco son opcionales.
+          </p>
+          @if (error) {
+            <p class="notice error" role="alert">{{ error }}</p>
+          }
+          @if (busy) {
+            <p role="status">Procesando solicitud...</p>
+          }
+          <div class="actions">
+            <button type="button" (click)="close()">Cancelar</button
+            ><button class="primary" type="submit" [disabled]="form.invalid || busy">
+              Guardar cliente
+            </button>
+          </div>
+        </fieldset>
+      </form>
+    </section>
+  </div>
+}
+@if (selected; as client) {
+  <div class="overlay" (click)="close()">
+    <section
+      class="dialog"
+      managementDialog
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="client-detail-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="dialog-head">
+        <h2 id="client-detail-title">Detalle del cliente</h2>
+        <button type="button" aria-label="Cerrar diálogo" (click)="close()">×</button>
+      </div>
+      <h2>{{ client.fullNameOrCompany }}</h2>
+      <dl>
+        <dt>Tipo</dt>
+        <dd>{{ client.clientType === 'PERSON' ? 'Persona natural' : 'Persona jurídica' }}</dd>
+        <dt>Documento</dt>
+        <dd>{{ client.documentNumber }}</dd>
+        <dt>Correo</dt>
+        <dd>{{ client.email }}</dd>
+        <dt>Teléfono</dt>
+        <dd>{{ client.phone || 'Sin registrar' }}</dd>
+        <dt>Dirección</dt>
+        <dd>{{ client.address || 'Sin registrar' }}</dd>
+      </dl>
+      <h2>Expedientes asociados</h2>
+      @for (item of clientCases; track item.caseId) {
+        <div class="case">
+          <strong>#{{ item.caseId }} · {{ item.title }}</strong>
+          <p>{{ item.status }}</p>
+        </div>
+      } @empty {
+        <p>No hay expedientes asociados.</p>
+      }
+      @if (error) {
+        <p class="notice error" role="alert">{{ error }}</p>
+      }
+      @if (busy) {
+        <p role="status">Procesando solicitud...</p>
+      }
+      <div class="actions">
+        <button class="primary" (click)="openForm(client)">Editar cliente</button>
+      </div>
+    </section>
+  </div>
+}
+@if (pending; as client) {
+  <div class="overlay" (click)="close()">
+    <section
+      class="dialog"
+      managementDialog
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="delete-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="dialog-head">
+        <h2 id="delete-title">¿Eliminar cliente?</h2>
+        <button type="button" aria-label="Cerrar diálogo" (click)="close()">×</button>
+      </div>
+      <p>
+        Se eliminará a {{ client.fullNameOrCompany }} del servidor. No se eliminarán expedientes
+        asociados; si existen restricciones, se mostrará el error del servidor.
+      </p>
+      @if (error) {
+        <p class="notice error" role="alert">{{ error }}</p>
+      }
+      @if (busy) {
+        <p role="status">Procesando solicitud...</p>
+      }
+      <div class="actions">
+        <button (click)="close()">Cancelar</button
+        ><button class="danger" [disabled]="busy" (click)="remove()">Eliminar cliente</button>
+      </div>
+    </section>
+  </div>
+}
