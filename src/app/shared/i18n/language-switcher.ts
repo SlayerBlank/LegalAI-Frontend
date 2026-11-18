@@ -4,13 +4,14 @@ import { I18nService } from '../../services/i18n.service';
 import { UiSoundService } from '../../services/ui-sound.service';
 import { TranslatePipe } from './i18n.pipes';
 
-/** Selector ES / EN con sonido corto y anuncio accesible del cambio. */
+/** i18n: selector de idioma ES / EN con sonido corto y anuncio accesible del cambio. */
 @Component({
   selector: 'app-language-switcher',
   standalone: true,
   imports: [TranslatePipe],
   template: `
-    <div class="language-switch" role="group" [attr.aria-label]="'language.label' | t">
+    <div class="language-switch" role="group" [attr.aria-label]="'i18n.title' | t">
+      <span class="tag" aria-hidden="true" [title]="'i18n.title' | t">{{ 'i18n.badge' | t }}</span>
       @for (lang of i18n.languages; track lang) {
         <button
           type="button"
@@ -32,11 +33,20 @@ import { TranslatePipe } from './i18n.pipes';
     }
     .language-switch {
       display: inline-flex;
+      align-items: center;
       gap: 2px;
       padding: 3px;
       border-radius: 999px;
       background: var(--surface);
       border: 1px solid var(--border);
+    }
+    .tag {
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      padding: 0 0.45rem 0 0.55rem;
+      color: var(--primary);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     }
     button {
       border: 0;
