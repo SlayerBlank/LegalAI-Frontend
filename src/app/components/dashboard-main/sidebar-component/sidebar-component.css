@@ -245,3 +245,85 @@ button:focus-visible {
     transition: none;
   }
 }
+
+/* ---- Diseño moderno (menú lateral) ---------------------------------------
+ * Marca con degradado, enlace activo como píldora con indicador lateral,
+ * hover suave y tarjetas redondeadas. Solo estilos: el HTML no cambia.
+ */
+aside {
+  background:
+    radial-gradient(
+      120% 40% at 0% 0%,
+      color-mix(in srgb, var(--primary) 9%, transparent),
+      transparent 70%
+    ),
+    var(--surface);
+}
+.brand-mark {
+  border-radius: 10px;
+  background: linear-gradient(
+    135deg,
+    var(--primary),
+    color-mix(in srgb, var(--primary) 55%, #7c3aed)
+  );
+  color: #fff;
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--primary) 35%, transparent);
+}
+.group-label {
+  font-weight: 700;
+  text-transform: uppercase;
+}
+nav a {
+  position: relative;
+  border-radius: 10px;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+nav a:hover {
+  color: var(--text);
+  transform: translateX(2px);
+}
+nav a.active {
+  background: linear-gradient(
+    90deg,
+    var(--primary-soft),
+    color-mix(in srgb, var(--primary-soft) 40%, transparent)
+  );
+}
+nav a.active::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 10px;
+  bottom: 10px;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: var(--primary);
+}
+.help-card {
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: linear-gradient(160deg, var(--primary-soft), var(--bg));
+}
+.avatar {
+  background: linear-gradient(
+    135deg,
+    var(--primary),
+    color-mix(in srgb, var(--primary) 55%, #7c3aed)
+  );
+  color: #fff;
+  font-weight: 700;
+}
+.profile-details {
+  border-radius: 12px;
+}
+@media (prefers-reduced-motion: reduce) {
+  nav a {
+    transition: none;
+  }
+  nav a:hover {
+    transform: none;
+  }
+}
