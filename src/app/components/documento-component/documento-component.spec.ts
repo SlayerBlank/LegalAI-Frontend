@@ -331,4 +331,19 @@ describe('DocumentoComponent - transporte HTTP aislado', () => {
       localStorage.removeItem('legalai-language');
     }
   });
+
+  it('acepta un PDF soltado en la zona de carga y valida los que no lo son', () => {
+    const c = mount().componentInstance;
+    c.openUpload();
+    const drop = (file: File) =>
+      ({ preventDefault: vi.fn(), dataTransfer: { files: [file] } }) as unknown as DragEvent;
+    c.onDragOver({ preventDefault: vi.fn() } as unknown as DragEvent);
+    expect(c.dragging).toBe(true);
+    c.onDrop(drop(pdf('foto.png', 'image/png')));
+    expect(c.dragging).toBe(false);
+    expect(c.uploadError).toContain('Solo se permiten archivos PDF');
+    c.onDrop(drop(pdf('demanda.pdf')));
+    expect(c.uploadFile?.name).toBe('demanda.pdf');
+    expect(c.uploadError).toBe('');
+  });
 });
