@@ -313,4 +313,22 @@ describe('DocumentoComponent - transporte HTTP aislado', () => {
     expect(c.selected).toBeNull();
     expect(TestBed.inject(Router).navigate).toHaveBeenCalledWith(['/documentos', 31, 'fragmentos']);
   });
+
+  it('muestra la pantalla en inglés con fechas en formato en-US', async () => {
+    localStorage.setItem('legalai-language', 'en');
+    try {
+      const f = mount();
+      await f.whenStable();
+      f.detectChanges();
+      const text: string = f.nativeElement.textContent;
+      expect(text).toContain('Documents');
+      expect(text).toContain('Processed');
+      expect(text).toContain('11/02/2026');
+      expect(f.componentInstance.validateFile(pdf('foto.png', 'image/png'))).toBe(
+        'Only PDF files are allowed.',
+      );
+    } finally {
+      localStorage.removeItem('legalai-language');
+    }
+  });
 });
