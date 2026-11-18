@@ -109,3 +109,44 @@ a:focus-visible {
     align-items: flex-start;
   }
 }
+
+/* ---- Diseño moderno: cabecera fija tipo vidrio con controles en píldora ---- */
+.public-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  min-height: 76px;
+  padding-block: 14px;
+  background: color-mix(in srgb, var(--pub-surface) 78%, transparent);
+  backdrop-filter: saturate(160%) blur(14px);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  box-shadow: 0 8px 24px #0f172a0a;
+}
+.brand-mark {
+  border-radius: 10px;
+  background: linear-gradient(
+    135deg,
+    var(--pub-blue),
+    color-mix(in srgb, var(--pub-blue) 55%, #7c3aed)
+  );
+  color: #fff;
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--pub-blue) 35%, transparent);
+}
+.header-actions {
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.home-link,
+.access-button {
+  border-radius: 999px;
+  padding: 8px 14px;
+  border: 1px solid var(--pub-line);
+  background: var(--pub-surface);
+  font-weight: 600;
+  transition: border-color 0.2s ease;
+}
+.home-link:hover,
+.access-button:hover {
+  border-color: var(--pub-blue);
+}
