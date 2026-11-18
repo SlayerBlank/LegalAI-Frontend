@@ -1,24 +1,24 @@
 :host {
-  --bg: #f5f7fa;
+  --bg: #f6f7fb;
   --surface: #fff;
-  --text: #1c2e47;
-  --muted: #718098;
-  --primary: #2a5598;
-  --primary-soft: #eaf0f9;
-  --border: #dce4ef;
+  --text: #0f172a;
+  --muted: #64748b;
+  --primary: #2552d0;
+  --primary-soft: #eef2ff;
+  --border: #e2e8f0;
   --shadow: 0 12px 30px #132b480c;
   display: block;
   background: var(--bg);
   color: var(--text);
 }
 :host-context([data-theme='dark']) {
-  --bg: #0e1928;
-  --surface: #192639;
-  --text: #e7edf6;
-  --muted: #a4b3c8;
-  --primary: #a8c8ff;
-  --primary-soft: #213a5c;
-  --border: #2e4058;
+  --bg: #0b1220;
+  --surface: #111a2e;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --primary: #7aa2ff;
+  --primary-soft: #1b2a4a;
+  --border: #1f2a44;
   --shadow: 0 12px 30px #0002;
 }
 .shell {
