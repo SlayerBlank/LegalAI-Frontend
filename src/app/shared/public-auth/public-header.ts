@@ -2,10 +2,19 @@ import { Component, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ThemeService } from '../../services/theme-service';
 import { PublicThemeSwitcher } from './public-theme-switcher';
+import { LanguageSwitcherComponent } from '../i18n/language-switcher';
+import { RegionSwitcherComponent } from '../i18n/region-switcher';
+import { MusicToggleComponent } from '../i18n/music-toggle';
 @Component({
   selector: 'app-public-header',
   standalone: true,
-  imports: [RouterLink, PublicThemeSwitcher],
+  imports: [
+    RouterLink,
+    PublicThemeSwitcher,
+    LanguageSwitcherComponent,
+    RegionSwitcherComponent,
+    MusicToggleComponent,
+  ],
   templateUrl: './public-header.html',
   styleUrl: './public-header.css',
 })

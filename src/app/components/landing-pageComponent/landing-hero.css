@@ -214,3 +214,44 @@
 .preview-caption span {
   margin-right: 8px;
 }
+
+/* ---- Diseño moderno: cabecera tipo vidrio y selector de tema en píldora ---- */
+.public-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: color-mix(in srgb, var(--lp-panel, #fff) 78%, transparent);
+  backdrop-filter: saturate(160%) blur(14px);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+}
+.header-actions {
+  gap: 10px;
+}
+.theme-switch {
+  border-radius: 999px;
+  gap: 2px;
+}
+.theme-switch button {
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.35rem 0.7rem;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+.theme-switch button[aria-pressed='true'] {
+  background: var(--lp-blue);
+  color: #fff;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--lp-blue) 40%, transparent);
+}
+@media (max-width: 1100px) {
+  .header-actions app-region-switcher {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-switch button {
+    transition: none;
+  }
+}

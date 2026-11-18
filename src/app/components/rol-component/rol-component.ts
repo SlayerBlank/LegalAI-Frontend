@@ -11,7 +11,11 @@ import { ManagementDialogDirective } from '../../shared/management-dialog.direct
   standalone: true,
   imports: [FormsModule, ManagementDialogDirective],
   templateUrl: './rol-component.html',
-  styleUrls: ['../../shared/management.css', './rol-component.css'],
+  styleUrls: [
+    '../../shared/management.css',
+    '../../shared/modern-module.css',
+    './rol-component.css',
+  ],
 })
 export class RolComponent extends ManagementHttpState<RoleResponse> implements OnInit {
   private readonly api = inject(RolService);

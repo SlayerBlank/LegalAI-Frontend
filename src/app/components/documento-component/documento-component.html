@@ -1,1 +1,347 @@
-<section class="module-page"><p class="eyebrow">MÓDULO</p><h1>Documentos</h1><p>Repositorio central de documentos legales.</p><div class="notice">Este módulo está pendiente de implementación.</div></section>
+<header>
+  <div>
+    <h1>{{ 'docs.title' | t }}</h1>
+    <p>{{ 'docs.subtitle' | t }}</p>
+  </div>
+  <button class="primary" [disabled]="loading || busy || caseId === null" (click)="openUpload()">
+    {{ 'docs.upload' | t }}
+  </button>
+</header>
+@if (notice) {
+  <div class="notice" role="status">{{ notice }}</div>
+}
+@if (loading) {
+  <div class="notice" role="status" aria-live="polite">{{ 'common.loading' | t }}</div>
+}
+@if (busy && !uploadOpen && !selected && !pending) {
+  <div class="notice" role="status" aria-live="polite">{{ 'common.processing' | t }}</div>
+}
+@if (error && !uploadOpen && !selected && !pending) {
+  <div class="notice error" role="alert">
+    {{ error }}
+    <button type="button" (click)="load()" [disabled]="loading || busy">
+      {{ 'common.reload' | t }}
+    </button>
+  </div>
+}
+@if (loaded && !loading) {
+  @if (cases.length === 0) {
+    <section class="panel empty-state">
+      <h2>{{ 'docs.noCasesTitle' | t }}</h2>
+      <p>{{ 'docs.noCasesText' | t }}</p>
+    </section>
+  } @else {
+    <section class="stats" [attr.aria-label]="'docs.statsLabel' | t">
+      <article class="stat">
+        <span>{{ 'docs.statTotal' | t }}</span
+        ><strong>{{ documents.length | lnumber }}</strong>
+      </article>
+      <article class="stat">
+        <span>{{ 'docs.statProcessed' | t }}</span
+        ><strong>{{ count('PROCESSED') | lnumber }}</strong>
+      </article>
+      <article class="stat">
+        <span>{{ 'docs.statPending' | t }}</span
+        ><strong>{{ count('UPLOADED', 'PROCESSING') | lnumber }}</strong>
+      </article>
+      <article class="stat">
+        <span>{{ 'docs.statError' | t }}</span
+        ><strong>{{ count('ERROR') | lnumber }}</strong>
+      </article>
+    </section>
+    <section class="panel">
+      <div class="toolbar">
+        <select
+          class="case-select"
+          [attr.aria-label]="'docs.case' | t"
+          [ngModel]="caseId"
+          (ngModelChange)="selectCase($event)"
+          [disabled]="busy"
+        >
+          @for (item of cases; track item.caseId) {
+            <option [ngValue]="item.caseId">#{{ item.caseId }} · {{ item.title }}</option>
+          }
+        </select>
+        <input
+          class="search"
+          [attr.aria-label]="'docs.search' | t"
+          [placeholder]="'docs.searchPlaceholder' | t"
+          [(ngModel)]="query"
+          (ngModelChange)="resetPage()"
+        /><select
+          [attr.aria-label]="'docs.statusFilter' | t"
+          [(ngModel)]="filter"
+          (ngModelChange)="resetPage()"
+        >
+          <option value="">{{ 'docs.allStatuses' | t }}</option>
+          <option value="UPLOADED">{{ 'status.UPLOADED' | t }}</option>
+          <option value="PROCESSING">{{ 'status.PROCESSING' | t }}</option>
+          <option value="PROCESSED">{{ 'status.PROCESSED' | t }}</option>
+          <option value="ERROR">{{ 'status.ERROR' | t }}</option>
+        </select>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>{{ 'docs.colDocument' | t }}</th>
+              <th>{{ 'docs.colCategory' | t }}</th>
+              <th>{{ 'docs.colSize' | t }}</th>
+              <th>{{ 'docs.colStatus' | t }}</th>
+              <th>{{ 'docs.colUploaded' | t }}</th>
+              <th>{{ 'docs.colActions' | t }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (doc of paginate(filtered); track doc.documentId) {
+              <tr>
+                <td class="name">
+                  {{ doc.fileName }}<small>#{{ doc.documentId }}</small>
+                </td>
+                <td>{{ doc.category || ('common.none' | t) }}</td>
+                <td>{{ formatSize(doc.sizeBytes) }}</td>
+                <td>
+                  <span
+                    class="badge status"
+                    [attr.data-status]="doc.processingStatus"
+                    [class.inactive]="doc.processingStatus === 'ERROR'"
+                    >{{ statusLabel(doc.processingStatus) }}</span
+                  >
+                </td>
+                <td>{{ doc.createdAt | ldate }}</td>
+                <td>
+                  <div class="row-actions">
+                    <button (click)="showDetail(doc)" [disabled]="busy">
+                      {{ 'common.viewDetail' | t }}</button
+                    ><button (click)="openChunks(doc)" [disabled]="busy">
+                      {{ 'docs.chunks' | t }}</button
+                    ><button (click)="download(doc)" [disabled]="busy">
+                      {{ 'docs.download' | t }}</button
+                    ><button class="danger" (click)="confirmRemove(doc)" [disabled]="busy">
+                      {{ 'common.delete' | t }}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="empty">
+                  @if (documents.length === 0) {
+                    {{ 'docs.emptyCase' | t }}
+                  } @else {
+                    {{ 'docs.emptySearch' | t }}
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <footer class="pager">
+        <span
+          >{{ 'common.results' | t: { count: filtered.length } }} ·
+          {{ 'common.pageOf' | t: { page: page, pages: pages(filtered) } }}</span
+        >
+        <div class="row-actions">
+          <button (click)="page = page - 1" [disabled]="page === 1">
+            {{ 'common.previous' | t }}</button
+          ><button (click)="page = page + 1" [disabled]="page >= pages(filtered)">
+            {{ 'common.next' | t }}
+          </button>
+        </div>
+      </footer>
+    </section>
+  }
+}
+@if (uploadOpen) {
+  <div class="overlay" (click)="close()">
+    <section
+      class="dialog"
+      managementDialog
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="upload-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="dialog-head">
+        <h2 id="upload-title">{{ 'docs.uploadTitle' | t }}</h2>
+        <button type="button" [attr.aria-label]="'common.close' | t" (click)="close()">×</button>
+      </div>
+      <form (ngSubmit)="upload()">
+        <fieldset [disabled]="busy">
+          <div class="form-grid">
+            <label class="wide"
+              >{{ 'docs.case' | t }}
+              <input
+                [value]="currentCase ? '#' + currentCase.caseId + ' · ' + currentCase.title : ''"
+                readonly
+            /></label>
+            <label
+              class="wide dropzone"
+              [class.dragging]="dragging"
+              [class.has-file]="uploadFile && !uploadError"
+              [class.invalid]="!!uploadError"
+              (dragover)="onDragOver($event)"
+              (dragleave)="onDragLeave($event)"
+              (drop)="onDrop($event)"
+            >
+              <span class="dropzone-title">{{ 'docs.file' | t }}</span>
+              <svg class="dropzone-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 16V4m0 0-4 4m4-4 4 4M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+              </svg>
+              @if (uploadFile) {
+                <strong class="dropzone-file">{{ uploadFile.name }}</strong>
+                <small>{{ formatSize(uploadFile.size) }}</small>
+              } @else {
+                <span class="dropzone-hint">{{ 'docs.dropHint' | t }}</span>
+              }
+              <input
+                class="visually-hidden"
+                type="file"
+                name="file"
+                accept="application/pdf,.pdf"
+                required
+                (change)="onFileSelected($event)"
+              />
+            </label>
+            <label class="wide"
+              >{{ 'docs.category' | t }}
+              <input
+                name="category"
+                [(ngModel)]="uploadCategory"
+                [maxlength]="categoryMax"
+                [placeholder]="'docs.categoryPlaceholder' | t"
+            /></label>
+          </div>
+          <p class="hint">{{ 'docs.uploadHint' | t }}</p>
+          @if (uploadError) {
+            <p class="notice error" role="alert">{{ uploadError }}</p>
+          }
+          @if (error) {
+            <p class="notice error" role="alert">{{ error }}</p>
+          }
+          @if (busy) {
+            <p role="status">{{ 'docs.uploading' | t }}</p>
+          }
+          <div class="actions">
+            <button type="button" (click)="close()">{{ 'common.cancel' | t }}</button
+            ><button
+              class="primary"
+              type="submit"
+              [disabled]="!uploadFile || !!uploadError || busy"
+            >
+              {{ 'docs.uploadSubmit' | t }}
+            </button>
+          </div>
+        </fieldset>
+      </form>
+    </section>
+  </div>
+}
+@if (selected; as doc) {
+  <div class="overlay" (click)="close()">
+    <section
+      class="dialog"
+      managementDialog
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="document-detail-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="dialog-head">
+        <h2 id="document-detail-title">{{ 'docs.detailTitle' | t }}</h2>
+        <button type="button" [attr.aria-label]="'common.close' | t" (click)="close()">×</button>
+      </div>
+      <h2 class="file-name">{{ doc.fileName }}</h2>
+      <dl>
+        <dt>{{ 'docs.case' | t }}</dt>
+        <dd>#{{ doc.caseId }}</dd>
+        <dt>{{ 'docs.colCategory' | t }}</dt>
+        <dd>{{ doc.category || ('docs.noCategory' | t) }}</dd>
+        <dt>{{ 'docs.colSize' | t }}</dt>
+        <dd>{{ formatSize(doc.sizeBytes) }}</dd>
+        <dt>{{ 'docs.colStatus' | t }}</dt>
+        <dd>{{ statusLabel(doc.processingStatus) }}</dd>
+        <dt>{{ 'docs.extracted' | t }}</dt>
+        <dd>
+          {{
+            doc.hasExtractedText
+              ? ('docs.extractedChars' | t: { count: (doc.extractedTextLength | lnumber) })
+              : ('docs.noExtracted' | t)
+          }}
+        </dd>
+        <dt>{{ 'docs.colUploaded' | t }}</dt>
+        <dd>{{ doc.createdAt | ldate }}</dd>
+      </dl>
+      @if (preparation; as prep) {
+        <h2>{{ 'docs.preparation' | t }}</h2>
+        <div class="prep" [class.ready]="prep.readyForRag">
+          <strong>{{ stageLabel(prep.stage) }}</strong>
+          <span>{{
+            'docs.prepCounts' | t: { chunks: prep.chunks, embedded: prep.embeddedChunks }
+          }}</span>
+        </div>
+      }
+      @if (text !== null) {
+        <h2>{{ 'docs.extracted' | t }}</h2>
+        <pre class="extracted" tabindex="0">{{ text || ('docs.noText' | t) }}</pre>
+      }
+      @if (error) {
+        <p class="notice error" role="alert">{{ error }}</p>
+      }
+      @if (busy) {
+        <p role="status">{{ 'common.processing' | t }}</p>
+      }
+      <div class="actions">
+        @if (preparation && !preparation.readyForRag) {
+          <button
+            class="primary"
+            [disabled]="busy || preparation.stage === 'PROCESSING'"
+            (click)="prepare()"
+          >
+            {{ 'docs.prepare' | t }}
+          </button>
+        }
+        @if (text === null && doc.hasExtractedText) {
+          <button [disabled]="busy" (click)="loadText()">{{ 'docs.viewText' | t }}</button>
+        }
+        @if (preparation && preparation.chunks > 0) {
+          <button [disabled]="busy" (click)="openChunks(doc)">
+            {{ 'docs.viewChunks' | t: { count: preparation.chunks } }}
+          </button>
+        }
+        <button [disabled]="busy" (click)="download(doc)">{{ 'docs.downloadPdf' | t }}</button>
+      </div>
+    </section>
+  </div>
+}
+@if (pending; as doc) {
+  <div class="overlay" (click)="close()">
+    <section
+      class="dialog"
+      managementDialog
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="delete-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="dialog-head">
+        <h2 id="delete-title">{{ 'docs.deleteTitle' | t }}</h2>
+        <button type="button" [attr.aria-label]="'common.close' | t" (click)="close()">×</button>
+      </div>
+      <p>{{ 'docs.deleteText' | t: { name: doc.fileName } }}</p>
+      @if (error) {
+        <p class="notice error" role="alert">{{ error }}</p>
+      }
+      @if (busy) {
+        <p role="status">{{ 'common.processing' | t }}</p>
+      }
+      <div class="actions">
+        <button (click)="close()">{{ 'common.cancel' | t }}</button
+        ><button class="danger" [disabled]="busy" (click)="remove()">
+          {{ 'docs.deleteSubmit' | t }}
+        </button>
+      </div>
+    </section>
+  </div>
+}

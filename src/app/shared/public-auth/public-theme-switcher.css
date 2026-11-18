@@ -32,3 +32,28 @@ button:focus-visible {
     padding: 7px 12px;
   }
 }
+
+/* ---- Diseño moderno: selector de tema en píldora, igual que i18n / l10n ---- */
+.theme-options {
+  border-radius: 999px;
+  background: var(--pub-surface);
+  gap: 2px;
+}
+button {
+  border-radius: 999px;
+  font-weight: 600;
+  padding-inline: 12px;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+button[aria-pressed='true'] {
+  color: #fff;
+  background: var(--pub-blue);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--pub-blue) 40%, transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  button {
+    transition: none;
+  }
+}

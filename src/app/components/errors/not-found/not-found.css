@@ -20,9 +20,7 @@
 }
 .error-copy h1 {
   font:
-    400 clamp(38px, 3.9vw, 56px)/1.12 Georgia,
-    'Times New Roman',
-    serif;
+    700 clamp(38px, 3.9vw, 56px)/1.12 var(--font-display);
   letter-spacing: -0.02em;
   margin: 28px 0;
 }
@@ -78,9 +76,7 @@
 }
 .error-number {
   font:
-    400 clamp(100px, 10vw, 144px)/1 Georgia,
-    'Times New Roman',
-    serif;
+    700 clamp(100px, 10vw, 144px)/1 var(--font-display);
   color: var(--pub-blue);
   letter-spacing: -0.045em;
   display: block;

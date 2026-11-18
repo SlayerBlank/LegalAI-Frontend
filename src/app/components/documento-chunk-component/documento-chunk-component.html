@@ -1,0 +1,169 @@
+<header>
+  <div>
+    <a
+      class="back"
+      routerLink="/documentos"
+      [queryParams]="document ? { caseId: document.caseId } : {}"
+      >{{ 'chunks.back' | t }}</a
+    >
+    <h1>{{ 'chunks.title' | t }}</h1>
+    <p>
+      @if (document) {
+        {{ 'chunks.subtitleDoc' | t: { name: document.fileName, caseId: document.caseId } }}
+      } @else {
+        {{ 'chunks.subtitle' | t }}
+      }
+    </p>
+  </div>
+  <button
+    class="primary"
+    [disabled]="loading || busy || !canRegenerate"
+    [title]="canRegenerate ? '' : ('chunks.regenerateDisabled' | t)"
+    (click)="askRegenerate()"
+  >
+    {{ 'chunks.regenerate' | t }}
+  </button>
+</header>
+@if (notice) {
+  <div class="notice" role="status">{{ notice }}</div>
+}
+@if (loading) {
+  <div class="notice" role="status" aria-live="polite">{{ 'common.loading' | t }}</div>
+}
+@if (busy && !confirmRegenerate) {
+  <div class="notice" role="status" aria-live="polite">{{ 'common.processing' | t }}</div>
+}
+@if (error && !confirmRegenerate) {
+  <div class="notice error" role="alert">
+    {{ error }}
+    @if (documentId !== null) {
+      <button type="button" (click)="load()" [disabled]="loading || busy">
+        {{ 'common.reload' | t }}
+      </button>
+    }
+  </div>
+}
+@if (loaded && !loading) {
+  <section class="stats" [attr.aria-label]="'chunks.statsLabel' | t">
+    <article class="stat">
+      <span>{{ 'chunks.statTotal' | t }}</span
+      ><strong>{{ chunks.length | lnumber }}</strong>
+    </article>
+    <article class="stat">
+      <span>{{ 'chunks.statEmbedded' | t }}</span
+      ><strong>{{ preparation ? (preparation.embeddedChunks | lnumber) : '—' }}</strong>
+    </article>
+    <article class="stat">
+      <span>{{ 'chunks.statAverage' | t }}</span
+      ><strong>{{ averageLength | lnumber }}</strong>
+    </article>
+    <article class="stat">
+      <span>{{ 'chunks.statExtracted' | t }}</span
+      ><strong>{{ document?.extractedTextLength ?? 0 | lnumber }}</strong>
+    </article>
+  </section>
+  <section class="panel">
+    <div class="toolbar">
+      <input
+        class="search"
+        [attr.aria-label]="'chunks.search' | t"
+        [placeholder]="'chunks.searchPlaceholder' | t"
+        [(ngModel)]="query"
+        (ngModelChange)="resetPage()"
+      />
+      <span class="count">{{
+        'chunks.countOf' | t: { count: filtered.length, total: chunks.length }
+      }}</span>
+    </div>
+    <ol class="chunk-list">
+      @for (chunk of paginate(filtered); track chunk.chunkId) {
+        <li class="chunk">
+          <div class="chunk-head">
+            <span class="badge">#{{ chunk.chunkIndex }}</span>
+            <small>{{
+              'chunks.range'
+                | t
+                  : {
+                      start: (chunk.charStart | lnumber),
+                      end: (chunk.charEnd | lnumber),
+                      length: (chunk.content.length | lnumber),
+                    }
+            }}</small>
+          </div>
+          <p class="chunk-text">
+            @for (part of highlight(visibleText(chunk)); track $index) {
+              @if (part.match) {
+                <mark>{{ part.text }}</mark>
+              } @else {
+                {{ part.text }}
+              }
+            }
+          </p>
+          @if (isLong(chunk) && !query.trim()) {
+            <button
+              type="button"
+              class="link"
+              [attr.aria-expanded]="expanded.has(chunk.chunkId)"
+              (click)="toggle(chunk)"
+            >
+              {{ (expanded.has(chunk.chunkId) ? 'chunks.showLess' : 'chunks.showMore') | t }}
+            </button>
+          }
+        </li>
+      } @empty {
+        <li class="empty">
+          @if (chunks.length === 0) {
+            {{ 'chunks.empty' | t }}
+            @if (canRegenerate) {
+              {{ 'chunks.emptyCanRegenerate' | t }}
+            } @else {
+              {{ 'chunks.emptyNeedsProcessing' | t }}
+            }
+          } @else {
+            {{ 'chunks.noMatch' | t: { query: query } }}
+          }
+        </li>
+      }
+    </ol>
+    <footer class="pager">
+      <span>{{ 'common.pageOf' | t: { page: page, pages: pages(filtered) } }}</span>
+      <div class="row-actions">
+        <button (click)="page = page - 1" [disabled]="page === 1">
+          {{ 'common.previous' | t }}</button
+        ><button (click)="page = page + 1" [disabled]="page >= pages(filtered)">
+          {{ 'common.next' | t }}
+        </button>
+      </div>
+    </footer>
+  </section>
+}
+@if (confirmRegenerate) {
+  <div class="overlay" (click)="close()">
+    <section
+      class="dialog"
+      managementDialog
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="regenerate-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="dialog-head">
+        <h2 id="regenerate-title">{{ 'chunks.confirmTitle' | t }}</h2>
+        <button type="button" [attr.aria-label]="'common.close' | t" (click)="close()">×</button>
+      </div>
+      <p>{{ 'chunks.confirmText' | t: { count: chunks.length } }}</p>
+      @if (error) {
+        <p class="notice error" role="alert">{{ error }}</p>
+      }
+      @if (busy) {
+        <p role="status">{{ 'chunks.regenerating' | t }}</p>
+      }
+      <div class="actions">
+        <button (click)="close()">{{ 'common.cancel' | t }}</button
+        ><button class="primary" [disabled]="busy" (click)="regenerate()">
+          {{ 'chunks.confirmSubmit' | t }}
+        </button>
+      </div>
+    </section>
+  </div>
+}

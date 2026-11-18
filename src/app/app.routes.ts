@@ -4,7 +4,6 @@ import { DashboardMainComponent } from './components/dashboard-main/dashboard-ma
 import { DashboardHomeComponent } from './components/dashboard-main/dashboard-home';
 import { ClienteComponent } from './components/cliente-component/cliente-component';
 import { ExpedienteComponent } from './components/expediente-component/expediente-component';
-import { DocumentoComponent } from './components/documento-component/documento-component';
 import { ChatIaComponent } from './components/chat-ia-component/chat-ia-component';
 import { BorradorComponent } from './components/borrador-component/borrador-component';
 import { ResumenComponent } from './components/resumen-component/resumen-component';
@@ -14,7 +13,6 @@ import { UsuarioInsertComponent } from './components/usuario-component/usuario-i
 import { UsuarioLoginComponent } from './components/usuario-component/usuario-login/usuario-login';
 import { GestionUsuariosComponent } from './components/gestion-usuarios/gestion-usuarios';
 import { RolComponent } from './components/rol-component/rol-component';
-import { AuditoriaComponent } from './components/auditoria-component/auditoria-component';
 import { NotFoundComponent } from './components/errors/not-found/not-found';
 import { authGuard } from './services/auth.guard';
 import { adminGuard } from './services/admin.guard';
@@ -27,14 +25,32 @@ export const routes: Routes = [
       { path: 'dashboard', component: DashboardHomeComponent },
       { path: 'clientes', component: ClienteComponent },
       { path: 'expedientes', component: ExpedienteComponent },
-      { path: 'documentos', component: DocumentoComponent },
+      {
+        path: 'documentos',
+        loadComponent: () =>
+          import('./components/documento-component/documento-component').then((m) => m.DocumentoComponent),
+      },
+      {
+        path: 'documentos/:documentId/fragmentos',
+        loadComponent: () =>
+          import('./components/documento-chunk-component/documento-chunk-component').then(
+            (m) => m.DocumentoChunkComponent,
+          ),
+      },
       { path: 'chat-ia', component: ChatIaComponent },
       { path: 'borradores', component: BorradorComponent },
       { path: 'resumenes', component: ResumenComponent },
       { path: 'citaciones-ia', component: CitacionesIaComponent },
       { path: 'gestionusuarios', component: GestionUsuariosComponent, canActivate: [adminGuard] },
       { path: 'roles', component: RolComponent, canActivate: [adminGuard] },
-      { path: 'auditoria', component: AuditoriaComponent },
+      {
+        path: 'auditoria',
+        canActivate: [adminGuard],
+        loadComponent: () =>
+          import('./components/auditoria-component/auditoria-component').then(
+            (m) => m.AuditoriaComponent,
+          ),
+      },
     ],
   },
   {

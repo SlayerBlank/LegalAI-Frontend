@@ -1,3 +1,59 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { API_BASE_URL } from '../core/http/api.config';
+import {
+  CaseResponse,
+  DocumentPreparationResponse,
+  DocumentResponse,
+  DocumentTextResponse,
+} from '../models/documento';
+
 @Injectable({ providedIn: 'root' })
-export class DocumentoService { readonly integrationPending = true; }
+export class DocumentoService {
+  private readonly http = inject(HttpClient);
+  private readonly cases = `${API_BASE_URL}/cases`;
+  private readonly documents = `${API_BASE_URL}/documents`;
+
+  /** Expedientes propios del usuario autenticado. */
+  listCases(): Observable<CaseResponse[]> {
+    return this.http.get<CaseResponse[]>(this.cases);
+  }
+
+  list(caseId: number): Observable<DocumentResponse[]> {
+    return this.http.get<DocumentResponse[]>(`${this.cases}/${caseId}/documents`);
+  }
+
+  /** Sube el PDF; el backend lo guarda y luego intenta extraer texto, chunks y embeddings. */
+  upload(caseId: number, file: File, category: string | null): Observable<DocumentResponse> {
+    const body = new FormData();
+    body.append('file', file, file.name);
+    if (category) body.append('category', category);
+    return this.http.post<DocumentResponse>(`${this.cases}/${caseId}/documents/upload`, body);
+  }
+
+  get(id: number): Observable<DocumentResponse> {
+    return this.http.get<DocumentResponse>(`${this.documents}/${id}`);
+  }
+
+  preparation(id: number): Observable<DocumentPreparationResponse> {
+    return this.http.get<DocumentPreparationResponse>(`${this.documents}/${id}/preparation`);
+  }
+
+  prepare(id: number): Observable<DocumentPreparationResponse> {
+    return this.http.post<DocumentPreparationResponse>(`${this.documents}/${id}/prepare`, null);
+  }
+
+  text(id: number): Observable<DocumentTextResponse> {
+    return this.http.get<DocumentTextResponse>(`${this.documents}/${id}/text`);
+  }
+
+  /** Descarga autenticada (pasa por el interceptor JWT), por eso se pide como Blob. */
+  download(id: number): Observable<Blob> {
+    return this.http.get(`${this.documents}/${id}/download`, { responseType: 'blob' });
+  }
+
+  remove(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.documents}/${id}`);
+  }
+}

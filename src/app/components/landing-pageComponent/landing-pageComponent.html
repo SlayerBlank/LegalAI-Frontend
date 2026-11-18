@@ -32,6 +32,9 @@
       ><a href="#confianza">Confianza</a>
     </nav>
     <div class="header-actions">
+      <app-language-switcher />
+      <app-region-switcher />
+      <app-music-toggle />
       <div class="theme-switch" role="group" aria-label="Apariencia">
         @for (option of themes; track option.value) {
           <button

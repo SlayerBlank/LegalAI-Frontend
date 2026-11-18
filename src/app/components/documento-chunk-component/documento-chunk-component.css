@@ -1,0 +1,106 @@
+/* Estilos propios de Fragmentos; el resto viene de shared/management.css y los tokens del tema. */
+.stats {
+  grid-template-columns: repeat(4, 1fr);
+}
+.back {
+  display: inline-block;
+  margin-bottom: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-decoration: none;
+}
+.back:hover {
+  text-decoration: underline;
+}
+.count {
+  font-size: 0.85rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.chunk-list {
+  list-style: none;
+  margin: 0;
+  padding: 1rem;
+  display: grid;
+  gap: 0.8rem;
+}
+.chunk {
+  position: relative;
+  padding: 1rem 1.2rem 1rem 1.4rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+.chunk::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: color-mix(in srgb, var(--primary) 35%, transparent);
+  transition: background 0.2s ease;
+}
+.chunk:hover {
+  border-color: color-mix(in srgb, var(--primary) 35%, var(--border));
+  box-shadow: 0 8px 24px #0f172a14;
+  transform: translateY(-1px);
+}
+.chunk:hover::before {
+  background: var(--primary);
+}
+.chunk-head .badge {
+  font-variant-numeric: tabular-nums;
+}
+.chunk-list .empty {
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+}
+.chunk-head {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+.chunk-head small {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.chunk-text {
+  color: var(--text);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.9rem;
+}
+mark {
+  background: linear-gradient(transparent 15%, #fde68a 15%, #fde68a 90%, transparent 90%);
+  color: #1f2937;
+  border-radius: 3px;
+  padding: 0 0.15rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .chunk {
+    transition: none;
+  }
+  .chunk:hover {
+    transform: none;
+  }
+}
+button.link {
+  border: 0;
+  background: none;
+  padding: 0.2rem 0;
+  color: var(--primary);
+  font-size: 0.85rem;
+}
+@media (max-width: 800px) {
+  .stats {
+    grid-template-columns: 1fr 1fr;
+  }
+}
