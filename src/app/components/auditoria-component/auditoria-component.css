@@ -1,1 +1,55 @@
-.module-page{max-width:760px}.eyebrow{color:var(--primary);font-size:.75rem;font-weight:700;letter-spacing:.12em}.module-page h1{margin:.5rem 0}.module-page>p:not(.eyebrow){color:var(--muted)}.notice{margin-top:2rem;padding:1rem;border:1px dashed var(--border);border-radius:.6rem;background:var(--surface);color:var(--muted)}
+/* Estilos propios de Auditoría; el resto viene de shared/management.css y los tokens del tema. */
+.filters {
+  padding: 1.2rem;
+  margin-bottom: 1.6rem;
+}
+.filter-grid {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;
+  gap: 1rem;
+}
+.filters .actions {
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+.nowrap {
+  white-space: nowrap;
+}
+.details {
+  max-width: 22rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+dd small {
+  color: var(--muted);
+}
+.section {
+  margin: 1.4rem 0 0.6rem;
+}
+.detail-text {
+  max-height: 14rem;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  padding: 0.9rem;
+  margin: 0;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+}
+@media (max-width: 1000px) {
+  .filter-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 600px) {
+  .filter-grid {
+    grid-template-columns: 1fr;
+  }
+}
