@@ -141,6 +141,41 @@ export class AuditoriaComponent extends ManagementHttpState<AuditLogResponse> im
     this.run(this.api.get(log.logId), 'busy', (fresh) => (this.selected = fresh));
   }
 
+  /** Exporta la página visible a CSV (UTF-8 con BOM para que Excel respete las tildes). */
+  exportCsv() {
+    if (!this.result.content.length) return;
+    const header = [
+      'logId',
+      'fecha',
+      'userId',
+      'usuario',
+      'correo',
+      'accion',
+      'entidad',
+      'entityId',
+      'detalles',
+    ];
+    const rows = this.result.content.map((log) => [
+      log.logId,
+      log.createdAt,
+      log.userId,
+      this.userLabel(log),
+      this.userEmail(log),
+      log.action,
+      log.entityType,
+      log.entityId ?? '',
+      log.details ?? '',
+    ]);
+    const csv = [header, ...rows].map((row) => row.map(csvCell).join(',')).join('\r\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `auditoria-pagina-${this.result.number + 1}.csv`;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url));
+  }
+
   @HostListener('document:keydown.escape') dismiss() {
     this.close();
   }
@@ -148,4 +183,11 @@ export class AuditoriaComponent extends ManagementHttpState<AuditLogResponse> im
   private fetch(page: number) {
     this.run(this.api.search(this.applied, page), 'loading', (result) => (this.result = result));
   }
+}
+
+/** Escapa comillas y neutraliza fórmulas (=, +, -, @) para que Excel no las ejecute. */
+export function csvCell(value: string | number): string {
+  let text = String(value);
+  if (/^[=+\-@\t\r]/.test(text)) text = `'${text}`;
+  return `"${text.replace(/"/g, '""')}"`;
 }

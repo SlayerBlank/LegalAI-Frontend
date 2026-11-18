@@ -3,6 +3,9 @@
     <h1>Auditoría</h1>
     <p>Consulta quién hizo qué y cuándo dentro del sistema. Solo para administradores.</p>
   </div>
+  <button [disabled]="loading || busy || !result.content.length" (click)="exportCsv()">
+    Exportar página (CSV)
+  </button>
 </header>
 @if (loading) {
   <div class="notice" role="status" aria-live="polite">Cargando datos...</div>
