@@ -4,7 +4,6 @@ import { DashboardMainComponent } from './components/dashboard-main/dashboard-ma
 import { DashboardHomeComponent } from './components/dashboard-main/dashboard-home';
 import { ClienteComponent } from './components/cliente-component/cliente-component';
 import { ExpedienteComponent } from './components/expediente-component/expediente-component';
-import { DocumentoComponent } from './components/documento-component/documento-component';
 import { ChatIaComponent } from './components/chat-ia-component/chat-ia-component';
 import { BorradorComponent } from './components/borrador-component/borrador-component';
 import { ResumenComponent } from './components/resumen-component/resumen-component';
@@ -27,7 +26,11 @@ export const routes: Routes = [
       { path: 'dashboard', component: DashboardHomeComponent },
       { path: 'clientes', component: ClienteComponent },
       { path: 'expedientes', component: ExpedienteComponent },
-      { path: 'documentos', component: DocumentoComponent },
+      {
+        path: 'documentos',
+        loadComponent: () =>
+          import('./components/documento-component/documento-component').then((m) => m.DocumentoComponent),
+      },
       { path: 'chat-ia', component: ChatIaComponent },
       { path: 'borradores', component: BorradorComponent },
       { path: 'resumenes', component: ResumenComponent },
