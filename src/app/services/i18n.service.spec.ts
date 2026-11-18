@@ -3,15 +3,20 @@ import { DOCUMENT } from '@angular/common';
 import { I18nService } from './i18n.service';
 import { UiSoundService } from './ui-sound.service';
 import { LanguageSwitcherComponent } from '../shared/i18n/language-switcher';
+import { RegionSwitcherComponent } from '../shared/i18n/region-switcher';
 import { EN } from '../i18n/en';
 import { ES } from '../i18n/es';
 
 describe('I18nService (i18n + l10n)', () => {
   beforeEach(() => {
     localStorage.removeItem('legalai-language');
+    localStorage.removeItem('legalai-region');
     TestBed.configureTestingModule({});
   });
-  afterEach(() => localStorage.removeItem('legalai-language'));
+  afterEach(() => {
+    localStorage.removeItem('legalai-language');
+    localStorage.removeItem('legalai-region');
+  });
 
   it('empieza en español y marca el atributo lang del documento', () => {
     const i18n = TestBed.inject(I18nService);
@@ -69,6 +74,76 @@ describe('I18nService (i18n + l10n)', () => {
   });
 });
 
+describe('l10n: región independiente del idioma', () => {
+  beforeEach(() => {
+    localStorage.removeItem('legalai-language');
+    localStorage.removeItem('legalai-region');
+    TestBed.configureTestingModule({});
+  });
+  afterEach(() => {
+    localStorage.removeItem('legalai-language');
+    localStorage.removeItem('legalai-region');
+  });
+
+  it('textos en inglés con formato de Perú', () => {
+    const i18n = TestBed.inject(I18nService);
+    i18n.setLanguage('en');
+    i18n.setRegion('es-PE');
+    expect(i18n.t('docs.title')).toBe('Documents');
+    expect(i18n.locale()).toBe('es-PE');
+    expect(i18n.formatDate('2026-11-18T09:05:00')).toContain('18/11/2026');
+    expect(localStorage.getItem('legalai-region')).toBe('es-PE');
+  });
+
+  it('textos en español con formato de EE. UU. y vuelta a automático', () => {
+    const i18n = TestBed.inject(I18nService);
+    i18n.setRegion('en-US');
+    expect(i18n.t('docs.title')).toBe('Documentos');
+    expect(i18n.formatNumber(1234.5, 1)).toBe('1,234.5');
+    i18n.setRegion(null);
+    expect(i18n.locale()).toBe('es-PE');
+    expect(localStorage.getItem('legalai-region')).toBeNull();
+  });
+
+  it('restaura la región guardada e ignora valores no válidos', () => {
+    localStorage.setItem('legalai-region', 'en-GB');
+    expect(TestBed.inject(I18nService).locale()).toBe('en-GB');
+  });
+
+  it('ignora una región guardada que no existe', () => {
+    localStorage.setItem('legalai-region', 'xx-YY');
+    expect(TestBed.inject(I18nService).region()).toBeNull();
+  });
+});
+
+describe('RegionSwitcherComponent', () => {
+  let sound: { languageChanged: ReturnType<typeof vi.fn>; regionChanged: ReturnType<typeof vi.fn> };
+
+  beforeEach(() => {
+    localStorage.removeItem('legalai-region');
+    sound = { languageChanged: vi.fn(), regionChanged: vi.fn() };
+    TestBed.configureTestingModule({ providers: [{ provide: UiSoundService, useValue: sound }] });
+  });
+  afterEach(() => localStorage.removeItem('legalai-region'));
+
+  it('muestra el rótulo l10n, ejemplos por región y cambia el formato con sonido', async () => {
+    const fixture = TestBed.createComponent(RegionSwitcherComponent);
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.textContent).toContain('l10n');
+    const select = el.querySelector('select')!;
+    expect(select.options.length).toBe(6);
+    expect(select.options[1].textContent).toContain('Perú');
+    select.value = 'en-US';
+    select.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(TestBed.inject(I18nService).locale()).toBe('en-US');
+    expect(sound.regionChanged).toHaveBeenCalledTimes(1);
+    expect(el.textContent).toContain('Formato regional: Estados Unidos');
+  });
+});
+
 describe('LanguageSwitcherComponent', () => {
   let sound: { languageChanged: ReturnType<typeof vi.fn> };
 
@@ -92,6 +167,7 @@ describe('LanguageSwitcherComponent', () => {
     expect(sound.languageChanged).toHaveBeenCalledWith('en');
     expect(en.getAttribute('aria-pressed')).toBe('true');
     expect(el.textContent).toContain('Language changed to English');
+    expect(el.textContent).toContain('i18n');
   });
 
   it('no suena si se pulsa el idioma que ya está activo', () => {
