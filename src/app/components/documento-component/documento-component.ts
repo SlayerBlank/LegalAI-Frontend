@@ -24,7 +24,11 @@ import { I18nService } from '../../services/i18n.service';
   standalone: true,
   imports: [FormsModule, ManagementDialogDirective, ...I18N_PIPES],
   templateUrl: './documento-component.html',
-  styleUrls: ['../../shared/management.css', './documento-component.css'],
+  styleUrls: [
+    '../../shared/management.css',
+    '../../shared/modern-module.css',
+    './documento-component.css',
+  ],
 })
 export class DocumentoComponent extends ManagementHttpState<DocumentResponse> implements OnInit {
   private readonly api = inject(DocumentoService);
