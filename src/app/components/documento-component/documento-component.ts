@@ -127,13 +127,39 @@ export class DocumentoComponent extends ManagementHttpState<DocumentResponse> im
     this.uploadFile = null;
     this.uploadCategory = '';
     this.uploadError = '';
+    this.dragging = false;
     this.uploadOpen = true;
   }
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-    this.uploadFile = input.files?.[0] ?? null;
-    this.uploadError = this.uploadFile ? this.validateFile(this.uploadFile) : '';
+    this.pickFile(input.files?.[0] ?? null);
+  }
+
+  // ---- Arrastrar y soltar --------------------------------------------------
+
+  dragging = false;
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    if (!this.busy) this.dragging = true;
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    this.dragging = false;
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    this.dragging = false;
+    if (this.busy) return;
+    this.pickFile(event.dataTransfer?.files?.[0] ?? null);
+  }
+
+  private pickFile(file: File | null) {
+    this.uploadFile = file;
+    this.uploadError = file ? this.validateFile(file) : '';
   }
 
   /** Mismas reglas que DocumentoServiceImplement.validateUpload; el servidor decide al final. */

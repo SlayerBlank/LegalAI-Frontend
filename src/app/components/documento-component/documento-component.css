@@ -55,6 +55,82 @@
 .dialog .actions {
   flex-wrap: wrap;
 }
+/* Zona para arrastrar y soltar el PDF */
+.dropzone {
+  align-items: center;
+  text-align: center;
+  gap: 0.35rem;
+  padding: 1.6rem 1rem;
+  border: 2px dashed color-mix(in srgb, var(--primary) 35%, var(--border));
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--primary) 4%, var(--surface));
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+.dropzone:hover,
+.dropzone:focus-within,
+.dropzone.dragging {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface));
+}
+.dropzone.dragging {
+  transform: scale(1.01);
+}
+.dropzone.has-file {
+  border-style: solid;
+  border-color: #16a34a;
+  background: color-mix(in srgb, #16a34a 7%, var(--surface));
+}
+.dropzone.invalid {
+  border-color: #dc2626;
+  background: color-mix(in srgb, #dc2626 6%, var(--surface));
+}
+.dropzone-title {
+  align-self: flex-start;
+  font-size: 0.85rem;
+}
+.dropzone-icon {
+  width: 34px;
+  height: 34px;
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.dropzone-file {
+  overflow-wrap: anywhere;
+}
+.dropzone-hint,
+.dropzone small {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.dropzone:focus-within {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dropzone {
+    transition: none;
+  }
+  .dropzone.dragging {
+    transform: none;
+  }
+}
 @media (max-width: 800px) {
   .stats {
     grid-template-columns: 1fr 1fr;

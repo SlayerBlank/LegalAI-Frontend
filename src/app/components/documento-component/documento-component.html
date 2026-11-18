@@ -176,15 +176,34 @@
                 [value]="currentCase ? '#' + currentCase.caseId + ' · ' + currentCase.title : ''"
                 readonly
             /></label>
-            <label class="wide"
-              >{{ 'docs.file' | t }}
+            <label
+              class="wide dropzone"
+              [class.dragging]="dragging"
+              [class.has-file]="uploadFile && !uploadError"
+              [class.invalid]="!!uploadError"
+              (dragover)="onDragOver($event)"
+              (dragleave)="onDragLeave($event)"
+              (drop)="onDrop($event)"
+            >
+              <span class="dropzone-title">{{ 'docs.file' | t }}</span>
+              <svg class="dropzone-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 16V4m0 0-4 4m4-4 4 4M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+              </svg>
+              @if (uploadFile) {
+                <strong class="dropzone-file">{{ uploadFile.name }}</strong>
+                <small>{{ formatSize(uploadFile.size) }}</small>
+              } @else {
+                <span class="dropzone-hint">{{ 'docs.dropHint' | t }}</span>
+              }
               <input
+                class="visually-hidden"
                 type="file"
                 name="file"
                 accept="application/pdf,.pdf"
                 required
                 (change)="onFileSelected($event)"
-            /></label>
+              />
+            </label>
             <label class="wide"
               >{{ 'docs.category' | t }}
               <input
