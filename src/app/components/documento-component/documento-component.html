@@ -1,53 +1,59 @@
 <header>
   <div>
-    <h1>Documentos</h1>
-    <p>Sube los PDF de cada expediente y prepáralos para el análisis con IA.</p>
+    <h1>{{ 'docs.title' | t }}</h1>
+    <p>{{ 'docs.subtitle' | t }}</p>
   </div>
   <button class="primary" [disabled]="loading || busy || caseId === null" (click)="openUpload()">
-    + Subir PDF
+    {{ 'docs.upload' | t }}
   </button>
 </header>
 @if (notice) {
   <div class="notice" role="status">{{ notice }}</div>
 }
 @if (loading) {
-  <div class="notice" role="status" aria-live="polite">Cargando datos...</div>
+  <div class="notice" role="status" aria-live="polite">{{ 'common.loading' | t }}</div>
 }
 @if (busy && !uploadOpen && !selected && !pending) {
-  <div class="notice" role="status" aria-live="polite">Procesando solicitud...</div>
+  <div class="notice" role="status" aria-live="polite">{{ 'common.processing' | t }}</div>
 }
 @if (error && !uploadOpen && !selected && !pending) {
   <div class="notice error" role="alert">
     {{ error }}
-    <button type="button" (click)="load()" [disabled]="loading || busy">Volver a cargar</button>
+    <button type="button" (click)="load()" [disabled]="loading || busy">
+      {{ 'common.reload' | t }}
+    </button>
   </div>
 }
 @if (loaded && !loading) {
   @if (cases.length === 0) {
     <section class="panel empty-state">
-      <h2>Aún no tienes expedientes</h2>
-      <p>Los documentos se guardan dentro de un expediente. Crea uno primero en Expedientes.</p>
+      <h2>{{ 'docs.noCasesTitle' | t }}</h2>
+      <p>{{ 'docs.noCasesText' | t }}</p>
     </section>
   } @else {
-    <section class="stats" aria-label="Estadísticas de documentos del expediente">
+    <section class="stats" [attr.aria-label]="'docs.statsLabel' | t">
       <article class="stat">
-        <span>Documentos</span><strong>{{ documents.length }}</strong>
+        <span>{{ 'docs.statTotal' | t }}</span
+        ><strong>{{ documents.length | lnumber }}</strong>
       </article>
       <article class="stat">
-        <span>Procesados</span><strong>{{ count('PROCESSED') }}</strong>
+        <span>{{ 'docs.statProcessed' | t }}</span
+        ><strong>{{ count('PROCESSED') | lnumber }}</strong>
       </article>
       <article class="stat">
-        <span>Pendientes</span><strong>{{ count('UPLOADED', 'PROCESSING') }}</strong>
+        <span>{{ 'docs.statPending' | t }}</span
+        ><strong>{{ count('UPLOADED', 'PROCESSING') | lnumber }}</strong>
       </article>
       <article class="stat">
-        <span>Con error</span><strong>{{ count('ERROR') }}</strong>
+        <span>{{ 'docs.statError' | t }}</span
+        ><strong>{{ count('ERROR') | lnumber }}</strong>
       </article>
     </section>
     <section class="panel">
       <div class="toolbar">
         <select
           class="case-select"
-          aria-label="Expediente"
+          [attr.aria-label]="'docs.case' | t"
           [ngModel]="caseId"
           (ngModelChange)="selectCase($event)"
           [disabled]="busy"
@@ -58,32 +64,32 @@
         </select>
         <input
           class="search"
-          aria-label="Buscar documentos"
-          placeholder="Buscar por nombre o categoría…"
+          [attr.aria-label]="'docs.search' | t"
+          [placeholder]="'docs.searchPlaceholder' | t"
           [(ngModel)]="query"
           (ngModelChange)="resetPage()"
         /><select
-          aria-label="Estado de procesamiento"
+          [attr.aria-label]="'docs.statusFilter' | t"
           [(ngModel)]="filter"
           (ngModelChange)="resetPage()"
         >
-          <option value="">Todos los estados</option>
-          <option value="UPLOADED">Subido</option>
-          <option value="PROCESSING">Procesando</option>
-          <option value="PROCESSED">Procesado</option>
-          <option value="ERROR">Error</option>
+          <option value="">{{ 'docs.allStatuses' | t }}</option>
+          <option value="UPLOADED">{{ 'status.UPLOADED' | t }}</option>
+          <option value="PROCESSING">{{ 'status.PROCESSING' | t }}</option>
+          <option value="PROCESSED">{{ 'status.PROCESSED' | t }}</option>
+          <option value="ERROR">{{ 'status.ERROR' | t }}</option>
         </select>
       </div>
       <div class="table-scroll">
         <table>
           <thead>
             <tr>
-              <th>Documento</th>
-              <th>Categoría</th>
-              <th>Tamaño</th>
-              <th>Estado</th>
-              <th>Subido</th>
-              <th>Acciones</th>
+              <th>{{ 'docs.colDocument' | t }}</th>
+              <th>{{ 'docs.colCategory' | t }}</th>
+              <th>{{ 'docs.colSize' | t }}</th>
+              <th>{{ 'docs.colStatus' | t }}</th>
+              <th>{{ 'docs.colUploaded' | t }}</th>
+              <th>{{ 'docs.colActions' | t }}</th>
             </tr>
           </thead>
           <tbody>
@@ -92,21 +98,27 @@
                 <td class="name">
                   {{ doc.fileName }}<small>#{{ doc.documentId }}</small>
                 </td>
-                <td>{{ doc.category || '—' }}</td>
+                <td>{{ doc.category || ('common.none' | t) }}</td>
                 <td>{{ formatSize(doc.sizeBytes) }}</td>
                 <td>
-                  <span class="badge" [class.inactive]="doc.processingStatus === 'ERROR'">{{
-                    statusLabel(doc.processingStatus)
-                  }}</span>
+                  <span
+                    class="badge status"
+                    [attr.data-status]="doc.processingStatus"
+                    [class.inactive]="doc.processingStatus === 'ERROR'"
+                    >{{ statusLabel(doc.processingStatus) }}</span
+                  >
                 </td>
-                <td>{{ doc.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+                <td>{{ doc.createdAt | ldate }}</td>
                 <td>
                   <div class="row-actions">
-                    <button (click)="showDetail(doc)" [disabled]="busy">Ver detalle</button
-                    ><button (click)="openChunks(doc)" [disabled]="busy">Fragmentos</button
-                    ><button (click)="download(doc)" [disabled]="busy">Descargar</button
+                    <button (click)="showDetail(doc)" [disabled]="busy">
+                      {{ 'common.viewDetail' | t }}</button
+                    ><button (click)="openChunks(doc)" [disabled]="busy">
+                      {{ 'docs.chunks' | t }}</button
+                    ><button (click)="download(doc)" [disabled]="busy">
+                      {{ 'docs.download' | t }}</button
                     ><button class="danger" (click)="confirmRemove(doc)" [disabled]="busy">
-                      Eliminar
+                      {{ 'common.delete' | t }}
                     </button>
                   </div>
                 </td>
@@ -115,9 +127,9 @@
               <tr>
                 <td colspan="6" class="empty">
                   @if (documents.length === 0) {
-                    Este expediente aún no tiene documentos. Sube el primer PDF.
+                    {{ 'docs.emptyCase' | t }}
                   } @else {
-                    No se encontraron documentos. Prueba con otra búsqueda.
+                    {{ 'docs.emptySearch' | t }}
                   }
                 </td>
               </tr>
@@ -126,11 +138,15 @@
         </table>
       </div>
       <footer class="pager">
-        <span>{{ filtered.length }} resultados · Página {{ page }} de {{ pages(filtered) }}</span>
+        <span
+          >{{ 'common.results' | t: { count: filtered.length } }} ·
+          {{ 'common.pageOf' | t: { page: page, pages: pages(filtered) } }}</span
+        >
         <div class="row-actions">
-          <button (click)="page = page - 1" [disabled]="page === 1">← Anterior</button
+          <button (click)="page = page - 1" [disabled]="page === 1">
+            {{ 'common.previous' | t }}</button
           ><button (click)="page = page + 1" [disabled]="page >= pages(filtered)">
-            Siguiente →
+            {{ 'common.next' | t }}
           </button>
         </div>
       </footer>
@@ -148,20 +164,20 @@
       (click)="$event.stopPropagation()"
     >
       <div class="dialog-head">
-        <h2 id="upload-title">Subir documento</h2>
-        <button type="button" aria-label="Cerrar diálogo" (click)="close()">×</button>
+        <h2 id="upload-title">{{ 'docs.uploadTitle' | t }}</h2>
+        <button type="button" [attr.aria-label]="'common.close' | t" (click)="close()">×</button>
       </div>
       <form (ngSubmit)="upload()">
         <fieldset [disabled]="busy">
           <div class="form-grid">
             <label class="wide"
-              >Expediente
+              >{{ 'docs.case' | t }}
               <input
                 [value]="currentCase ? '#' + currentCase.caseId + ' · ' + currentCase.title : ''"
                 readonly
             /></label>
             <label class="wide"
-              >Archivo PDF *
+              >{{ 'docs.file' | t }}
               <input
                 type="file"
                 name="file"
@@ -170,18 +186,15 @@
                 (change)="onFileSelected($event)"
             /></label>
             <label class="wide"
-              >Categoría
+              >{{ 'docs.category' | t }}
               <input
                 name="category"
                 [(ngModel)]="uploadCategory"
                 [maxlength]="categoryMax"
-                placeholder="Ej.: Contrato, Demanda, Sentencia"
+                [placeholder]="'docs.categoryPlaceholder' | t"
             /></label>
           </div>
-          <p class="hint">
-            Máximo 10 MB. Después de subirlo, el servidor extrae el texto, lo divide en fragmentos y
-            genera los embeddings para la IA. Puede tardar unos segundos.
-          </p>
+          <p class="hint">{{ 'docs.uploadHint' | t }}</p>
           @if (uploadError) {
             <p class="notice error" role="alert">{{ uploadError }}</p>
           }
@@ -189,16 +202,16 @@
             <p class="notice error" role="alert">{{ error }}</p>
           }
           @if (busy) {
-            <p role="status">Subiendo y preparando el documento...</p>
+            <p role="status">{{ 'docs.uploading' | t }}</p>
           }
           <div class="actions">
-            <button type="button" (click)="close()">Cancelar</button
+            <button type="button" (click)="close()">{{ 'common.cancel' | t }}</button
             ><button
               class="primary"
               type="submit"
               [disabled]="!uploadFile || !!uploadError || busy"
             >
-              Subir documento
+              {{ 'docs.uploadSubmit' | t }}
             </button>
           </div>
         </fieldset>
@@ -217,46 +230,48 @@
       (click)="$event.stopPropagation()"
     >
       <div class="dialog-head">
-        <h2 id="document-detail-title">Detalle del documento</h2>
-        <button type="button" aria-label="Cerrar diálogo" (click)="close()">×</button>
+        <h2 id="document-detail-title">{{ 'docs.detailTitle' | t }}</h2>
+        <button type="button" [attr.aria-label]="'common.close' | t" (click)="close()">×</button>
       </div>
       <h2 class="file-name">{{ doc.fileName }}</h2>
       <dl>
-        <dt>Expediente</dt>
+        <dt>{{ 'docs.case' | t }}</dt>
         <dd>#{{ doc.caseId }}</dd>
-        <dt>Categoría</dt>
-        <dd>{{ doc.category || 'Sin categoría' }}</dd>
-        <dt>Tamaño</dt>
+        <dt>{{ 'docs.colCategory' | t }}</dt>
+        <dd>{{ doc.category || ('docs.noCategory' | t) }}</dd>
+        <dt>{{ 'docs.colSize' | t }}</dt>
         <dd>{{ formatSize(doc.sizeBytes) }}</dd>
-        <dt>Estado</dt>
+        <dt>{{ 'docs.colStatus' | t }}</dt>
         <dd>{{ statusLabel(doc.processingStatus) }}</dd>
-        <dt>Texto extraído</dt>
+        <dt>{{ 'docs.extracted' | t }}</dt>
         <dd>
           {{
-            doc.hasExtractedText ? doc.extractedTextLength + ' caracteres' : 'Sin texto extraído'
+            doc.hasExtractedText
+              ? ('docs.extractedChars' | t: { count: (doc.extractedTextLength | lnumber) })
+              : ('docs.noExtracted' | t)
           }}
         </dd>
-        <dt>Subido</dt>
-        <dd>{{ doc.createdAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+        <dt>{{ 'docs.colUploaded' | t }}</dt>
+        <dd>{{ doc.createdAt | ldate }}</dd>
       </dl>
       @if (preparation; as prep) {
-        <h2>Preparación para la IA</h2>
+        <h2>{{ 'docs.preparation' | t }}</h2>
         <div class="prep" [class.ready]="prep.readyForRag">
           <strong>{{ stageLabel(prep.stage) }}</strong>
-          <span>{{ prep.chunks }} fragmentos · {{ prep.embeddedChunks }} con embedding</span>
+          <span>{{
+            'docs.prepCounts' | t: { chunks: prep.chunks, embedded: prep.embeddedChunks }
+          }}</span>
         </div>
       }
       @if (text !== null) {
-        <h2>Texto extraído</h2>
-        <pre class="extracted" tabindex="0">{{
-          text || 'El documento no tiene texto extraído.'
-        }}</pre>
+        <h2>{{ 'docs.extracted' | t }}</h2>
+        <pre class="extracted" tabindex="0">{{ text || ('docs.noText' | t) }}</pre>
       }
       @if (error) {
         <p class="notice error" role="alert">{{ error }}</p>
       }
       @if (busy) {
-        <p role="status">Procesando solicitud...</p>
+        <p role="status">{{ 'common.processing' | t }}</p>
       }
       <div class="actions">
         @if (preparation && !preparation.readyForRag) {
@@ -265,18 +280,18 @@
             [disabled]="busy || preparation.stage === 'PROCESSING'"
             (click)="prepare()"
           >
-            Preparar para IA
+            {{ 'docs.prepare' | t }}
           </button>
         }
         @if (text === null && doc.hasExtractedText) {
-          <button [disabled]="busy" (click)="loadText()">Ver texto extraído</button>
+          <button [disabled]="busy" (click)="loadText()">{{ 'docs.viewText' | t }}</button>
         }
         @if (preparation && preparation.chunks > 0) {
           <button [disabled]="busy" (click)="openChunks(doc)">
-            Ver {{ preparation.chunks }} fragmentos
+            {{ 'docs.viewChunks' | t: { count: preparation.chunks } }}
           </button>
         }
-        <button [disabled]="busy" (click)="download(doc)">Descargar PDF</button>
+        <button [disabled]="busy" (click)="download(doc)">{{ 'docs.downloadPdf' | t }}</button>
       </div>
     </section>
   </div>
@@ -292,21 +307,21 @@
       (click)="$event.stopPropagation()"
     >
       <div class="dialog-head">
-        <h2 id="delete-title">¿Eliminar documento?</h2>
-        <button type="button" aria-label="Cerrar diálogo" (click)="close()">×</button>
+        <h2 id="delete-title">{{ 'docs.deleteTitle' | t }}</h2>
+        <button type="button" [attr.aria-label]="'common.close' | t" (click)="close()">×</button>
       </div>
-      <p>
-        Se eliminará {{ doc.fileName }} junto con sus fragmentos. Esta acción no se puede deshacer.
-      </p>
+      <p>{{ 'docs.deleteText' | t: { name: doc.fileName } }}</p>
       @if (error) {
         <p class="notice error" role="alert">{{ error }}</p>
       }
       @if (busy) {
-        <p role="status">Procesando solicitud...</p>
+        <p role="status">{{ 'common.processing' | t }}</p>
       }
       <div class="actions">
-        <button (click)="close()">Cancelar</button
-        ><button class="danger" [disabled]="busy" (click)="remove()">Eliminar documento</button>
+        <button (click)="close()">{{ 'common.cancel' | t }}</button
+        ><button class="danger" [disabled]="busy" (click)="remove()">
+          {{ 'docs.deleteSubmit' | t }}
+        </button>
       </div>
     </section>
   </div>

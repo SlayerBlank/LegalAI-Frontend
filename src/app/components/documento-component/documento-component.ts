@@ -1,5 +1,4 @@
 import { Component, DestroyRef, HostListener, OnInit, inject } from '@angular/core';
-import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -17,28 +16,13 @@ import {
 import { DocumentoService } from '../../services/documento-service';
 import { ManagementHttpState } from '../../shared/management-http-state';
 import { ManagementDialogDirective } from '../../shared/management-dialog.directive';
-
-const STATUS_LABELS: Record<ProcessingStatus, string> = {
-  UPLOADED: 'Subido',
-  PROCESSING: 'Procesando',
-  PROCESSED: 'Procesado',
-  ERROR: 'Error',
-};
-
-const STAGE_LABELS: Record<PreparationStage, string> = {
-  READY: 'Listo para la IA',
-  PROCESSING: 'Extrayendo texto…',
-  EXTRACTION_REQUIRED: 'Falta extraer el texto',
-  EXTRACTION_ERROR: 'No se pudo extraer el texto (¿PDF escaneado?)',
-  CHUNKS_REQUIRED: 'Faltan generar los fragmentos',
-  EMBEDDINGS_REQUIRED: 'Faltan generar los embeddings',
-  EMBEDDINGS_UNAVAILABLE: 'Embeddings no disponibles en el servidor',
-};
+import { I18N_PIPES } from '../../shared/i18n/i18n.pipes';
+import { I18nService } from '../../services/i18n.service';
 
 @Component({
   selector: 'app-documento',
   standalone: true,
-  imports: [FormsModule, DatePipe, ManagementDialogDirective],
+  imports: [FormsModule, ManagementDialogDirective, ...I18N_PIPES],
   templateUrl: './documento-component.html',
   styleUrls: ['../../shared/management.css', './documento-component.css'],
 })
@@ -47,6 +31,7 @@ export class DocumentoComponent extends ManagementHttpState<DocumentResponse> im
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroy = inject(DestroyRef);
+  readonly i18n = inject(I18nService);
 
   readonly categoryMax = DOCUMENT_CATEGORY_MAX;
   cases: CaseResponse[] = [];
@@ -119,18 +104,15 @@ export class DocumentoComponent extends ManagementHttpState<DocumentResponse> im
   }
 
   statusLabel(status: ProcessingStatus): string {
-    return STATUS_LABELS[status] ?? status;
+    return this.i18n.t(`status.${status}`);
   }
 
   stageLabel(stage: PreparationStage): string {
-    return STAGE_LABELS[stage] ?? stage;
+    return this.i18n.t(`stage.${stage}`);
   }
 
   formatSize(bytes: number | null): string {
-    if (bytes === null || bytes === undefined) return '—';
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    return this.i18n.formatBytes(bytes);
   }
 
   // ---- Subida -------------------------------------------------------------
@@ -152,13 +134,13 @@ export class DocumentoComponent extends ManagementHttpState<DocumentResponse> im
 
   /** Mismas reglas que DocumentoServiceImplement.validateUpload; el servidor decide al final. */
   validateFile(file: File): string {
-    if (file.size === 0) return 'El archivo está vacío.';
+    if (file.size === 0) return this.i18n.t('docs.errEmpty');
     if (file.size > DOCUMENT_MAX_FILE_BYTES)
-      return `El archivo supera el máximo de ${this.formatSize(DOCUMENT_MAX_FILE_BYTES)}.`;
+      return this.i18n.t('docs.errTooLarge', { max: this.formatSize(DOCUMENT_MAX_FILE_BYTES) });
     if (!file.name.toLowerCase().endsWith('.pdf') || file.type !== 'application/pdf')
-      return 'Solo se permiten archivos PDF.';
+      return this.i18n.t('docs.errNotPdf');
     if (file.name.length > DOCUMENT_FILE_NAME_MAX || /[<>:"/\\|?*\u0000-\u001f]/.test(file.name))
-      return 'El nombre del archivo no es válido. Renómbralo e inténtalo de nuevo.';
+      return this.i18n.t('docs.errName');
     return '';
   }
 
@@ -182,8 +164,8 @@ export class DocumentoComponent extends ManagementHttpState<DocumentResponse> im
       this.uploadOpen = false;
       this.resetPage();
       this.notice = prep
-        ? `Documento subido. Estado: ${this.stageLabel(prep.stage)}.`
-        : 'Documento subido correctamente.';
+        ? this.i18n.t('docs.uploadedNotice', { stage: this.stageLabel(prep.stage) })
+        : this.i18n.t('docs.uploadedPlain');
     });
   }
 
@@ -217,7 +199,7 @@ export class DocumentoComponent extends ManagementHttpState<DocumentResponse> im
         this.preparation = prep;
         this.selected = fresh;
         this.replace(fresh);
-        this.notice = `Preparación terminada: ${this.stageLabel(prep.stage)}.`;
+        this.notice = this.i18n.t('docs.preparedNotice', { stage: this.stageLabel(prep.stage) });
       },
       // Una etapa puede fallar después de que otras se completaron: se refresca el estado sin ocultar el error.
       () => this.refreshQuietly(id),
@@ -257,7 +239,7 @@ export class DocumentoComponent extends ManagementHttpState<DocumentResponse> im
       this.documents = this.documents.filter((d) => d.documentId !== id);
       this.pending = null;
       this.page = Math.min(this.page, this.pages(this.filtered));
-      this.notice = 'Documento eliminado correctamente.';
+      this.notice = this.i18n.t('docs.deletedNotice');
     });
   }
 
