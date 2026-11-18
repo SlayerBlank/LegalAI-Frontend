@@ -13,7 +13,6 @@ import { UsuarioInsertComponent } from './components/usuario-component/usuario-i
 import { UsuarioLoginComponent } from './components/usuario-component/usuario-login/usuario-login';
 import { GestionUsuariosComponent } from './components/gestion-usuarios/gestion-usuarios';
 import { RolComponent } from './components/rol-component/rol-component';
-import { AuditoriaComponent } from './components/auditoria-component/auditoria-component';
 import { NotFoundComponent } from './components/errors/not-found/not-found';
 import { authGuard } from './services/auth.guard';
 import { adminGuard } from './services/admin.guard';
@@ -44,7 +43,14 @@ export const routes: Routes = [
       { path: 'citaciones-ia', component: CitacionesIaComponent },
       { path: 'gestionusuarios', component: GestionUsuariosComponent, canActivate: [adminGuard] },
       { path: 'roles', component: RolComponent, canActivate: [adminGuard] },
-      { path: 'auditoria', component: AuditoriaComponent },
+      {
+        path: 'auditoria',
+        canActivate: [adminGuard],
+        loadComponent: () =>
+          import('./components/auditoria-component/auditoria-component').then(
+            (m) => m.AuditoriaComponent,
+          ),
+      },
     ],
   },
   {
