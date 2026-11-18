@@ -19,6 +19,11 @@ export class UiSoundService {
     this.play(notes.map((frequency, i) => ({ frequency, start: i * 0.09, duration: 0.14 })));
   }
 
+  /** Un "tic" breve al cambiar la región (l10n). */
+  regionChanged(): void {
+    this.play([{ frequency: 1046.5, start: 0, duration: 0.08 }]); // Do6
+  }
+
   private play(tones: Tone[]): void {
     const AudioCtor =
       this.window?.AudioContext ??
