@@ -37,3 +37,30 @@ export interface RoleRequest {
 export interface RoleResponse extends RoleRequest {
   roleId: number;
 }
+
+export interface ChatSessionResponseDTO {
+  sessionId: number;
+  caseId: number;
+  documentId: number | null;
+  documentScopeRequired: boolean;
+  title: string | null;
+  messageCount: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ChatMessageDTO {
+  messageId: number;
+  sessionId: number;
+  role: 'USER' | 'ASSISTANT' | 'SYSTEM';
+  content: string;
+  createdAt: string;
+}
+
+export interface CitacionIAResponseDTO {
+  citationId: number;
+  messageId: number;
+  documentId: number | null;
+  chunkId: number | null;
+  relevanceScore: number | null;
+}

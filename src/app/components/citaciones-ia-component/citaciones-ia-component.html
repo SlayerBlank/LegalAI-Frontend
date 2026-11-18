@@ -1,1 +1,201 @@
-<section class="module-page"><p class="eyebrow">MÓDULO</p><h1>Citaciones IA</h1><p>Apoyo inteligente para citaciones legales.</p><div class="notice">Este módulo está pendiente de implementación.</div></section>
+<header>
+  <div>
+    <h1>Citaciones IA</h1>
+    <p>Fuentes documentales asociadas a las respuestas del asistente.</p>
+  </div>
+  <button
+    class="primary"
+    type="button"
+    (click)="loadCitations()"
+    [disabled]="loading || busy || !selectedMessageId"
+  >
+    Actualizar fuentes
+  </button>
+</header>
+
+@if (notice) {
+  <div class="notice" role="status">{{ notice }}</div>
+}
+@if (loading) {
+  <div class="notice" role="status" aria-live="polite">Consultando fuentes de ejemplo...</div>
+}
+@if (busy) {
+  <div class="notice" role="status" aria-live="polite">Cargando mensajes de ejemplo...</div>
+}
+@if (error) {
+  <div class="notice error" role="alert">
+    {{ error }}
+    <button type="button" (click)="loadSessions()" [disabled]="loading || busy">
+      Volver a cargar
+    </button>
+  </div>
+}
+
+@if (loaded && !loading) {
+  @if (sessions.length === 0) {
+    <section class="panel empty" role="status">No hay sesiones de ejemplo disponibles.</section>
+  } @else {
+    <section class="panel citation-context" aria-label="Seleccionar respuesta">
+      <div class="context-fields">
+        <label>
+          Sesión de chat
+          <select
+            name="sessionId"
+            [(ngModel)]="selectedSessionId"
+            (ngModelChange)="onSessionChange()"
+            [disabled]="loading || busy"
+          >
+            @for (session of sessions; track session.sessionId) {
+              <option [value]="session.sessionId">
+                {{ session.title || 'Sesión' }} · Expediente #{{ session.caseId }}
+              </option>
+            }
+          </select>
+        </label>
+        <label>
+          Respuesta del asistente
+          <select
+            name="messageId"
+            [(ngModel)]="selectedMessageId"
+            (ngModelChange)="onMessageChange()"
+            [disabled]="loading || busy || messages.length === 0"
+          >
+            @for (message of messages; track message.messageId) {
+              <option [value]="message.messageId">
+                Respuesta #{{ message.messageId }} · {{ message.createdAt }}
+              </option>
+            }
+          </select>
+        </label>
+      </div>
+
+      @if (selectedSession; as session) {
+        <div class="context-summary">
+          <div>
+            <p class="eyebrow">CONTEXTO DE LA RESPUESTA</p>
+            <h2>{{ session.title || 'Sesión sin título' }}</h2>
+            <p>
+              Sesión #{{ session.sessionId }} · Expediente #{{ session.caseId }} ·
+              {{ session.messageCount }} mensajes
+            </p>
+          </div>
+          @if (session.documentScopeRequired && session.documentId === null) {
+            <span class="badge inactive">Documento original no disponible</span>
+          } @else if (session.documentId !== null) {
+            <span class="badge">Documento #{{ session.documentId }}</span>
+          } @else {
+            <span class="badge">Alcance del expediente</span>
+          }
+        </div>
+      }
+
+      @if (selectedMessage; as message) {
+        <div class="answer-preview">
+          <span>Respuesta #{{ message.messageId }}</span>
+          <p>{{ message.content }}</p>
+        </div>
+      } @else if (!busy) {
+        <p class="empty-message">Esta sesión no tiene respuestas del asistente para consultar.</p>
+      }
+    </section>
+
+    <section class="stats" aria-label="Resumen de fuentes consultadas">
+      <article class="stat">
+        <span>Total de referencias</span><strong>{{ citations.length }}</strong>
+      </article>
+      <article class="stat">
+        <span>Documentos vinculados</span><strong>{{ linkedDocumentCount }}</strong>
+      </article>
+      <article class="stat">
+        <span>Referencias conservadas</span><strong>{{ retainedCount }}</strong>
+      </article>
+    </section>
+
+    <section class="panel">
+      <div class="toolbar">
+        <input
+          class="search"
+          aria-label="Buscar referencias"
+          placeholder="Buscar por ID de referencia, documento o fragmento…"
+          [(ngModel)]="query"
+          (ngModelChange)="resetPage()"
+          [disabled]="loading || busy"
+        />
+        <select
+          aria-label="Filtrar por estado del documento"
+          [(ngModel)]="filter"
+          (ngModelChange)="resetPage()"
+          [disabled]="loading || busy"
+        >
+          <option value="">Todos los documentos</option>
+          <option value="linked">Documento vinculado</option>
+          <option value="retained">Referencia conservada</option>
+        </select>
+      </div>
+
+      @if (busy) {
+        <div class="notice" role="status">Cargando fuentes...</div>
+      } @else {
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Citation ID</th>
+                <th scope="col">Message ID</th>
+                <th scope="col">Document ID</th>
+                <th scope="col">Chunk ID</th>
+                <th scope="col">Relevance score</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (citation of paginate(filtered); track citation.citationId) {
+                <tr>
+                  <td class="name">#{{ citation.citationId }}</td>
+                  <td>#{{ citation.messageId }}</td>
+                  <td>
+                    @if (citation.documentId === null) {
+                      <span class="badge inactive">Documento eliminado</span>
+                    } @else {
+                      <span class="badge">#{{ citation.documentId }}</span>
+                    }
+                  </td>
+                  <td>{{ citation.chunkId ?? '—' }}</td>
+                  <td class="score">
+                    @if (citation.relevanceScore === null) {
+                      <span>No disponible</span>
+                    } @else {
+                      {{ citation.relevanceScore | number: '1.3-3' }}
+                    }
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5" class="empty">
+                    No hay referencias para esta respuesta o los filtros no devolvieron resultados.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <footer class="pager">
+          <span>{{ filtered.length }} resultados · Página {{ page }} de {{ pages(filtered) }}</span>
+          <div class="row-actions">
+            <button type="button" (click)="page = page - 1" [disabled]="page === 1">
+              ← Anterior
+            </button>
+            <button type="button" (click)="page = page + 1" [disabled]="page >= pages(filtered)">
+              Siguiente →
+            </button>
+          </div>
+        </footer>
+      }
+    </section>
+
+    <p class="hint">
+      Son fragmentos documentales consultados por el RAG, no citas verificadas de normas o
+      jurisprudencia. <code>relevanceScore</code> equivale a 1 − distancia coseno; no es una medida
+      de confianza. El backend no proporciona páginas en este recurso.
+    </p>
+  }
+}
