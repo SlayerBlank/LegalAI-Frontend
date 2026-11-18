@@ -20,9 +20,7 @@ a {
   align-items: center;
   gap: 10px;
   font:
-    32px/1 Georgia,
-    'Times New Roman',
-    serif;
+    800 32px/1 var(--font-display);
   white-space: nowrap;
 }
 .brand-mark {

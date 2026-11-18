@@ -30,9 +30,7 @@ aside {
   gap: 11px;
   color: var(--text);
   font:
-    32px/1 Georgia,
-    'Times New Roman',
-    serif;
+    800 32px/1 var(--font-display);
   text-decoration: none;
 }
 .brand-mark {
