@@ -1,10 +1,12 @@
 import { Component, HostListener, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { LanguageSwitcherComponent } from '../../shared/i18n/language-switcher';
+import { RegionSwitcherComponent } from '../../shared/i18n/region-switcher';
 import { ThemePreference, ThemeService } from '../../services/theme-service';
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, LanguageSwitcherComponent, RegionSwitcherComponent],
   templateUrl: './landing-pageComponent.html',
   styleUrls: [
     './landing-pageComponent.css',
