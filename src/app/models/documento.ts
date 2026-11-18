@@ -63,3 +63,21 @@ export interface DocumentTextResponse {
 export const DOCUMENT_MAX_FILE_BYTES = 10 * 1024 * 1024;
 export const DOCUMENT_CATEGORY_MAX = 80;
 export const DOCUMENT_FILE_NAME_MAX = 255;
+
+/** DocumentChunkResponseDTO: GET /api/documents/{id}/chunks (offsets sobre el texto normalizado). */
+export interface DocumentChunkResponse {
+  chunkId: number;
+  documentId: number;
+  chunkIndex: number;
+  content: string;
+  charStart: number;
+  charEnd: number;
+}
+
+/** ChunkGenerationResponseDTO: POST /api/documents/{id}/chunks */
+export interface ChunkGenerationResponse {
+  documentId: number;
+  chunksCreated: number;
+  chunkSize: number;
+  overlap: number;
+}
