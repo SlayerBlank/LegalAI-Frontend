@@ -29,8 +29,7 @@ aside {
   align-items: center;
   gap: 11px;
   color: var(--text);
-  font:
-    800 32px/1 var(--font-display);
+  font: 800 32px/1 var(--font-display);
   text-decoration: none;
 }
 .brand-mark {
@@ -259,11 +258,7 @@ aside {
 }
 .brand-mark {
   border-radius: 10px;
-  background: linear-gradient(
-    135deg,
-    var(--primary),
-    color-mix(in srgb, var(--primary) 55%, #7c3aed)
-  );
+  background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 70%, #000));
   color: #fff;
   box-shadow: 0 6px 16px color-mix(in srgb, var(--primary) 35%, transparent);
 }
@@ -306,11 +301,7 @@ nav a.active::before {
   background: linear-gradient(160deg, var(--primary-soft), var(--bg));
 }
 .avatar {
-  background: linear-gradient(
-    135deg,
-    var(--primary),
-    color-mix(in srgb, var(--primary) 55%, #7c3aed)
-  );
+  background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 70%, #000));
   color: #fff;
   font-weight: 700;
 }

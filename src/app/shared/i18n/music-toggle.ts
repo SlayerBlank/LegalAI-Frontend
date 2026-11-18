@@ -62,8 +62,12 @@ import { TranslatePipe } from './i18n.pipes';
     .music.playing {
       color: #fff;
       border-color: transparent;
-      background: linear-gradient(135deg, #b8860b, #d4a72c);
-      box-shadow: 0 4px 14px #b8860b55;
+      background: linear-gradient(
+        135deg,
+        var(--primary),
+        color-mix(in srgb, var(--primary) 70%, #000)
+      );
+      box-shadow: 0 4px 14px color-mix(in srgb, var(--primary) 35%, transparent);
     }
     .music:disabled {
       opacity: 0.45;

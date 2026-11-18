@@ -19,8 +19,7 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  font:
-    800 32px/1 var(--font-display);
+  font: 800 32px/1 var(--font-display);
   white-space: nowrap;
 }
 .brand-mark {
@@ -125,7 +124,7 @@ a:focus-visible {
   background: linear-gradient(
     135deg,
     var(--pub-blue),
-    color-mix(in srgb, var(--pub-blue) 55%, #7c3aed)
+    color-mix(in srgb, var(--pub-blue) 70%, #000)
   );
   color: #fff;
   box-shadow: 0 6px 16px color-mix(in srgb, var(--pub-blue) 35%, transparent);

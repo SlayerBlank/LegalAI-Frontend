@@ -47,11 +47,7 @@ button:not(:disabled):active {
 button.primary {
   color: #fff;
   border: 0;
-  background: linear-gradient(
-    135deg,
-    var(--primary),
-    color-mix(in srgb, var(--primary) 70%, #7c3aed)
-  );
+  background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 70%, #000));
   box-shadow: 0 6px 18px color-mix(in srgb, var(--primary) 35%, transparent);
 }
 button.primary:not(:disabled):hover {
@@ -114,11 +110,7 @@ textarea:focus {
   position: absolute;
   inset: 0 0 auto;
   height: 3px;
-  background: linear-gradient(
-    90deg,
-    var(--primary),
-    color-mix(in srgb, var(--primary) 40%, #22d3ee)
-  );
+  background: linear-gradient(90deg, var(--primary), color-mix(in srgb, var(--primary) 55%, #fff));
 }
 .stat:nth-child(2)::before {
   background: linear-gradient(90deg, var(--ok), #4ade80);

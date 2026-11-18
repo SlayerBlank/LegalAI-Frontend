@@ -19,11 +19,7 @@
 .stat::before,
 .stat:nth-child(2)::before,
 .stat:nth-child(3)::before {
-  background: linear-gradient(
-    90deg,
-    var(--primary),
-    color-mix(in srgb, var(--primary) 40%, #22d3ee)
-  );
+  background: linear-gradient(90deg, var(--primary), color-mix(in srgb, var(--primary) 55%, #fff));
 }
 td.nowrap:first-child {
   font-variant-numeric: tabular-nums;
