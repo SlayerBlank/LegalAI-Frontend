@@ -1,5 +1,4 @@
 import { Component, HostListener, OnInit, inject } from '@angular/core';
-import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { catchError, forkJoin, of } from 'rxjs';
 import {
@@ -15,6 +14,8 @@ import { AuditoriaService } from '../../services/auditoria-service';
 import { UsuarioService } from '../../services/usuario-service';
 import { ManagementHttpState } from '../../shared/management-http-state';
 import { ManagementDialogDirective } from '../../shared/management-dialog.directive';
+import { I18N_PIPES } from '../../shared/i18n/i18n.pipes';
+import { I18nService } from '../../services/i18n.service';
 
 const EMPTY_FILTERS: AuditLogFilters = {
   userId: null,
@@ -27,13 +28,14 @@ const EMPTY_FILTERS: AuditLogFilters = {
 @Component({
   selector: 'app-auditoria',
   standalone: true,
-  imports: [FormsModule, DatePipe, ManagementDialogDirective],
+  imports: [FormsModule, ManagementDialogDirective, ...I18N_PIPES],
   templateUrl: './auditoria-component.html',
   styleUrls: ['../../shared/management.css', './auditoria-component.css'],
 })
 export class AuditoriaComponent extends ManagementHttpState<AuditLogResponse> implements OnInit {
   private readonly api = inject(AuditoriaService);
   private readonly usersApi = inject(UsuarioService);
+  readonly i18n = inject(I18nService);
 
   readonly actions = Object.keys(AUDIT_ACTIONS);
   readonly entityTypes = AUDIT_ENTITY_TYPES;
@@ -104,9 +106,9 @@ export class AuditoriaComponent extends ManagementHttpState<AuditLogResponse> im
 
   validate(filters: AuditLogFilters): string {
     if (filters.from && filters.to && filters.from > filters.to)
-      return 'La fecha “desde” no puede ser posterior a la fecha “hasta”.';
+      return this.i18n.t('audit.errDates');
     if (filters.action.length > 80 || filters.entityType.length > 80)
-      return 'La acción y la entidad no deben superar los 80 caracteres.';
+      return this.i18n.t('audit.errLength');
     return '';
   }
 
@@ -124,12 +126,16 @@ export class AuditoriaComponent extends ManagementHttpState<AuditLogResponse> im
   }
 
   actionLabel(action: string): string {
-    return AUDIT_ACTIONS[action] ?? action;
+    // Acciones nuevas del backend que aún no estén en el diccionario se muestran tal cual.
+    return action in AUDIT_ACTIONS ? this.i18n.t(`action.${action}`) : action;
   }
 
   userLabel(log: AuditLogResponse): string {
     if (log.userFullName) return log.userFullName;
-    return this.users.find((u) => u.userId === log.userId)?.fullName ?? `Usuario #${log.userId}`;
+    return (
+      this.users.find((u) => u.userId === log.userId)?.fullName ??
+      this.i18n.t('audit.userFallback', { id: log.userId })
+    );
   }
 
   userEmail(log: AuditLogResponse): string {

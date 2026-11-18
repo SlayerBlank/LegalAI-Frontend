@@ -1,49 +1,51 @@
 <header>
   <div>
-    <h1>Auditoría</h1>
-    <p>Consulta quién hizo qué y cuándo dentro del sistema. Solo para administradores.</p>
+    <h1>{{ 'audit.title' | t }}</h1>
+    <p>{{ 'audit.subtitle' | t }}</p>
   </div>
   <button [disabled]="loading || busy || !result.content.length" (click)="exportCsv()">
-    Exportar página (CSV)
+    {{ 'audit.export' | t }}
   </button>
 </header>
 @if (loading) {
-  <div class="notice" role="status" aria-live="polite">Cargando datos...</div>
+  <div class="notice" role="status" aria-live="polite">{{ 'common.loading' | t }}</div>
 }
 @if (busy && !selected) {
-  <div class="notice" role="status" aria-live="polite">Procesando solicitud...</div>
+  <div class="notice" role="status" aria-live="polite">{{ 'common.processing' | t }}</div>
 }
 @if (error && !selected) {
   <div class="notice error" role="alert">
     {{ error }}
-    <button type="button" (click)="load()" [disabled]="loading || busy">Volver a cargar</button>
+    <button type="button" (click)="load()" [disabled]="loading || busy">
+      {{ 'common.reload' | t }}
+    </button>
   </div>
 }
 @if (!usersAvailable) {
   <div class="notice" role="status">
-    No se pudo cargar la lista de usuarios; se muestran sus identificadores.
+    {{ 'audit.usersUnavailable' | t }}
   </div>
 }
-<section class="panel filters" aria-label="Filtros de auditoría">
+<section class="panel filters" [attr.aria-label]="'audit.filters' | t">
   <form (ngSubmit)="search()">
     <fieldset [disabled]="loading || busy">
       <div class="filter-grid">
         <label
-          >Usuario
+          >{{ 'audit.user' | t }}
           <select name="userId" [(ngModel)]="form.userId">
-            <option [ngValue]="null">Todos</option>
+            <option [ngValue]="null">{{ 'audit.all' | t }}</option>
             @for (user of users; track user.userId) {
               <option [ngValue]="user.userId">{{ user.fullName }} · {{ user.email }}</option>
             }
           </select>
         </label>
         <label
-          >Acción
+          >{{ 'audit.action' | t }}
           <input
             name="action"
             list="audit-actions"
             maxlength="80"
-            placeholder="Ej.: UPLOAD_DOCUMENT"
+            [placeholder]="'audit.actionPlaceholder' | t"
             [(ngModel)]="form.action"
           />
           <datalist id="audit-actions">
@@ -53,37 +55,41 @@
           </datalist>
         </label>
         <label
-          >Entidad
+          >{{ 'audit.entity' | t }}
           <select name="entityType" [(ngModel)]="form.entityType">
-            <option value="">Todas</option>
+            <option value="">{{ 'audit.allEntities' | t }}</option>
             @for (type of entityTypes; track type) {
               <option [value]="type">{{ type }}</option>
             }
           </select>
         </label>
-        <label>Desde <input type="date" name="from" [(ngModel)]="form.from" /></label>
-        <label>Hasta <input type="date" name="to" [(ngModel)]="form.to" /></label>
+        <label
+          >{{ 'audit.from' | t }} <input type="date" name="from" [(ngModel)]="form.from"
+        /></label>
+        <label>{{ 'audit.to' | t }} <input type="date" name="to" [(ngModel)]="form.to" /></label>
       </div>
       @if (formError) {
         <p class="notice error" role="alert">{{ formError }}</p>
       }
       <div class="actions">
-        <button type="button" (click)="clear()">Limpiar filtros</button
-        ><button class="primary" type="submit">Buscar</button>
+        <button type="button" (click)="clear()">{{ 'audit.clear' | t }}</button
+        ><button class="primary" type="submit">{{ 'audit.search' | t }}</button>
       </div>
     </fieldset>
   </form>
 </section>
 @if (loaded) {
-  <section class="stats" aria-label="Resumen de la consulta">
+  <section class="stats" [attr.aria-label]="'audit.summary' | t">
     <article class="stat">
-      <span>Registros encontrados</span><strong>{{ result.totalElements }}</strong>
+      <span>{{ 'audit.statFound' | t }}</span
+      ><strong>{{ result.totalElements | lnumber }}</strong>
     </article>
     <article class="stat">
-      <span>Filtros activos</span><strong>{{ activeFilters }}</strong>
+      <span>{{ 'audit.statFilters' | t }}</span
+      ><strong>{{ activeFilters }}</strong>
     </article>
     <article class="stat">
-      <span>Página</span
+      <span>{{ 'audit.statPage' | t }}</span
       ><strong>{{ result.totalPages ? result.number + 1 : 0 }} / {{ result.totalPages }}</strong>
     </article>
   </section>
@@ -92,18 +98,18 @@
       <table>
         <thead>
           <tr>
-            <th>Fecha</th>
-            <th>Usuario</th>
-            <th>Acción</th>
-            <th>Entidad</th>
-            <th>Detalles</th>
-            <th>Acciones</th>
+            <th>{{ 'audit.colDate' | t }}</th>
+            <th>{{ 'audit.colUser' | t }}</th>
+            <th>{{ 'audit.colAction' | t }}</th>
+            <th>{{ 'audit.colEntity' | t }}</th>
+            <th>{{ 'audit.colDetails' | t }}</th>
+            <th>{{ 'audit.colActions' | t }}</th>
           </tr>
         </thead>
         <tbody>
           @for (log of result.content; track log.logId) {
             <tr>
-              <td class="nowrap">{{ log.createdAt | date: 'dd/MM/yyyy HH:mm:ss' }}</td>
+              <td class="nowrap">{{ log.createdAt | ldate: true }}</td>
               <td class="name">
                 {{ userLabel(log) }}<small>{{ userEmail(log) }}</small>
               </td>
@@ -116,7 +122,9 @@
               <td class="details">{{ log.details || '—' }}</td>
               <td>
                 <div class="row-actions">
-                  <button (click)="showDetail(log)" [disabled]="busy">Ver detalle</button>
+                  <button (click)="showDetail(log)" [disabled]="busy">
+                    {{ 'common.viewDetail' | t }}
+                  </button>
                 </div>
               </td>
             </tr>
@@ -124,9 +132,9 @@
             <tr>
               <td colspan="6" class="empty">
                 @if (activeFilters) {
-                  No hay registros con esos filtros.
+                  {{ 'audit.emptyFiltered' | t }}
                 } @else {
-                  Todavía no hay registros de auditoría.
+                  {{ 'audit.empty' | t }}
                 }
               </td>
             </tr>
@@ -135,15 +143,18 @@
       </table>
     </div>
     <footer class="pager">
-      <span>{{ firstRow }}–{{ lastRow }} de {{ result.totalElements }} registros</span>
+      <span>{{
+        'audit.range'
+          | t: { first: firstRow, last: lastRow, total: (result.totalElements | lnumber) }
+      }}</span>
       <div class="row-actions">
         <button (click)="goTo(result.number - 1)" [disabled]="loading || result.number === 0">
-          ← Anterior</button
+          {{ 'common.previous' | t }}</button
         ><button
           (click)="goTo(result.number + 1)"
           [disabled]="loading || result.number + 1 >= result.totalPages"
         >
-          Siguiente →
+          {{ 'common.next' | t }}
         </button>
       </div>
     </footer>
@@ -160,31 +171,31 @@
       (click)="$event.stopPropagation()"
     >
       <div class="dialog-head">
-        <h2 id="audit-detail-title">Registro #{{ log.logId }}</h2>
-        <button type="button" aria-label="Cerrar diálogo" (click)="close()">×</button>
+        <h2 id="audit-detail-title">{{ 'audit.detailTitle' | t: { id: log.logId } }}</h2>
+        <button type="button" [attr.aria-label]="'common.close' | t" (click)="close()">×</button>
       </div>
       <dl>
-        <dt>Fecha</dt>
-        <dd>{{ log.createdAt | date: 'dd/MM/yyyy HH:mm:ss' }}</dd>
-        <dt>Usuario</dt>
+        <dt>{{ 'audit.colDate' | t }}</dt>
+        <dd>{{ log.createdAt | ldate: true }}</dd>
+        <dt>{{ 'audit.colUser' | t }}</dt>
         <dd>
           {{ userLabel(log) }}
           @if (userEmail(log)) {
             <br /><small>{{ userEmail(log) }}</small>
           }
         </dd>
-        <dt>Acción</dt>
+        <dt>{{ 'audit.colAction' | t }}</dt>
         <dd>
           {{ actionLabel(log.action) }} <small>({{ log.action }})</small>
         </dd>
-        <dt>Entidad</dt>
+        <dt>{{ 'audit.colEntity' | t }}</dt>
         <dd>{{ log.entityType }}{{ log.entityId !== null ? ' #' + log.entityId : '' }}</dd>
       </dl>
-      <h2 class="section">Detalles</h2>
-      <pre class="detail-text">{{ log.details || 'Sin detalles registrados.' }}</pre>
+      <h2 class="section">{{ 'audit.details' | t }}</h2>
+      <pre class="detail-text">{{ log.details || ('audit.noDetails' | t) }}</pre>
       <div class="actions">
         <button class="primary" (click)="filterByUser(log.userId)">
-          Ver todos los registros de este usuario
+          {{ 'audit.byUser' | t }}
         </button>
       </div>
     </section>
