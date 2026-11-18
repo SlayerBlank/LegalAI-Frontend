@@ -1,0 +1,63 @@
+/* Estilos propios de Fragmentos; el resto viene de shared/management.css y los tokens del tema. */
+.stats {
+  grid-template-columns: repeat(4, 1fr);
+}
+.back {
+  display: inline-block;
+  margin-bottom: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-decoration: none;
+}
+.back:hover {
+  text-decoration: underline;
+}
+.count {
+  font-size: 0.85rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.chunk-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.chunk {
+  padding: 1rem 1.2rem;
+  border-top: 1px solid var(--border);
+}
+.chunk-head {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+.chunk-head small {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.chunk-text {
+  color: var(--text);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.9rem;
+}
+mark {
+  background: #fde68a;
+  color: #1f2937;
+  border-radius: 3px;
+  padding: 0 0.1rem;
+}
+button.link {
+  border: 0;
+  background: none;
+  padding: 0.2rem 0;
+  color: var(--primary);
+  font-size: 0.85rem;
+}
+@media (max-width: 800px) {
+  .stats {
+    grid-template-columns: 1fr 1fr;
+  }
+}

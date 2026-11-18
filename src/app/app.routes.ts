@@ -31,6 +31,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./components/documento-component/documento-component').then((m) => m.DocumentoComponent),
       },
+      {
+        path: 'documentos/:documentId/fragmentos',
+        loadComponent: () =>
+          import('./components/documento-chunk-component/documento-chunk-component').then(
+            (m) => m.DocumentoChunkComponent,
+          ),
+      },
       { path: 'chat-ia', component: ChatIaComponent },
       { path: 'borradores', component: BorradorComponent },
       { path: 'resumenes', component: ResumenComponent },
