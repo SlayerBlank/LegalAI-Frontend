@@ -12,6 +12,8 @@ import { DocumentChunkService } from '../../services/document-chunk-service';
 import { DocumentoService } from '../../services/documento-service';
 import { ManagementHttpState } from '../../shared/management-http-state';
 import { ManagementDialogDirective } from '../../shared/management-dialog.directive';
+import { I18N_PIPES } from '../../shared/i18n/i18n.pipes';
+import { I18nService } from '../../services/i18n.service';
 
 export interface TextPart {
   text: string;
@@ -23,7 +25,7 @@ const PREVIEW_CHARS = 280;
 @Component({
   selector: 'app-documento-chunk',
   standalone: true,
-  imports: [FormsModule, RouterLink, ManagementDialogDirective],
+  imports: [FormsModule, RouterLink, ManagementDialogDirective, ...I18N_PIPES],
   templateUrl: './documento-chunk-component.html',
   styleUrls: ['../../shared/management.css', './documento-chunk-component.css'],
 })
@@ -34,6 +36,7 @@ export class DocumentoChunkComponent
   private readonly route = inject(ActivatedRoute);
   private readonly documents = inject(DocumentoService);
   private readonly api = inject(DocumentChunkService);
+  readonly i18n = inject(I18nService);
 
   documentId: number | null = null;
   document: DocumentResponse | null = null;
@@ -47,7 +50,7 @@ export class DocumentoChunkComponent
     const id = Number(this.route.snapshot.paramMap.get('documentId'));
     this.documentId = Number.isInteger(id) && id > 0 ? id : null;
     if (this.documentId === null) {
-      this.error = 'El identificador del documento no es válido.';
+      this.error = this.i18n.t('chunks.invalidId');
       return;
     }
     this.load();
@@ -157,10 +160,11 @@ export class DocumentoChunkComponent
         this.expanded.clear();
         this.resetPage();
         this.confirmRegenerate = false;
-        this.notice =
-          `Se generaron ${generation.chunksCreated} fragmentos ` +
-          `(tamaño ${generation.chunkSize}, solapamiento ${generation.overlap}). ` +
-          'Vuelve a preparar el documento para la IA para generar sus embeddings.';
+        this.notice = this.i18n.t('chunks.generatedNotice', {
+          count: generation.chunksCreated,
+          size: generation.chunkSize,
+          overlap: generation.overlap,
+        });
       },
     );
   }

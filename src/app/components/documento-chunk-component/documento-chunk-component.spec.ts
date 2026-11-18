@@ -173,15 +173,13 @@ describe('DocumentoChunkComponent - transporte HTTP aislado', () => {
     expect(req.request.method).toBe('POST');
     req.flush({ documentId: 31, chunksCreated: 1, chunkSize: 2500, overlap: 300 });
     http.expectOne('/api/documents/31/chunks').flush([chunks[1]]);
-    http
-      .expectOne('/api/documents/31/preparation')
-      .flush({
-        ...prep,
-        stage: 'EMBEDDINGS_REQUIRED',
-        readyForRag: false,
-        chunks: 1,
-        embeddedChunks: 0,
-      });
+    http.expectOne('/api/documents/31/preparation').flush({
+      ...prep,
+      stage: 'EMBEDDINGS_REQUIRED',
+      readyForRag: false,
+      chunks: 1,
+      embeddedChunks: 0,
+    });
     expect(c.chunks).toEqual([chunks[1]]);
     expect(c.preparation?.embeddedChunks).toBe(0);
     expect(c.confirmRegenerate).toBe(false);

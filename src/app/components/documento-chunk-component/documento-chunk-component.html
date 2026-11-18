@@ -4,79 +4,91 @@
       class="back"
       routerLink="/documentos"
       [queryParams]="document ? { caseId: document.caseId } : {}"
-      >← Volver a Documentos</a
+      >{{ 'chunks.back' | t }}</a
     >
-    <h1>Fragmentos del documento</h1>
+    <h1>{{ 'chunks.title' | t }}</h1>
     <p>
       @if (document) {
-        {{ document.fileName }} · expediente #{{ document.caseId }}
+        {{ 'chunks.subtitleDoc' | t: { name: document.fileName, caseId: document.caseId } }}
       } @else {
-        Partes del texto que usa la IA para buscar y citar información.
+        {{ 'chunks.subtitle' | t }}
       }
     </p>
   </div>
   <button
     class="primary"
     [disabled]="loading || busy || !canRegenerate"
-    [title]="canRegenerate ? '' : 'El documento debe estar procesado y tener texto extraído'"
+    [title]="canRegenerate ? '' : ('chunks.regenerateDisabled' | t)"
     (click)="askRegenerate()"
   >
-    Regenerar fragmentos
+    {{ 'chunks.regenerate' | t }}
   </button>
 </header>
 @if (notice) {
   <div class="notice" role="status">{{ notice }}</div>
 }
 @if (loading) {
-  <div class="notice" role="status" aria-live="polite">Cargando datos...</div>
+  <div class="notice" role="status" aria-live="polite">{{ 'common.loading' | t }}</div>
 }
 @if (busy && !confirmRegenerate) {
-  <div class="notice" role="status" aria-live="polite">Procesando solicitud...</div>
+  <div class="notice" role="status" aria-live="polite">{{ 'common.processing' | t }}</div>
 }
 @if (error && !confirmRegenerate) {
   <div class="notice error" role="alert">
     {{ error }}
     @if (documentId !== null) {
-      <button type="button" (click)="load()" [disabled]="loading || busy">Volver a cargar</button>
+      <button type="button" (click)="load()" [disabled]="loading || busy">
+        {{ 'common.reload' | t }}
+      </button>
     }
   </div>
 }
 @if (loaded && !loading) {
-  <section class="stats" aria-label="Estadísticas de fragmentos">
+  <section class="stats" [attr.aria-label]="'chunks.statsLabel' | t">
     <article class="stat">
-      <span>Fragmentos</span><strong>{{ chunks.length }}</strong>
+      <span>{{ 'chunks.statTotal' | t }}</span
+      ><strong>{{ chunks.length | lnumber }}</strong>
     </article>
     <article class="stat">
-      <span>Con embedding</span
-      ><strong>{{ preparation ? preparation.embeddedChunks : '—' }}</strong>
+      <span>{{ 'chunks.statEmbedded' | t }}</span
+      ><strong>{{ preparation ? (preparation.embeddedChunks | lnumber) : '—' }}</strong>
     </article>
     <article class="stat">
-      <span>Longitud media</span><strong>{{ averageLength }}</strong>
+      <span>{{ 'chunks.statAverage' | t }}</span
+      ><strong>{{ averageLength | lnumber }}</strong>
     </article>
     <article class="stat">
-      <span>Texto extraído</span><strong>{{ document?.extractedTextLength ?? 0 }}</strong>
+      <span>{{ 'chunks.statExtracted' | t }}</span
+      ><strong>{{ document?.extractedTextLength ?? 0 | lnumber }}</strong>
     </article>
   </section>
   <section class="panel">
     <div class="toolbar">
       <input
         class="search"
-        aria-label="Buscar dentro de los fragmentos"
-        placeholder="Buscar dentro de los fragmentos…"
+        [attr.aria-label]="'chunks.search' | t"
+        [placeholder]="'chunks.searchPlaceholder' | t"
         [(ngModel)]="query"
         (ngModelChange)="resetPage()"
       />
-      <span class="count">{{ filtered.length }} de {{ chunks.length }}</span>
+      <span class="count">{{
+        'chunks.countOf' | t: { count: filtered.length, total: chunks.length }
+      }}</span>
     </div>
     <ol class="chunk-list">
       @for (chunk of paginate(filtered); track chunk.chunkId) {
         <li class="chunk">
           <div class="chunk-head">
             <span class="badge">#{{ chunk.chunkIndex }}</span>
-            <small
-              >Caracteres {{ chunk.charStart }}–{{ chunk.charEnd }} ·
-              {{ chunk.content.length }} caracteres</small
-            >
+            <small>{{
+              'chunks.range'
+                | t
+                  : {
+                      start: (chunk.charStart | lnumber),
+                      end: (chunk.charEnd | lnumber),
+                      length: (chunk.content.length | lnumber),
+                    }
+            }}</small>
           </div>
           <p class="chunk-text">
             @for (part of highlight(visibleText(chunk)); track $index) {
@@ -94,30 +106,33 @@
               [attr.aria-expanded]="expanded.has(chunk.chunkId)"
               (click)="toggle(chunk)"
             >
-              {{ expanded.has(chunk.chunkId) ? 'Ver menos' : 'Ver completo' }}
+              {{ (expanded.has(chunk.chunkId) ? 'chunks.showLess' : 'chunks.showMore') | t }}
             </button>
           }
         </li>
       } @empty {
         <li class="empty">
           @if (chunks.length === 0) {
-            Este documento aún no tiene fragmentos.
+            {{ 'chunks.empty' | t }}
             @if (canRegenerate) {
-              Usa “Regenerar fragmentos” para crearlos.
+              {{ 'chunks.emptyCanRegenerate' | t }}
             } @else {
-              Primero debe procesarse para extraer su texto.
+              {{ 'chunks.emptyNeedsProcessing' | t }}
             }
           } @else {
-            Ningún fragmento contiene “{{ query }}”.
+            {{ 'chunks.noMatch' | t: { query: query } }}
           }
         </li>
       }
     </ol>
     <footer class="pager">
-      <span>Página {{ page }} de {{ pages(filtered) }}</span>
+      <span>{{ 'common.pageOf' | t: { page: page, pages: pages(filtered) } }}</span>
       <div class="row-actions">
-        <button (click)="page = page - 1" [disabled]="page === 1">← Anterior</button
-        ><button (click)="page = page + 1" [disabled]="page >= pages(filtered)">Siguiente →</button>
+        <button (click)="page = page - 1" [disabled]="page === 1">
+          {{ 'common.previous' | t }}</button
+        ><button (click)="page = page + 1" [disabled]="page >= pages(filtered)">
+          {{ 'common.next' | t }}
+        </button>
       </div>
     </footer>
   </section>
@@ -133,23 +148,21 @@
       (click)="$event.stopPropagation()"
     >
       <div class="dialog-head">
-        <h2 id="regenerate-title">¿Regenerar fragmentos?</h2>
-        <button type="button" aria-label="Cerrar diálogo" (click)="close()">×</button>
+        <h2 id="regenerate-title">{{ 'chunks.confirmTitle' | t }}</h2>
+        <button type="button" [attr.aria-label]="'common.close' | t" (click)="close()">×</button>
       </div>
-      <p>
-        Se reemplazarán los {{ chunks.length }} fragmentos actuales por otros nuevos a partir del
-        texto extraído. Sus embeddings se perderán y habrá que preparar el documento para la IA otra
-        vez.
-      </p>
+      <p>{{ 'chunks.confirmText' | t: { count: chunks.length } }}</p>
       @if (error) {
         <p class="notice error" role="alert">{{ error }}</p>
       }
       @if (busy) {
-        <p role="status">Regenerando fragmentos...</p>
+        <p role="status">{{ 'chunks.regenerating' | t }}</p>
       }
       <div class="actions">
-        <button (click)="close()">Cancelar</button
-        ><button class="primary" [disabled]="busy" (click)="regenerate()">Regenerar</button>
+        <button (click)="close()">{{ 'common.cancel' | t }}</button
+        ><button class="primary" [disabled]="busy" (click)="regenerate()">
+          {{ 'chunks.confirmSubmit' | t }}
+        </button>
       </div>
     </section>
   </div>
