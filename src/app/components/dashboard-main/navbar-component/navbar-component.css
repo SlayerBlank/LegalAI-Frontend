@@ -156,3 +156,92 @@ button:focus-visible {
     flex-shrink: 0;
   }
 }
+
+/* ---- Diseño moderno (barra superior) ------------------------------------
+ * Cabecera fija tipo "vidrio" con desenfoque y controles en forma de píldora,
+ * coherentes con los selectores i18n / l10n. Respeta tema claro/oscuro.
+ */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  min-height: 76px;
+  padding-block: 14px;
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
+  backdrop-filter: saturate(160%) blur(14px);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  box-shadow:
+    0 1px 0 #ffffff0d,
+    0 8px 24px #0f172a0a;
+}
+.current-path {
+  font-weight: 700;
+  color: var(--text);
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--primary-soft);
+}
+.session-state::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: #16a34a;
+  box-shadow: 0 0 0 3px #16a34a26;
+  vertical-align: middle;
+}
+.navbar-actions {
+  gap: 10px;
+}
+.theme-switch {
+  border-radius: 999px;
+  background: var(--surface);
+}
+.theme-switch button {
+  border-radius: 999px;
+  font-weight: 600;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+.theme-switch button[aria-pressed='true'] {
+  background: var(--primary);
+  color: var(--surface);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--primary) 35%, transparent);
+}
+.notifications,
+.menu-trigger {
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.menu-trigger:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+time {
+  font-variant-numeric: tabular-nums;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+@media (max-width: 1280px) {
+  time {
+    display: none;
+  }
+}
+@media (max-width: 640px) {
+  .navbar-actions {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-switch button {
+    transition: none;
+  }
+}
