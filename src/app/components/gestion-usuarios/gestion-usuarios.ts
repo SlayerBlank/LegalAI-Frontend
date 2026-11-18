@@ -12,7 +12,11 @@ import { ManagementDialogDirective } from '../../shared/management-dialog.direct
   standalone: true,
   imports: [FormsModule, ManagementDialogDirective],
   templateUrl: './gestion-usuarios.html',
-  styleUrls: ['../../shared/management.css', './gestion-usuarios.css'],
+  styleUrls: [
+    '../../shared/management.css',
+    '../../shared/modern-module.css',
+    './gestion-usuarios.css',
+  ],
 })
 export class GestionUsuariosComponent extends ManagementHttpState<UserResponse> implements OnInit {
   private readonly api = inject(UsuarioService);

@@ -10,7 +10,11 @@ import { ManagementDialogDirective } from '../../shared/management-dialog.direct
   standalone: true,
   imports: [FormsModule, ManagementDialogDirective],
   templateUrl: './cliente-component.html',
-  styleUrls: ['../../shared/management.css', './cliente-component.css'],
+  styleUrls: [
+    '../../shared/management.css',
+    '../../shared/modern-module.css',
+    './cliente-component.css',
+  ],
 })
 export class ClienteComponent extends ManagementHttpState<ClientResponse> implements OnInit {
   private readonly api = inject(ClienteService);

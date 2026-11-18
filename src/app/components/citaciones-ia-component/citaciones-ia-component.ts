@@ -14,7 +14,11 @@ import { ManagementHttpState } from '../../shared/management-http-state';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './citaciones-ia-component.html',
-  styleUrls: ['../../shared/management.css', './citaciones-ia-component.css'],
+  styleUrls: [
+    '../../shared/management.css',
+    '../../shared/modern-module.css',
+    './citaciones-ia-component.css',
+  ],
 })
 export class CitacionesIaComponent
   extends ManagementHttpState<CitacionIAResponseDTO>
