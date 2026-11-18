@@ -303,4 +303,14 @@ describe('DocumentoComponent - transporte HTTP aislado', () => {
     expect(c.pending).toBeNull();
     expect(c.notice).toBe('Documento eliminado correctamente.');
   });
+
+  it('navega a los fragmentos del documento y cierra el detalle', () => {
+    const c = mount().componentInstance;
+    c.showDetail(doc);
+    http.expectOne('/api/documents/31').flush(doc);
+    http.expectOne('/api/documents/31/preparation').flush(prep);
+    c.openChunks(doc);
+    expect(c.selected).toBeNull();
+    expect(TestBed.inject(Router).navigate).toHaveBeenCalledWith(['/documentos', 31, 'fragmentos']);
+  });
 });
