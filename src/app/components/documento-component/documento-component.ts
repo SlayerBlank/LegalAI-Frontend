@@ -235,6 +235,12 @@ export class DocumentoComponent extends ManagementHttpState<DocumentResponse> im
     this.run(this.api.download(doc.documentId), 'busy', (blob) => saveBlob(blob, doc.fileName));
   }
 
+  openChunks(doc: DocumentResponse) {
+    if (this.busy) return;
+    this.close();
+    this.router.navigate(['/documentos', doc.documentId, 'fragmentos']);
+  }
+
   // ---- Eliminación ---------------------------------------------------------
 
   confirmRemove(doc: DocumentResponse) {

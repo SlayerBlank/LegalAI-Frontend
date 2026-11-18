@@ -103,6 +103,7 @@
                 <td>
                   <div class="row-actions">
                     <button (click)="showDetail(doc)" [disabled]="busy">Ver detalle</button
+                    ><button (click)="openChunks(doc)" [disabled]="busy">Fragmentos</button
                     ><button (click)="download(doc)" [disabled]="busy">Descargar</button
                     ><button class="danger" (click)="confirmRemove(doc)" [disabled]="busy">
                       Eliminar
@@ -269,6 +270,11 @@
         }
         @if (text === null && doc.hasExtractedText) {
           <button [disabled]="busy" (click)="loadText()">Ver texto extraído</button>
+        }
+        @if (preparation && preparation.chunks > 0) {
+          <button [disabled]="busy" (click)="openChunks(doc)">
+            Ver {{ preparation.chunks }} fragmentos
+          </button>
         }
         <button [disabled]="busy" (click)="download(doc)">Descargar PDF</button>
       </div>
