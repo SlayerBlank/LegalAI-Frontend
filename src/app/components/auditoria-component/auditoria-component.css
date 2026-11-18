@@ -1,7 +1,36 @@
 /* Estilos propios de Auditoría; el resto viene de shared/management.css y los tokens del tema. */
 .filters {
-  padding: 1.2rem;
+  padding: 1.3rem 1.4rem;
   margin-bottom: 1.6rem;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--primary) 6%, var(--surface)),
+    var(--surface) 60%
+  );
+}
+.filters label {
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+/* Las tres tarjetas de Auditoría son informativas: un solo color de acento. */
+.stat::before,
+.stat:nth-child(2)::before,
+.stat:nth-child(3)::before {
+  background: linear-gradient(
+    90deg,
+    var(--primary),
+    color-mix(in srgb, var(--primary) 40%, #22d3ee)
+  );
+}
+td.nowrap:first-child {
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+.badge {
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface));
 }
 .filter-grid {
   display: grid;

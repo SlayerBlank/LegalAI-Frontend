@@ -30,7 +30,11 @@ const EMPTY_FILTERS: AuditLogFilters = {
   standalone: true,
   imports: [FormsModule, ManagementDialogDirective, ...I18N_PIPES],
   templateUrl: './auditoria-component.html',
-  styleUrls: ['../../shared/management.css', './auditoria-component.css'],
+  styleUrls: [
+    '../../shared/management.css',
+    '../../shared/modern-module.css',
+    './auditoria-component.css',
+  ],
 })
 export class AuditoriaComponent extends ManagementHttpState<AuditLogResponse> implements OnInit {
   private readonly api = inject(AuditoriaService);
