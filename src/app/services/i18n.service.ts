@@ -2,9 +2,14 @@ import { DOCUMENT } from '@angular/common';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { DICTIONARIES, Language, TranslationKey } from '../i18n/dictionaries';
 
-/** Locale (l10n) usado para fechas, números y tamaños según el idioma activo. */
-const LOCALES: Record<Language, string> = { es: 'es-PE', en: 'en-US' };
+/** Región por defecto de cada idioma cuando el usuario no eligió una (modo automático). */
+const DEFAULT_REGION: Record<Language, RegionLocale> = { es: 'es-PE', en: 'en-US' };
 const STORAGE_KEY = 'legalai-language';
+const REGION_KEY = 'legalai-region';
+
+/** Regiones (l10n) disponibles: definen el formato de fechas y números, no el idioma. */
+export const REGIONS = ['es-PE', 'es-MX', 'es-ES', 'en-US', 'en-GB'] as const;
+export type RegionLocale = (typeof REGIONS)[number];
 
 export type TranslationParams = Record<string, string | number>;
 /** Clave conocida o compuesta en tiempo de ejecución (p. ej. 'status.' + estado). */
@@ -18,8 +23,12 @@ export type AnyTranslationKey = TranslationKey | (string & {});
 export class I18nService {
   private readonly document = inject(DOCUMENT);
   readonly language = signal<Language>(this.initialLanguage());
-  readonly locale = computed(() => LOCALES[this.language()]);
+  /** Región elegida a mano; null = automática según el idioma. */
+  readonly region = signal<RegionLocale | null>(this.initialRegion());
+  /** Locale efectivo para Intl: la región elegida o la del idioma (l10n). */
+  readonly locale = computed<RegionLocale>(() => this.region() ?? DEFAULT_REGION[this.language()]);
   readonly languages: readonly Language[] = ['es', 'en'];
+  readonly regions = REGIONS;
 
   constructor() {
     this.apply(this.language());
@@ -46,13 +55,24 @@ export class I18nService {
     }
   }
 
+  /** l10n: cambia solo el formato regional (fechas y números); null vuelve al automático. */
+  setRegion(region: RegionLocale | null): void {
+    this.region.set(region);
+    try {
+      if (region) localStorage.setItem(REGION_KEY, region);
+      else localStorage.removeItem(REGION_KEY);
+    } catch {
+      // Sin almacenamiento: la región se mantiene solo en esta sesión.
+    }
+  }
+
   toggle(): Language {
     const next = this.language() === 'es' ? 'en' : 'es';
     this.setLanguage(next);
     return next;
   }
 
-  /** Fecha localizada con Intl (dd/MM/yyyy en es-PE, MM/dd/yyyy en en-US). */
+  /** Fecha localizada con Intl según la región (dd/MM/yyyy en es-PE, MM/dd/yyyy en en-US). */
   formatDate(value: string | Date | null | undefined, withSeconds = false): string {
     if (!value) return '—';
     const date = value instanceof Date ? value : new Date(value);
@@ -72,7 +92,7 @@ export class I18nService {
     return new Intl.NumberFormat(this.locale(), { maximumFractionDigits }).format(value);
   }
 
-  /** Tamaño de archivo con separadores del idioma: "1,5 MB" (es) / "1.5 MB" (en). */
+  /** Tamaño de archivo con separadores de la región: "1,5 MB" (es-ES) / "1.5 MB" (en-US). */
   formatBytes(bytes: number | null | undefined): string {
     if (bytes === null || bytes === undefined) return '—';
     if (bytes < 1024) return `${this.formatNumber(bytes)} B`;
@@ -89,6 +109,15 @@ export class I18nService {
     }
     // La aplicación nace en español; el usuario elige inglés con el selector.
     return 'es';
+  }
+
+  private initialRegion(): RegionLocale | null {
+    try {
+      const saved = localStorage.getItem(REGION_KEY);
+      return (REGIONS as readonly string[]).includes(saved ?? '') ? (saved as RegionLocale) : null;
+    } catch {
+      return null;
+    }
   }
 
   private apply(language: Language): void {
