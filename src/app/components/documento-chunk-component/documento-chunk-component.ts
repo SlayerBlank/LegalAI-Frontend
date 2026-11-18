@@ -27,7 +27,11 @@ const PREVIEW_CHARS = 280;
   standalone: true,
   imports: [FormsModule, RouterLink, ManagementDialogDirective, ...I18N_PIPES],
   templateUrl: './documento-chunk-component.html',
-  styleUrls: ['../../shared/management.css', './documento-chunk-component.css'],
+  styleUrls: [
+    '../../shared/management.css',
+    '../../shared/modern-module.css',
+    './documento-chunk-component.css',
+  ],
 })
 export class DocumentoChunkComponent
   extends ManagementHttpState<DocumentChunkResponse>
