@@ -1,1 +1,179 @@
-.module-page{max-width:760px}.eyebrow{color:var(--primary);font-size:.75rem;font-weight:700;letter-spacing:.12em}.module-page h1{margin:.5rem 0}.module-page>p:not(.eyebrow){color:var(--muted)}.notice{margin-top:2rem;padding:1rem;border:1px dashed var(--border);border-radius:.6rem;background:var(--surface);color:var(--muted)}
+/* Estilos propios de Chat IA; la base viene de shared/management.css y modern-module.css. */
+.chat-layout {
+  display: grid;
+  grid-template-columns: minmax(15rem, 20rem) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+.sessions,
+.conversation {
+  display: flex;
+  flex-direction: column;
+}
+.sessions {
+  max-height: calc(100dvh - 12rem);
+}
+.sessions-head,
+.conversation-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.sessions-head select {
+  width: 100%;
+}
+.session-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem;
+  overflow-y: auto;
+}
+.session-list li {
+  border-radius: var(--radius-sm);
+  padding: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+.session-list li.active {
+  background: var(--primary-soft);
+  box-shadow: inset 3px 0 0 var(--primary);
+}
+.session-main {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+}
+.session-main strong {
+  overflow-wrap: anywhere;
+}
+.session-main small,
+.conversation-head small,
+.meta,
+time {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+.session-list .row-actions {
+  padding: 0 0.6rem 0.4rem;
+}
+.load-more {
+  margin: 0.5rem auto;
+}
+.conversation {
+  min-height: 60dvh;
+}
+.log {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1rem;
+  overflow-y: auto;
+  max-height: calc(100dvh - 22rem);
+  min-height: 16rem;
+}
+.bubble {
+  max-width: min(46rem, 88%);
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 14px 14px 14px 4px;
+  background: var(--bg);
+}
+.bubble.user {
+  align-self: flex-end;
+  border-radius: 14px 14px 4px 14px;
+  background: var(--primary-soft);
+  border-color: color-mix(in srgb, var(--primary) 25%, var(--border));
+}
+.bubble-head {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  margin: 0 0 0.3rem;
+  font-size: 0.8rem;
+}
+.content {
+  color: var(--text);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: 0;
+}
+.thinking {
+  color: var(--muted);
+  font-style: italic;
+}
+.sources {
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+}
+.sources summary {
+  cursor: pointer;
+  color: var(--primary);
+  font-weight: 600;
+}
+.sources ol {
+  padding-left: 1.2rem;
+  margin: 0.4rem 0 0;
+}
+blockquote {
+  margin: 0.3rem 0 0.6rem;
+  padding-left: 0.7rem;
+  border-left: 3px solid var(--border);
+  color: var(--muted);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.composer {
+  padding: 1rem;
+  border-top: 1px solid var(--border);
+}
+.composer textarea {
+  resize: vertical;
+  min-height: 4.5rem;
+}
+.composer-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+.field-error {
+  color: var(--bad);
+  font-size: 0.8rem;
+}
+.hint {
+  font-size: 0.78rem;
+}
+.placeholder {
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+.empty {
+  padding: 1.5rem;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+@media (max-width: 900px) {
+  .chat-layout {
+    grid-template-columns: 1fr;
+  }
+  .sessions {
+    max-height: 22rem;
+  }
+  .log {
+    max-height: none;
+  }
+}

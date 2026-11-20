@@ -1,0 +1,118 @@
+/* Sección "Consultas" del panel; usa los mismos tokens y medidas que dashboard-home. */
+:host {
+  display: block;
+  margin-bottom: 26px;
+}
+.queries-title {
+  font-size: 16px;
+  font-weight: 550;
+  margin: 0 0 14px;
+}
+.query-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+  min-width: 0;
+}
+.panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+.panel-heading h3 {
+  font-size: 14px;
+  font-weight: 550;
+  margin: 0;
+}
+.text-action {
+  font: inherit;
+  font-size: 11px;
+  color: var(--primary);
+  text-decoration: none;
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.text-action:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.state {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 0;
+  padding: 16px 0 4px;
+}
+.state.error p {
+  margin: 0 0 8px;
+}
+.table-scroll {
+  overflow-x: auto;
+  max-height: 22rem;
+  overflow-y: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+caption {
+  text-align: left;
+  font-size: 11px;
+  color: var(--muted);
+  padding-bottom: 8px;
+}
+th,
+td {
+  padding: 9px 4px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  font-weight: 400;
+}
+thead th {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+tbody th {
+  overflow-wrap: anywhere;
+}
+tbody a {
+  color: var(--text);
+  text-decoration: none;
+}
+tbody a:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+tfoot th,
+tfoot td {
+  font-weight: 600;
+  border-bottom: 0;
+}
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+@media (max-width: 900px) {
+  .query-grid {
+    grid-template-columns: 1fr;
+  }
+  .panel {
+    padding: 18px;
+  }
+}

@@ -1,1 +1,364 @@
-<section class="module-page"><p class="eyebrow">MÓDULO</p><h1>Expedientes</h1><p>Organización de asuntos y procesos legales.</p><div class="notice">Este módulo está pendiente de implementación.</div></section>
+<header>
+  <div>
+    <h1>{{ 'cases.title' | t }}</h1>
+    <p>{{ 'cases.subtitle' | t }}</p>
+  </div>
+  <button class="primary" type="button" [disabled]="loading() || busy()" (click)="openForm()">
+    {{ 'cases.new' | t }}
+  </button>
+</header>
+
+@if (notice()) {
+  <div class="notice" role="status">{{ notice() }}</div>
+}
+@if (loading()) {
+  <div class="notice" role="status" aria-live="polite">{{ 'common.loading' | t }}</div>
+}
+@if (busy() && !editing() && !pending()) {
+  <div class="notice" role="status" aria-live="polite">{{ 'common.processing' | t }}</div>
+}
+@if (error() && !editing() && !pending()) {
+  <div class="notice error" role="alert">
+    {{ error() }}
+    <button type="button" (click)="load()" [disabled]="loading() || busy()">
+      {{ 'common.reload' | t }}
+    </button>
+  </div>
+}
+@if (clientsError()) {
+  <div class="notice error" role="alert">
+    {{ 'cases.clientsError' | t: { error: clientsError() } }}
+    <button type="button" (click)="loadClients()">{{ 'common.reload' | t }}</button>
+  </div>
+}
+
+@if (loaded() && !loading()) {
+  <section class="stats" [attr.aria-label]="'cases.statsLabel' | t">
+    <article class="stat">
+      <span>{{ 'cases.statTotal' | t }}</span><strong>{{ cases().length | lnumber }}</strong>
+    </article>
+    <article class="stat">
+      <span>{{ 'cases.statActive' | t }}</span
+      ><strong>{{ count('OPEN', 'IN_PROGRESS') | lnumber }}</strong>
+    </article>
+    <article class="stat">
+      <span>{{ 'cases.statClosed' | t }}</span><strong>{{ count('CLOSED') | lnumber }}</strong>
+    </article>
+    <article class="stat">
+      <span>{{ 'cases.statArchived' | t }}</span
+      ><strong>{{ count('ARCHIVED') | lnumber }}</strong>
+    </article>
+  </section>
+}
+
+<section class="panel">
+  <form
+    class="toolbar server-filters"
+    [formGroup]="filterForm"
+    (ngSubmit)="applyFilters()"
+    [attr.aria-label]="'cases.filters' | t"
+  >
+    <label
+      >{{ 'cases.statusFilter' | t }}
+      <select formControlName="status">
+        <option value="">{{ 'cases.allStatuses' | t }}</option>
+        @for (s of statuses; track s) {
+          <option [value]="s">{{ statusLabel(s) }}</option>
+        }
+      </select>
+    </label>
+    <label
+      >{{ 'cases.openedFrom' | t }}
+      <input type="date" formControlName="openedFrom" />
+    </label>
+    <label
+      >{{ 'cases.openedTo' | t }}
+      <input type="date" formControlName="openedTo" />
+    </label>
+    <div class="row-actions">
+      <button class="primary" type="submit" [disabled]="loading() || busy()">
+        {{ 'cases.apply' | t }}
+      </button>
+      <button type="button" [disabled]="loading() || busy()" (click)="clearFilters()">
+        {{ 'cases.clear' | t }}
+      </button>
+    </div>
+    @if (filterForm.hasError('range')) {
+      <p class="field-error" role="alert">{{ 'cases.errDates' | t }}</p>
+    }
+    @if (hasServerFilters()) {
+      <span class="badge">{{ 'cases.filtersActive' | t }}</span>
+    }
+  </form>
+
+  <div class="toolbar">
+    <input
+      class="search"
+      type="search"
+      [attr.aria-label]="'cases.search' | t"
+      [placeholder]="'cases.searchPlaceholder' | t"
+      [value]="query()"
+      (input)="setQuery($any($event.target).value)"
+    />
+    <select
+      [attr.aria-label]="'cases.clientFilter' | t"
+      [value]="clientFilter() ?? ''"
+      (change)="setClientFilter($any($event.target).value)"
+    >
+      <option value="">{{ 'cases.allClients' | t }}</option>
+      @for (c of clients(); track c.clientId) {
+        <option [value]="c.clientId">{{ c.fullNameOrCompany }}</option>
+      }
+    </select>
+  </div>
+
+  @if (loaded() && !loading()) {
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">{{ 'cases.colCase' | t }}</th>
+            <th scope="col">{{ 'cases.colClient' | t }}</th>
+            <th scope="col">{{ 'cases.colStatus' | t }}</th>
+            <th scope="col">{{ 'cases.colOpened' | t }}</th>
+            <th scope="col">{{ 'cases.colClosed' | t }}</th>
+            <th scope="col">{{ 'cases.colSessions' | t }}</th>
+            <th scope="col">{{ 'cases.colActions' | t }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of rows(); track item.caseId) {
+            <tr>
+              <td class="name case-title">
+                {{ item.title }}<small>#{{ item.caseId }} · {{ item.description || ('cases.noDescription' | t) }}</small>
+              </td>
+              <td>{{ clientName(item.clientId) }}</td>
+              <td>
+                <span class="badge status" [attr.data-case]="item.status">{{
+                  statusLabel(item.status)
+                }}</span>
+              </td>
+              <td>{{ day(item.openedAt) }}</td>
+              <td>{{ day(item.closedAt) }}</td>
+              <td>{{ sessionsOf(item.caseId) }}</td>
+              <td>
+                <div class="row-actions">
+                  <button type="button" [disabled]="busy()" (click)="showDetail(item)">
+                    {{ 'common.viewDetail' | t }}</button
+                  ><button type="button" [disabled]="busy()" (click)="openForm(item)">
+                    {{ 'cases.edit' | t }}</button
+                  ><button
+                    class="danger"
+                    type="button"
+                    [disabled]="busy()"
+                    (click)="confirmRemove(item)"
+                  >
+                    {{ 'common.delete' | t }}
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="empty">
+                {{
+                  (cases().length || hasServerFilters() ? 'cases.emptySearch' : 'cases.empty') | t
+                }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <footer class="pager">
+      <span
+        >{{ 'common.results' | t: { count: filtered().length } }} ·
+        {{ 'common.pageOf' | t: { page: page(), pages: pages() } }}</span
+      >
+      <div class="row-actions">
+        <button type="button" (click)="page.set(page() - 1)" [disabled]="page() <= 1">
+          {{ 'common.previous' | t }}</button
+        ><button type="button" (click)="page.set(page() + 1)" [disabled]="page() >= pages()">
+          {{ 'common.next' | t }}
+        </button>
+      </div>
+    </footer>
+  }
+</section>
+
+@if (editing(); as target) {
+  <div class="overlay" (click)="close()">
+    <section
+      class="dialog"
+      managementDialog
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="case-form-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="dialog-head">
+        <h2 id="case-form-title">
+          {{ (target === 'new' ? 'cases.formNew' : 'cases.formEdit') | t }}
+        </h2>
+        <button type="button" [attr.aria-label]="'common.close' | t" (click)="close()">×</button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+        <fieldset [disabled]="busy()">
+          @if (!clients().length && !clientsError()) {
+            <p class="notice">{{ 'cases.noClients' | t }}</p>
+          }
+          <div class="form-grid">
+            <label class="wide"
+              >{{ 'cases.client' | t }}
+              <select formControlName="clientId" required aria-describedby="case-client-error">
+                <option [ngValue]="null">{{ 'cases.selectClient' | t }}</option>
+                @if (!hasClient(form.controls.clientId.value)) {
+                  <option [ngValue]="form.controls.clientId.value">
+                    {{ clientName(form.controls.clientId.value!) }}
+                  </option>
+                }
+                @for (c of clients(); track c.clientId) {
+                  <option [ngValue]="c.clientId">{{ c.fullNameOrCompany }}</option>
+                }
+              </select>
+              @if (form.controls.clientId.touched && form.controls.clientId.invalid) {
+                <small id="case-client-error" class="field-error">{{ 'cases.errClient' | t }}</small>
+              }
+            </label>
+            <label class="wide"
+              >{{ 'cases.caseTitle' | t }}
+              <input
+                formControlName="title"
+                required
+                [attr.maxlength]="titleMax"
+                aria-describedby="case-title-error"
+              />
+              @if (form.controls.title.touched && form.controls.title.invalid) {
+                <small id="case-title-error" class="field-error">{{
+                  'cases.errTitle' | t: { max: titleMax }
+                }}</small>
+              }
+            </label>
+            <label class="wide"
+              >{{ 'cases.description' | t }}
+              <textarea formControlName="description" rows="3"></textarea>
+            </label>
+            <label
+              >{{ 'cases.status' | t }}
+              <select formControlName="status">
+                @for (s of statuses; track s) {
+                  <option [ngValue]="s">{{ statusLabel(s) }}</option>
+                }
+              </select>
+            </label>
+            <label
+              >{{ 'cases.openedAt' | t }}
+              <input type="date" formControlName="openedAt" />
+            </label>
+            <label class="wide"
+              >{{ 'cases.closedAt' | t }}
+              <input type="date" formControlName="closedAt" aria-describedby="case-closed-hint" />
+              <small id="case-closed-hint" class="hint">{{ 'cases.closedHint' | t }}</small>
+              @if (form.hasError('closedBeforeOpened')) {
+                <small class="field-error" role="alert">{{ 'cases.errClosedBefore' | t }}</small>
+              }
+            </label>
+          </div>
+          <p class="hint">{{ 'cases.openedHint' | t }}</p>
+          @if (error()) {
+            <p class="notice error" role="alert">{{ error() }}</p>
+          }
+          @if (busy()) {
+            <p role="status">{{ 'common.processing' | t }}</p>
+          }
+          <div class="actions">
+            <button type="button" (click)="close()">{{ 'common.cancel' | t }}</button
+            ><button class="primary" type="submit" [disabled]="busy()">
+              {{ 'cases.save' | t }}
+            </button>
+          </div>
+        </fieldset>
+      </form>
+    </section>
+  </div>
+}
+
+@if (selected(); as item) {
+  <div class="overlay" (click)="close()">
+    <section
+      class="dialog"
+      managementDialog
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="case-detail-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="dialog-head">
+        <h2 id="case-detail-title">{{ 'cases.detailTitle' | t }}</h2>
+        <button type="button" [attr.aria-label]="'common.close' | t" (click)="close()">×</button>
+      </div>
+      <h2 class="detail-name">{{ item.title }}</h2>
+      <dl>
+        <dt>{{ 'cases.colClient' | t }}</dt>
+        <dd>{{ clientName(item.clientId) }}</dd>
+        <dt>{{ 'cases.colStatus' | t }}</dt>
+        <dd>
+          <span class="badge status" [attr.data-case]="item.status">{{
+            statusLabel(item.status)
+          }}</span>
+        </dd>
+        <dt>{{ 'cases.description' | t }}</dt>
+        <dd class="pre">{{ item.description || ('cases.noDescription' | t) }}</dd>
+        <dt>{{ 'cases.openedAt' | t }}</dt>
+        <dd>{{ day(item.openedAt) }}</dd>
+        <dt>{{ 'cases.closedAt' | t }}</dt>
+        <dd>{{ day(item.closedAt) }}</dd>
+        <dt>{{ 'cases.sessions' | t }}</dt>
+        <dd>{{ sessionsOf(item.caseId) }}</dd>
+        <dt>{{ 'cases.created' | t }}</dt>
+        <dd>{{ item.createdAt | ldate }}</dd>
+        <dt>{{ 'cases.updated' | t }}</dt>
+        <dd>{{ item.updatedAt | ldate }}</dd>
+      </dl>
+      <div class="actions">
+        <button type="button" (click)="openDocuments(item)">{{ 'cases.openDocuments' | t }}</button
+        ><button type="button" (click)="openChat(item)">{{ 'cases.openChat' | t }}</button
+        ><button class="primary" type="button" (click)="openForm(item)">
+          {{ 'cases.edit' | t }}
+        </button>
+      </div>
+    </section>
+  </div>
+}
+
+@if (pending(); as item) {
+  <div class="overlay" (click)="close()">
+    <section
+      class="dialog"
+      managementDialog
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="case-delete-title"
+      aria-describedby="case-delete-text"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="dialog-head">
+        <h2 id="case-delete-title">{{ 'cases.deleteTitle' | t }}</h2>
+        <button type="button" [attr.aria-label]="'common.close' | t" (click)="close()">×</button>
+      </div>
+      <p id="case-delete-text">{{ 'cases.deleteText' | t: { name: item.title } }}</p>
+      @if (error()) {
+        <p class="notice error" role="alert">{{ error() }}</p>
+      }
+      @if (busy()) {
+        <p role="status">{{ 'common.processing' | t }}</p>
+      }
+      <div class="actions">
+        <button type="button" (click)="close()">{{ 'common.cancel' | t }}</button
+        ><button class="danger" type="button" [disabled]="busy()" (click)="remove()">
+          {{ 'cases.deleteSubmit' | t }}
+        </button>
+      </div>
+    </section>
+  </div>
+}

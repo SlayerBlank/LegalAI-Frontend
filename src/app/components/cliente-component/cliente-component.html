@@ -54,6 +54,7 @@
             <th>Documento</th>
             <th>Tipo</th>
             <th>Teléfono</th>
+            <th>Documentos</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -70,6 +71,7 @@
                 }}</span>
               </td>
               <td>{{ client.phone }}</td>
+              <td>{{ documentsOf(client.clientId) }}</td>
               <td>
                 <div class="row-actions">
                   <button (click)="showDetail(client)">Ver detalle</button
@@ -80,7 +82,7 @@
             </tr>
           } @empty {
             <tr>
-              <td colspan="5" class="empty">
+              <td colspan="6" class="empty">
                 No se encontraron clientes. Prueba con otra búsqueda.
               </td>
             </tr>
