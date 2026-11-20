@@ -5,8 +5,6 @@ import { DashboardHomeComponent } from './components/dashboard-main/dashboard-ho
 import { ClienteComponent } from './components/cliente-component/cliente-component';
 import { ExpedienteComponent } from './components/expediente-component/expediente-component';
 import { ChatIaComponent } from './components/chat-ia-component/chat-ia-component';
-import { BorradorComponent } from './components/borrador-component/borrador-component';
-import { ResumenComponent } from './components/resumen-component/resumen-component';
 import { CitacionesIaComponent } from './components/citaciones-ia-component/citaciones-ia-component';
 import { UsuarioComponent } from './components/usuario-component/usuario-component';
 import { UsuarioInsertComponent } from './components/usuario-component/usuario-insert/usuario-insert';
@@ -38,8 +36,14 @@ export const routes: Routes = [
           ),
       },
       { path: 'chat-ia', component: ChatIaComponent },
-      { path: 'borradores', component: BorradorComponent },
-      { path: 'resumenes', component: ResumenComponent },
+      {
+        path: 'borradores',
+        loadComponent: () => import('./components/borrador-component/borrador-component').then((module) => module.BorradorComponent),
+      },
+      {
+        path: 'resumenes',
+        loadComponent: () => import('./components/resumen-component/resumen-component').then((module) => module.ResumenComponent),
+      },
       { path: 'citaciones-ia', component: CitacionesIaComponent },
       { path: 'gestionusuarios', component: GestionUsuariosComponent, canActivate: [adminGuard] },
       { path: 'roles', component: RolComponent, canActivate: [adminGuard] },

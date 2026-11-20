@@ -1,3 +1,5 @@
+@use "./app/shared/legal-records/material-theme";
+
 :root { --bg:#F7F8FA; --surface:#FFFFFF; --text:#20242C; --muted:#6B7280; --primary:#2563EB; --primary-soft:#EFF6FF; --border:#E5E7EB; --shadow:0 12px 30px #1f29370d; }
 :root {
   /* Tipografía: Inter para el texto y Plus Jakarta Sans para títulos (cargadas en index.html). */
