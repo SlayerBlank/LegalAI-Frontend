@@ -1,1 +1,18 @@
-.module-page{max-width:760px}.eyebrow{color:var(--primary);font-size:.75rem;font-weight:700;letter-spacing:.12em}.module-page h1{margin:.5rem 0}.module-page>p:not(.eyebrow){color:var(--muted)}.notice{margin-top:2rem;padding:1rem;border:1px dashed var(--border);border-radius:.6rem;background:var(--surface);color:var(--muted)}
+.draft-search {
+  flex: 1 1 15rem;
+  max-width: 23rem;
+}
+
+.draft-grid {
+  --record-columns: minmax(13rem, 1fr) minmax(0, 2.6fr);
+}
+
+.badge.in-review {
+  background: light-dark(#fbf0dd, #46351d);
+  color: light-dark(#81500a, #ffcf82);
+}
+
+.badge.reviewed {
+  background: light-dark(#e5f2ee, #16382f);
+  color: light-dark(#17594c, #a2dec8);
+}

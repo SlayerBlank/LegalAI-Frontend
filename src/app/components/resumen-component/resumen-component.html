@@ -1,1 +1,204 @@
-<section class="module-page"><p class="eyebrow">MÓDULO</p><h1>Resúmenes</h1><p>Síntesis y consulta de información jurídica.</p><div class="notice">Este módulo está pendiente de implementación.</div></section>
+<section aria-labelledby="summaries-heading">
+  <header class="page-heading">
+    <div>
+      <h1 id="summaries-heading">Resúmenes</h1>
+      <p class="description">Síntesis de documentos y expedientes para consulta rápida.</p>
+    </div>
+    <button mat-flat-button type="button" [disabled]="workspace.busy()" (click)="create()">
+      + Nuevo resumen
+    </button>
+  </header>
+
+  <div class="toolbar summary-toolbar">
+    <button mat-button type="button" [disabled]="workspace.busy()" (click)="reload()">
+      Actualizar lista
+    </button>
+  </div>
+  <app-record-filter
+    [cases]="cases()"
+    heading="Filtros por expediente, tipo y fechas"
+    label="Tipo de resumen"
+    suggestionId="summary-type-filter"
+    [options]="types()"
+    [disabled]="workspace.busy()"
+    (applied)="filter($event)"
+    (cleared)="workspace.clearFilter()"
+  />
+
+  @if (workspace.busy()) {
+    <mat-progress-bar
+      class="record-progress"
+      mode="indeterminate"
+      aria-label="Procesando resúmenes"
+    />
+  }
+  @if (workspace.error()) {
+    <p class="error" role="alert">{{ workspace.error() }}</p>
+  }
+  @if (caseError()) {
+    <p class="error" role="alert">
+      {{ caseError() }} <button mat-button type="button" (click)="loadCases()">Reintentar</button>
+    </p>
+  }
+  @if (workspace.feedback()) {
+    <p class="notice" role="status">{{ workspace.feedback() }}</p>
+  }
+
+  <form class="record-grid summary-grid" [formGroup]="form" (ngSubmit)="save()">
+    <div class="summary-sidebar">
+      @if (editing()) {
+        <section class="panel" aria-labelledby="summary-settings">
+          <h2 id="summary-settings" class="panel-heading">Preparar una síntesis</h2>
+          @if (!cases().length && !caseError() && !selected()) {
+            <p class="notice source-notice">
+              Crea primero un expediente con esta cuenta para guardar una síntesis.
+            </p>
+          }
+          <fieldset class="summary-fields" [disabled]="workspace.busy()">
+            <label
+              >Expediente
+              <select formControlName="caseId">
+                <option [ngValue]="null">
+                  {{ cases().length ? 'Selecciona un expediente' : 'Sin expedientes disponibles' }}
+                </option>
+                @if (selected(); as summary) {
+                  @if (summary.caseId !== null && !hasCase(summary.caseId)) {
+                    <option [ngValue]="summary.caseId">{{ sourceLabel(summary) }}</option>
+                  }
+                }
+                @for (item of cases(); track item.caseId) {
+                  <option [ngValue]="item.caseId">{{ item.title }}</option>
+                }
+              </select>
+            </label>
+            <label
+              >Documento
+              <select formControlName="documentId" aria-describedby="summary-source-hint">
+                <option [ngValue]="null">
+                  {{ loadingDocuments() ? 'Cargando documentos…' : 'Sin documento' }}
+                </option>
+                @if (form.controls.documentId.value; as id) {
+                  @if (!hasDocument(id)) {
+                    <option [ngValue]="id">{{ documentName(id) }}</option>
+                  }
+                }
+                @for (item of documents(); track item.documentId) {
+                  <option [ngValue]="item.documentId">{{ item.fileName }}</option>
+                }
+              </select>
+            </label>
+            <small class="full-width" id="summary-source-hint"
+              >Puedes guardar una síntesis del expediente completo o vincularla a un
+              documento.</small
+            >
+            <label class="full-width"
+              >Tipo de resumen
+              <input
+                formControlName="summaryType"
+                list="summary-types"
+                placeholder="Por ejemplo, Ejecutivo"
+                maxlength="100"
+                required
+              />
+              <datalist id="summary-types">
+                @for (type of types(); track type) {
+                  <option [value]="type"></option>
+                }
+              </datalist>
+            </label>
+            @if (documentError()) {
+              <p class="error" role="alert">
+                {{ documentError() }}
+                <button mat-button type="button" (click)="reloadDocuments()">Reintentar</button>
+              </p>
+            }
+          </fieldset>
+        </section>
+      }
+      <aside class="panel record-list" aria-labelledby="summaries-list-heading">
+        <h2 id="summaries-list-heading">Síntesis recientes</h2>
+        @for (summary of workspace.records(); track summary.summaryId) {
+          <button
+            type="button"
+            class="record-card"
+            [disabled]="workspace.busy()"
+            [attr.aria-pressed]="summary.summaryId === selected()?.summaryId"
+            (click)="open(summary.summaryId)"
+          >
+            <strong>{{ summary.summaryType }}</strong>
+            <small>{{ sourceLabel(summary) }}</small>
+            <small>{{ summary.createdAt | date: 'dd/MM/yyyy · HH:mm' }}</small>
+          </button>
+        } @empty {
+          @if (!workspace.busy() && !workspace.error()) {
+            <p class="description">
+              {{
+                workspace.filtered()
+                  ? 'No hay resúmenes para esos filtros.'
+                  : 'Todavía no tienes resúmenes.'
+              }}
+            </p>
+          }
+        }
+      </aside>
+    </div>
+
+    <article class="panel">
+      @if (editing()) {
+        <header class="panel-heading">
+          <div>
+            <h2>{{ selected()?.summaryType || 'Nuevo resumen' }}</h2>
+            @if (selected(); as summary) {
+              <small>Creado el {{ summary.createdAt | date: 'dd/MM/yyyy · HH:mm' }}</small>
+            }
+          </div>
+          @if (selected(); as summary) {
+            <button
+              mat-button
+              type="button"
+              [disabled]="workspace.busy()"
+              (click)="remove(summary)"
+            >
+              Eliminar
+            </button>
+          }
+        </header>
+
+        <fieldset [disabled]="workspace.busy()">
+          <div class="fields">
+            <label class="full-width"
+              >Contenido
+              <textarea class="editor" formControlName="content" required></textarea>
+            </label>
+          </div>
+          @if (form.touched && form.invalid) {
+            <p class="error" role="alert">
+              Indica un expediente o un documento, el tipo y el contenido.
+            </p>
+          }
+          <div class="actions">
+            <button mat-flat-button type="submit" [disabled]="workspace.busy()">
+              Guardar resumen
+            </button>
+            @if (form.controls.documentId.value; as documentId) {
+              <button
+                mat-stroked-button
+                type="button"
+                [disabled]="workspace.busy()"
+                (click)="download(documentId)"
+              >
+                Descargar original
+              </button>
+            }
+            <button mat-button type="button" [disabled]="workspace.busy()" (click)="cancel()">
+              Cerrar editor
+            </button>
+          </div>
+        </fieldset>
+      } @else {
+        <h2>Preparar una síntesis</h2>
+        <p class="description">Selecciona un resumen de la lista o crea uno para empezar.</p>
+      }
+    </article>
+  </form>
+</section>

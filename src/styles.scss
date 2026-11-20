@@ -1,3 +1,5 @@
+@use "./app/shared/legal-records/material-theme";
+
 :root { --bg:#F7F8FA; --surface:#FFFFFF; --text:#20242C; --muted:#6B7280; --primary:#2563EB; --primary-soft:#EFF6FF; --border:#E5E7EB; --shadow:0 12px 30px #1f29370d; }
 :root[data-theme='dark'] { --bg:#111318; --surface:#1C2027; --text:#F2F4F7; --muted:#A1A8B3; --primary:#8AB4F8; --primary-soft:#24344f; --border:#343943; --shadow:0 12px 30px #0004; }
 * { box-sizing:border-box; }

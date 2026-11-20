@@ -1,1 +1,17 @@
-.module-page{max-width:760px}.eyebrow{color:var(--primary);font-size:.75rem;font-weight:700;letter-spacing:.12em}.module-page h1{margin:.5rem 0}.module-page>p:not(.eyebrow){color:var(--muted)}.notice{margin-top:2rem;padding:1rem;border:1px dashed var(--border);border-radius:.6rem;background:var(--surface);color:var(--muted)}
+.summary-toolbar {
+  justify-content: flex-end;
+}
+
+.summary-grid {
+  --record-columns: minmax(15rem, 1fr) minmax(0, 2.25fr);
+}
+
+.summary-sidebar,
+.summary-fields {
+  display: grid;
+  gap: 1rem;
+}
+
+.summary-sidebar {
+  min-width: 0;
+}

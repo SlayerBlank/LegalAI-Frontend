@@ -1,0 +1,21 @@
+@use '@angular/material' as mat;
+
+app-borrador,
+app-resumen,
+.cdk-overlay-container {
+  color-scheme: light;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        theme-type: color-scheme,
+      ),
+      typography: Inter,
+      density: -1,
+    )
+  );
+}
+
+:root[data-theme='dark'] :is(app-borrador, app-resumen, .cdk-overlay-container) {
+  color-scheme: dark;
+}

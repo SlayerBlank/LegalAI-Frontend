@@ -1,1 +1,180 @@
-<section class="module-page"><p class="eyebrow">MÓDULO</p><h1>Borradores</h1><p>Creación y revisión de documentos en borrador.</p><div class="notice">Este módulo está pendiente de implementación.</div></section>
+<section aria-labelledby="drafts-heading">
+  <header class="page-heading">
+    <div>
+      <h1 id="drafts-heading">Borradores</h1>
+      <p class="description">
+        Documentos en elaboración, del primer planteamiento a la versión revisada.
+      </p>
+    </div>
+    <button mat-flat-button type="button" [disabled]="workspace.busy()" (click)="create()">
+      + Nuevo borrador
+    </button>
+  </header>
+
+  <div class="toolbar draft-toolbar">
+    <label class="draft-search">
+      <span class="sr-only">Buscar por título o expediente</span>
+      <input
+        type="search"
+        placeholder="Buscar por título o expediente"
+        [ngModel]="search()"
+        (ngModelChange)="search.set($event)"
+      />
+    </label>
+    <button mat-button type="button" [disabled]="workspace.busy()" (click)="reload()">
+      Actualizar lista
+    </button>
+  </div>
+  <app-record-filter
+    [cases]="cases()"
+    heading="Filtros por expediente, estado y fechas"
+    label="Estado"
+    suggestionId="draft-status-filter"
+    [options]="statuses()"
+    [disabled]="workspace.busy()"
+    (applied)="filter($event)"
+    (cleared)="workspace.clearFilter()"
+  />
+
+  @if (workspace.busy()) {
+    <mat-progress-bar
+      class="record-progress"
+      mode="indeterminate"
+      aria-label="Procesando borradores"
+    />
+  }
+  @if (workspace.error()) {
+    <p class="error" role="alert">{{ workspace.error() }}</p>
+  }
+  @if (caseError()) {
+    <p class="error" role="alert">
+      {{ caseError() }} <button mat-button type="button" (click)="loadCases()">Reintentar</button>
+    </p>
+  }
+  @if (workspace.feedback()) {
+    <p class="notice" role="status">{{ workspace.feedback() }}</p>
+  }
+
+  <div class="record-grid draft-grid">
+    <aside class="record-list" aria-label="Lista de borradores">
+      @for (draft of visible(); track draft.draftId) {
+        <button
+          type="button"
+          class="record-card"
+          [disabled]="workspace.busy()"
+          [attr.aria-pressed]="selected()?.draftId === draft.draftId"
+          (click)="open(draft.draftId)"
+        >
+          <strong>{{ draft.title }}</strong>
+          <small>{{ caseTitle(draft.caseId) }}</small>
+          <span
+            class="badge"
+            [class.reviewed]="draft.status === 'Revisado'"
+            [class.in-review]="draft.status === 'En revisión'"
+            >{{ draft.status }}</span
+          >
+          <small>Actualizado el {{ draft.updatedAt | date: 'dd/MM/yyyy · HH:mm' }}</small>
+        </button>
+      } @empty {
+        @if (!workspace.busy() && !workspace.error()) {
+          <p class="panel description">
+            {{
+              workspace.filtered() || search()
+                ? 'No hay resultados para la búsqueda.'
+                : 'Todavía no tienes borradores.'
+            }}
+          </p>
+        }
+      }
+    </aside>
+
+    <article class="panel">
+      @if (editing()) {
+        <header class="panel-heading">
+          <div>
+            <h2>{{ selected()?.title || 'Nuevo borrador' }}</h2>
+            @if (selected(); as draft) {
+              <small>Guardado el {{ draft.updatedAt | date: 'dd/MM/yyyy · HH:mm' }}</small>
+            }
+          </div>
+          @if (selected(); as draft) {
+            <button mat-button type="button" [disabled]="workspace.busy()" (click)="remove(draft)">
+              Eliminar
+            </button>
+          }
+        </header>
+        <form [formGroup]="form" (ngSubmit)="save()">
+          <fieldset [disabled]="workspace.busy()">
+            @if (!cases().length && !caseError() && !selected()) {
+              <p class="notice source-notice">
+                Crea primero un expediente con esta cuenta para guardar el borrador.
+              </p>
+            }
+            <div class="fields">
+              <label
+                >Expediente
+                <select formControlName="caseId" required>
+                  <option [ngValue]="null">
+                    {{
+                      cases().length ? 'Selecciona un expediente' : 'Sin expedientes disponibles'
+                    }}
+                  </option>
+                  @if (selected(); as draft) {
+                    @if (!hasCase(draft.caseId)) {
+                      <option [ngValue]="draft.caseId">{{ caseTitle(draft.caseId) }}</option>
+                    }
+                  }
+                  @for (item of cases(); track item.caseId) {
+                    <option [ngValue]="item.caseId">{{ item.title }}</option>
+                  }
+                </select>
+              </label>
+              <label
+                >Estado
+                <input formControlName="status" list="draft-status-edit" maxlength="50" required />
+                <datalist id="draft-status-edit">
+                  @for (status of statuses(); track status) {
+                    <option [value]="status"></option>
+                  }
+                </datalist>
+              </label>
+              <label class="full-width"
+                >Título <input formControlName="title" maxlength="255" required
+              /></label>
+              <label class="full-width"
+                >Instrucciones (opcional) <textarea formControlName="prompt" rows="2"></textarea>
+              </label>
+              <label class="full-width"
+                >Contenido <textarea class="editor" formControlName="content" required></textarea>
+              </label>
+            </div>
+            @if (form.touched && form.invalid) {
+              <p class="error" role="alert">
+                Completa el expediente, el título, el estado y el contenido.
+              </p>
+            }
+            <div class="actions">
+              <button mat-flat-button type="submit" [disabled]="workspace.busy()">Guardar</button>
+              @if (selected()) {
+                <button
+                  mat-stroked-button
+                  type="button"
+                  [disabled]="workspace.busy()"
+                  (click)="save(true)"
+                >
+                  Marcar revisado
+                </button>
+              }
+              <button mat-button type="button" [disabled]="workspace.busy()" (click)="cancel()">
+                Cerrar editor
+              </button>
+            </div>
+          </fieldset>
+        </form>
+      } @else {
+        <h2>Editor de borradores</h2>
+        <p class="description">Selecciona un borrador de la lista o crea uno para empezar.</p>
+      }
+    </article>
+  </div>
+</section>
