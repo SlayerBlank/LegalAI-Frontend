@@ -3,8 +3,6 @@ import { LandingPageComponent } from './components/landing-pageComponent/landing
 import { DashboardMainComponent } from './components/dashboard-main/dashboard-main';
 import { DashboardHomeComponent } from './components/dashboard-main/dashboard-home';
 import { ClienteComponent } from './components/cliente-component/cliente-component';
-import { ExpedienteComponent } from './components/expediente-component/expediente-component';
-import { ChatIaComponent } from './components/chat-ia-component/chat-ia-component';
 import { CitacionesIaComponent } from './components/citaciones-ia-component/citaciones-ia-component';
 import { UsuarioComponent } from './components/usuario-component/usuario-component';
 import { UsuarioInsertComponent } from './components/usuario-component/usuario-insert/usuario-insert';
@@ -22,7 +20,11 @@ export const routes: Routes = [
     path: '', component: DashboardMainComponent, canActivate: [authGuard], children: [
       { path: 'dashboard', component: DashboardHomeComponent },
       { path: 'clientes', component: ClienteComponent },
-      { path: 'expedientes', component: ExpedienteComponent },
+      {
+        path: 'expedientes',
+        loadComponent: () =>
+          import('./components/expediente-component/expediente-component').then((m) => m.ExpedienteComponent),
+      },
       {
         path: 'documentos',
         loadComponent: () =>
@@ -35,7 +37,11 @@ export const routes: Routes = [
             (m) => m.DocumentoChunkComponent,
           ),
       },
-      { path: 'chat-ia', component: ChatIaComponent },
+      {
+        path: 'chat-ia',
+        loadComponent: () =>
+          import('./components/chat-ia-component/chat-ia-component').then((m) => m.ChatIaComponent),
+      },
       {
         path: 'borradores',
         loadComponent: () => import('./components/borrador-component/borrador-component').then((module) => module.BorradorComponent),
