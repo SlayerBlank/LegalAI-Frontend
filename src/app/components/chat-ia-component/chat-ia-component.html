@@ -1,1 +1,361 @@
-<section class="module-page"><p class="eyebrow">MÓDULO</p><h1>Asistente IA</h1><p>Espacio para asistencia legal inteligente.</p><div class="notice">Este módulo está pendiente de implementación.</div></section>
+<header>
+  <div>
+    <h1>{{ 'chat.title' | t }}</h1>
+    <p>{{ 'chat.subtitle' | t }}</p>
+  </div>
+  <button class="primary" type="button" [disabled]="busy() || sending()" (click)="openCreate()">
+    {{ 'chat.new' | t }}
+  </button>
+</header>
+
+@if (notice()) {
+  <div class="notice" role="status">{{ notice() }}</div>
+}
+@if (error() && !creating() && !renaming() && !deleting()) {
+  <div class="notice error" role="alert">
+    {{ error() }}
+    <button type="button" (click)="loadSessions()" [disabled]="loadingSessions() || busy()">
+      {{ 'common.reload' | t }}
+    </button>
+  </div>
+}
+@if (casesError()) {
+  <div class="notice error" role="alert">
+    {{ 'chat.casesError' | t: { error: casesError() } }}
+    <button type="button" (click)="loadCases()">{{ 'common.reload' | t }}</button>
+  </div>
+}
+
+<div class="chat-layout">
+  <aside class="panel sessions" [attr.aria-label]="'chat.sessions' | t">
+    <div class="sessions-head">
+      <h2>{{ 'chat.sessions' | t }}</h2>
+      <label class="sr-only" for="chat-case-filter">{{ 'chat.caseFilter' | t }}</label>
+      <select
+        id="chat-case-filter"
+        [value]="caseFilter() ?? ''"
+        [disabled]="loadingSessions() || busy()"
+        (change)="setCaseFilter($any($event.target).value)"
+      >
+        <option value="">{{ 'chat.allCases' | t }}</option>
+        @if (caseFilter() !== null && !caseTitles().has(caseFilter()!)) {
+          <option [value]="caseFilter()">{{ caseTitle(caseFilter()!) }}</option>
+        }
+        @for (c of cases(); track c.caseId) {
+          <option [value]="c.caseId">{{ c.title }}</option>
+        }
+      </select>
+    </div>
+
+    @if (loadingSessions() && !sessions().length) {
+      <p class="notice" role="status" aria-live="polite">{{ 'common.loading' | t }}</p>
+    }
+
+    <ul class="session-list">
+      @for (s of sessions(); track s.sessionId) {
+        <li [class.active]="s.sessionId === activeId()">
+          <button
+            type="button"
+            class="session-main"
+            [attr.aria-current]="s.sessionId === activeId() ? 'true' : null"
+            [disabled]="sending() || loadingHistory()"
+            (click)="select(s)"
+          >
+            <strong>{{ sessionTitle(s) }}</strong>
+            <small>{{ caseTitle(s.caseId) }}</small>
+            <small
+              >{{ 'chat.messageCount' | t: { count: s.messageCount } }} ·
+              {{ s.updatedAt || s.createdAt | ldate }}</small
+            >
+          </button>
+          <div class="row-actions">
+            <button type="button" [disabled]="busy() || sending()" (click)="openRename(s)">
+              {{ 'chat.rename' | t }}</button
+            ><button
+              type="button"
+              class="danger"
+              [disabled]="busy() || sending()"
+              (click)="confirmDelete(s)"
+            >
+              {{ 'common.delete' | t }}
+            </button>
+          </div>
+        </li>
+      } @empty {
+        @if (sessionsLoaded() && !loadingSessions()) {
+          <li class="empty">
+            {{ (cases().length || casesError() ? 'chat.emptySessions' : 'chat.noCases') | t }}
+          </li>
+        }
+      }
+    </ul>
+    @if (hasMoreSessions()) {
+      <button
+        type="button"
+        class="load-more"
+        [disabled]="loadingSessions()"
+        (click)="loadSessions(true)"
+      >
+        {{ 'chat.loadMore' | t }}
+      </button>
+    }
+  </aside>
+
+  <section class="panel conversation" aria-labelledby="chat-active-title">
+    @if (active(); as s) {
+      <div class="conversation-head">
+        <div>
+          <h2 id="chat-active-title">{{ sessionTitle(s) }}</h2>
+          <small
+            >{{ caseTitle(s.caseId) }} ·
+            {{
+              s.documentScopeRequired
+                ? ('chat.scopeDocument' | t: { id: s.documentId ?? '—' })
+                : ('chat.scopeCase' | t)
+            }}</small
+          >
+        </div>
+      </div>
+
+      @if (scopeMissing()) {
+        <p class="notice error" role="alert">{{ 'chat.scopeMissing' | t }}</p>
+      }
+
+      <div class="log" #log role="log" aria-live="polite" [attr.aria-busy]="loadingHistory()">
+        @if (hasOlder()) {
+          <button type="button" class="load-more" [disabled]="loadingHistory()" (click)="loadOlder()">
+            {{ 'chat.loadOlder' | t }}
+          </button>
+        }
+        @if (loadingHistory()) {
+          <p class="notice" role="status" aria-live="polite">{{ 'chat.loadingHistory' | t }}</p>
+        }
+        @for (m of messages(); track m.messageId) {
+          <article class="bubble" [class.user]="m.role === 'USER'">
+            <header class="bubble-head">
+              <strong>{{ (m.role === 'USER' ? 'chat.you' : 'chat.assistant') | t }}</strong>
+              <time [attr.datetime]="m.createdAt">{{ m.createdAt | ldate }}</time>
+            </header>
+            <p class="content">{{ m.content }}</p>
+            @if (m.role === 'ASSISTANT') {
+              @if (m.provider || m.model) {
+                <small class="meta">{{ m.provider }} · {{ m.model }}</small>
+              }
+              @if (sourcesOf(m).length) {
+                <details class="sources">
+                  <summary>{{ 'chat.sources' | t: { count: sourcesOf(m).length } }}</summary>
+                  <p class="hint">{{ 'chat.sourcesNote' | t }}</p>
+                  <ol>
+                    @for (src of sourcesOf(m); track src.chunkId) {
+                      <li>
+                        <strong>{{
+                          'chat.sourceRef' | t: { name: src.documentName, index: src.chunkIndex + 1 }
+                        }}</strong>
+                        <blockquote>{{ src.excerpt }}</blockquote>
+                      </li>
+                    }
+                  </ol>
+                </details>
+              }
+            }
+          </article>
+        } @empty {
+          @if (!loadingHistory() && !chatError()) {
+            <p class="empty">{{ 'chat.emptyHistory' | t }}</p>
+          }
+        }
+        @if (sending()) {
+          <p class="bubble thinking" role="status">{{ 'chat.thinking' | t }}</p>
+        }
+      </div>
+
+      @if (chatError()) {
+        <div class="notice error" role="alert">
+          {{ chatError() }}
+          @if (pendingTurn()) {
+            <span>{{ 'chat.sendFailed' | t }}</span>
+            <button type="button" [disabled]="sending()" (click)="send()">
+              {{ 'chat.retry' | t }}
+            </button>
+          }
+        </div>
+      }
+
+      <form class="composer" (ngSubmit)="send()" novalidate>
+        <label class="sr-only" for="chat-composer">{{ 'chat.composer' | t }}</label>
+        <textarea
+          id="chat-composer"
+          rows="3"
+          [formControl]="composer"
+          [attr.maxlength]="messageMax"
+          [placeholder]="'chat.placeholder' | t"
+          [readonly]="sending() || scopeMissing()"
+          [attr.aria-disabled]="scopeMissing() ? 'true' : null"
+          aria-describedby="chat-composer-counter"
+          (keydown.enter)="onComposerKey($event)"
+        ></textarea>
+        <div class="composer-foot">
+          <small id="chat-composer-counter" [class.field-error]="composer.touched && composer.invalid">
+            @if (composer.touched && composer.invalid) {
+              {{ 'chat.errMessage' | t: { max: messageMax } }} ·
+            }
+            {{ 'chat.counter' | t: { count: composerLength(), max: messageMax } }}
+          </small>
+          <button class="primary" type="submit" [disabled]="sending() || scopeMissing()">
+            {{ 'chat.send' | t }}
+          </button>
+        </div>
+      </form>
+    } @else {
+      <div class="placeholder">
+        <h2 id="chat-active-title">{{ 'chat.title' | t }}</h2>
+        <p>{{ 'chat.pickSession' | t }}</p>
+      </div>
+    }
+  </section>
+</div>
+
+@if (creating()) {
+  <div class="overlay" (click)="close()">
+    <section
+      class="dialog"
+      managementDialog
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="chat-create-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="dialog-head">
+        <h2 id="chat-create-title">{{ 'chat.createTitle' | t }}</h2>
+        <button type="button" [attr.aria-label]="'common.close' | t" (click)="close()">×</button>
+      </div>
+      <form [formGroup]="createForm" (ngSubmit)="create()" novalidate>
+        <fieldset [disabled]="busy()">
+          <div class="form-grid">
+            <label class="wide"
+              >{{ 'chat.case' | t }}
+              <select formControlName="caseId" required>
+                <option [ngValue]="null">{{ 'chat.selectCase' | t }}</option>
+                @for (c of cases(); track c.caseId) {
+                  <option [ngValue]="c.caseId">{{ c.title }}</option>
+                }
+              </select>
+              @if (createForm.controls.caseId.touched && createForm.controls.caseId.invalid) {
+                <small class="field-error">{{ 'chat.errCase' | t }}</small>
+              }
+            </label>
+            <label class="wide"
+              >{{ 'chat.document' | t }}
+              <select formControlName="documentId">
+                <option [ngValue]="null">{{ 'chat.wholeCase' | t }}</option>
+                @for (d of documents(); track d.documentId) {
+                  <option [ngValue]="d.documentId">{{ d.fileName }}</option>
+                }
+              </select>
+              @if (documentsError()) {
+                <small class="field-error">{{
+                  'chat.documentsError' | t: { error: documentsError() }
+                }}</small>
+              }
+            </label>
+            <label class="wide"
+              >{{ 'chat.sessionTitle' | t }}
+              <input
+                formControlName="title"
+                [attr.maxlength]="titleMax"
+                [placeholder]="'chat.titlePlaceholder' | t"
+              />
+              @if (createForm.controls.title.invalid) {
+                <small class="field-error">{{ 'chat.errTitle' | t: { max: titleMax } }}</small>
+              }
+            </label>
+          </div>
+          @if (error()) {
+            <p class="notice error" role="alert">{{ error() }}</p>
+          }
+          @if (busy()) {
+            <p role="status">{{ 'common.processing' | t }}</p>
+          }
+          <div class="actions">
+            <button type="button" (click)="close()">{{ 'common.cancel' | t }}</button
+            ><button class="primary" type="submit" [disabled]="busy()">
+              {{ 'chat.createSubmit' | t }}
+            </button>
+          </div>
+        </fieldset>
+      </form>
+    </section>
+  </div>
+}
+
+@if (renaming(); as s) {
+  <div class="overlay" (click)="close()">
+    <section
+      class="dialog"
+      managementDialog
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="chat-rename-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="dialog-head">
+        <h2 id="chat-rename-title">{{ 'chat.renameTitle' | t }}</h2>
+        <button type="button" [attr.aria-label]="'common.close' | t" (click)="close()">×</button>
+      </div>
+      <form [formGroup]="renameForm" (ngSubmit)="rename()" novalidate>
+        <fieldset [disabled]="busy()">
+          <label
+            >{{ 'chat.sessionTitle' | t }} *
+            <input formControlName="title" required [attr.maxlength]="titleMax" />
+            @if (renameForm.controls.title.touched && renameForm.controls.title.invalid) {
+              <small class="field-error">{{
+                'chat.errTitleRequired' | t: { max: titleMax }
+              }}</small>
+            }
+          </label>
+          @if (error()) {
+            <p class="notice error" role="alert">{{ error() }}</p>
+          }
+          <div class="actions">
+            <button type="button" (click)="close()">{{ 'common.cancel' | t }}</button
+            ><button class="primary" type="submit" [disabled]="busy()">
+              {{ 'chat.renameSubmit' | t }}
+            </button>
+          </div>
+        </fieldset>
+      </form>
+    </section>
+  </div>
+}
+
+@if (deleting(); as s) {
+  <div class="overlay" (click)="close()">
+    <section
+      class="dialog"
+      managementDialog
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="chat-delete-title"
+      aria-describedby="chat-delete-text"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="dialog-head">
+        <h2 id="chat-delete-title">{{ 'chat.deleteTitle' | t }}</h2>
+        <button type="button" [attr.aria-label]="'common.close' | t" (click)="close()">×</button>
+      </div>
+      <p id="chat-delete-text">{{ 'chat.deleteText' | t: { name: sessionTitle(s) } }}</p>
+      @if (error()) {
+        <p class="notice error" role="alert">{{ error() }}</p>
+      }
+      @if (busy()) {
+        <p role="status">{{ 'common.processing' | t }}</p>
+      }
+      <div class="actions">
+        <button type="button" (click)="close()">{{ 'common.cancel' | t }}</button
+        ><button class="danger" type="button" [disabled]="busy()" (click)="remove()">
+          {{ 'chat.deleteSubmit' | t }}
+        </button>
+      </div>
+    </section>
+  </div>
+}
