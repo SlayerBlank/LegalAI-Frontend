@@ -86,4 +86,13 @@ describe('ExpedienteService', () => {
       .expectOne('/api/cases/chat-session-count')
       .flush([{ caseId: 7, tituloExpediente: 'Demanda laboral', cantidadSesiones: 2 }]);
   });
+
+  it('HU-61 CA-02: devuelve [] cuando no hay expedientes', () => {
+    let result: unknown;
+    service.sessionCounts().subscribe((rows) => (result = rows));
+    const req = http.expectOne('/api/cases/chat-session-count');
+    expect(req.request.method).toBe('GET');
+    req.flush([]);
+    expect(result).toEqual([]);
+  });
 });
