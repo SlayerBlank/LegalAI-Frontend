@@ -55,6 +55,10 @@ describe('Private workspace: navigation, real metrics and drawer', () => {
     login.currentUser.set({ ...user });
   });
   afterEach(() => {
+    // Las consultas del panel se prueban en dashboard-queries.spec.ts.
+    http
+      .match('/api/cases/chat-session-count')
+      .forEach((req) => req.cancelled || req.flush([]));
     http.verify();
     TestBed.resetTestingModule();
     vi.unstubAllGlobals();

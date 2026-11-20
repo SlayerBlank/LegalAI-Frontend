@@ -335,4 +335,15 @@ export const ES = {
     'Se eliminará “{name}” junto con todos sus mensajes. Esta acción no se puede deshacer.',
   'chat.deleteSubmit': 'Eliminar conversación',
   'chat.deletedNotice': 'Conversación eliminada.',
+  // Consultas del panel
+  'queries.title': 'Consultas',
+  'queries.error': 'No se pudo cargar la consulta.',
+  'queries.retry': 'Reintentar',
+  'queries.total': 'Total',
+  'queries.viewCases': 'Ver expedientes',
+  'queries.sessionsTitle': 'Sesiones de IA por expediente',
+  'queries.sessionsCaption': 'Cantidad de sesiones de chat de cada expediente, de mayor a menor',
+  'queries.sessionsEmpty': 'Aún no tienes expedientes. Cuando los crees, verás aquí sus sesiones de chat.',
+  'queries.colCase': 'Expediente',
+  'queries.colSessions': 'Sesiones',
 } as const;

@@ -331,4 +331,15 @@ export const EN: Record<keyof typeof ES, string> = {
     '“{name}” will be deleted together with all its messages. This cannot be undone.',
   'chat.deleteSubmit': 'Delete conversation',
   'chat.deletedNotice': 'Conversation deleted.',
+  // Dashboard queries
+  'queries.title': 'Queries',
+  'queries.error': 'The query could not be loaded.',
+  'queries.retry': 'Retry',
+  'queries.total': 'Total',
+  'queries.viewCases': 'View cases',
+  'queries.sessionsTitle': 'AI sessions per case',
+  'queries.sessionsCaption': 'Number of chat sessions per case, from highest to lowest',
+  'queries.sessionsEmpty': 'You have no cases yet. Once you create them, their chat sessions will appear here.',
+  'queries.colCase': 'Case',
+  'queries.colSessions': 'Sessions',
 };

@@ -21,7 +21,12 @@ describe('Application navigation regressions', () => {
     }),
   );
   afterEach(() => {
-    TestBed.inject(HttpTestingController).verify();
+    const http = TestBed.inject(HttpTestingController);
+    // Las consultas del panel se prueban en dashboard-queries.spec.ts.
+    http
+      .match('/api/cases/chat-session-count')
+      .forEach((req) => req.cancelled || req.flush([]));
+    http.verify();
     vi.unstubAllGlobals();
   });
   it('creates the application', () => {

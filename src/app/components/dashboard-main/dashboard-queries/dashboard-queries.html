@@ -1,0 +1,63 @@
+<section class="queries" aria-labelledby="queries-title">
+  <h2 id="queries-title" class="queries-title">{{ 'queries.title' | t }}</h2>
+  <div class="query-grid">
+    <article class="panel" aria-labelledby="sessions-query-title">
+      <div class="panel-heading">
+        <h3 id="sessions-query-title">{{ 'queries.sessionsTitle' | t }}</h3>
+        <a class="text-action" routerLink="/expedientes"
+          >{{ 'queries.viewCases' | t }} <span aria-hidden="true">↗</span></a
+        >
+      </div>
+      @switch (sessions.status()) {
+        @case ('loading') {
+          <p class="state" role="status" aria-live="polite">{{ 'common.loading' | t }}</p>
+        }
+        @case ('error') {
+          <div class="state error" role="alert">
+            <p>{{ 'queries.error' | t }} {{ sessions.error() }}</p>
+            <button class="text-action" type="button" (click)="sessions.load()">
+              {{ 'queries.retry' | t }}
+            </button>
+          </div>
+        }
+        @case ('ready') {
+          @if (sessions.empty()) {
+            <p class="state">{{ 'queries.sessionsEmpty' | t }}</p>
+          } @else {
+            <div class="table-scroll">
+              <table>
+                <caption>
+                  {{ 'queries.sessionsCaption' | t }}
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">{{ 'queries.colCase' | t }}</th>
+                    <th scope="col" class="num">{{ 'queries.colSessions' | t }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of sessions.rows(); track row.caseId) {
+                    <tr>
+                      <th scope="row">
+                        <a routerLink="/chat-ia" [queryParams]="{ caseId: row.caseId }">{{
+                          row.tituloExpediente
+                        }}</a>
+                      </th>
+                      <td class="num">{{ row.cantidadSesiones | lnumber }}</td>
+                    </tr>
+                  }
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <th scope="row">{{ 'queries.total' | t }}</th>
+                    <td class="num">{{ sessions.total() | lnumber }}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          }
+        }
+      }
+    </article>
+  </div>
+</section>
