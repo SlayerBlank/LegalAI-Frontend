@@ -2,7 +2,12 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from '../core/http/api.config';
-import { ClientRequest, ClientResponse, ClientCaseResponse } from '../models/management';
+import {
+  ClientRequest,
+  ClientResponse,
+  ClientCaseResponse,
+  ClientDocumentCountResponse,
+} from '../models/management';
 @Injectable({ providedIn: 'root' })
 export class ClienteService {
   private readonly http = inject(HttpClient);
@@ -24,5 +29,9 @@ export class ClienteService {
   }
   cases(id: number): Observable<ClientCaseResponse[]> {
     return this.http.get<ClientCaseResponse[]>(`${this.url}/${id}/cases`);
+  }
+  /** Cantidad de documentos por cliente propio, ordenada por cantidad descendente. */
+  getDocumentCount(): Observable<ClientDocumentCountResponse[]> {
+    return this.http.get<ClientDocumentCountResponse[]>(`${this.url}/document-count`);
   }
 }

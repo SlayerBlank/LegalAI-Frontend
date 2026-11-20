@@ -59,7 +59,13 @@ describe('Management integration - isolated HTTP transport', () => {
     vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     http = TestBed.inject(HttpTestingController);
   });
-  afterEach(() => http.verify());
+  afterEach(() => {
+    // La columna Documentos de Clientes se prueba en cliente-document-count.spec.ts.
+    http
+      .match('/api/clients/document-count')
+      .forEach((req) => req.cancelled || req.flush([]));
+    http.verify();
+  });
   function clients(rows: ClientResponse[] = [client]) {
     const fixture = TestBed.createComponent(ClienteComponent);
     fixture.detectChanges();

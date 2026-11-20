@@ -25,6 +25,12 @@ export interface ClientCaseResponse {
   createdAt: string;
   updatedAt: string;
 }
+/** ClienteCantidadDocumentosResponseDTO: GET /api/clients/document-count (incluye clientes con 0). */
+export interface ClientDocumentCountResponse {
+  clientId: number;
+  nombreCliente: string;
+  cantidadDocumentos: number;
+}
 export type UserResponse = CurrentUserResponse;
 export interface UserUpdateRequest {
   fullName: string;

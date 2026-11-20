@@ -346,4 +346,10 @@ export const ES = {
   'queries.sessionsEmpty': 'Aún no tienes expedientes. Cuando los crees, verás aquí sus sesiones de chat.',
   'queries.colCase': 'Expediente',
   'queries.colSessions': 'Sesiones',
+  'queries.viewClients': 'Ver clientes',
+  'queries.documentsTitle': 'Documentos por cliente',
+  'queries.documentsCaption': 'Cantidad de documentos asociados a cada cliente, de mayor a menor',
+  'queries.documentsEmpty': 'Aún no tienes clientes. Cuando los registres, verás aquí sus documentos.',
+  'queries.colClient': 'Cliente',
+  'queries.colDocuments': 'Documentos',
 } as const;

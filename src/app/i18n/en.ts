@@ -342,4 +342,10 @@ export const EN: Record<keyof typeof ES, string> = {
   'queries.sessionsEmpty': 'You have no cases yet. Once you create them, their chat sessions will appear here.',
   'queries.colCase': 'Case',
   'queries.colSessions': 'Sessions',
+  'queries.viewClients': 'View clients',
+  'queries.documentsTitle': 'Documents per client',
+  'queries.documentsCaption': 'Number of documents linked to each client, from highest to lowest',
+  'queries.documentsEmpty': 'You have no clients yet. Once you register them, their documents will appear here.',
+  'queries.colClient': 'Client',
+  'queries.colDocuments': 'Documents',
 };
