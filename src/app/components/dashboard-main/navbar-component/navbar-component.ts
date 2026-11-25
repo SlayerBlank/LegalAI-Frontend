@@ -9,7 +9,7 @@ import { MusicToggleComponent } from '../../../shared/i18n/music-toggle';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [LanguageSwitcherComponent, RegionSwitcherComponent, MusicToggleComponent],
+  imports: [LanguageSwitcherComponent, RegionSwitcherComponent],
   templateUrl: './navbar-component.html',
   styleUrl: './navbar-component.css',
 })
