@@ -1,0 +1,186 @@
+/* Estilos compartidos por los reportes: filtros, distribución gráfico + tabla y tablas. */
+:host {
+  display: block;
+  min-width: 0;
+}
+
+/* Filtros */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px 20px;
+  margin-bottom: 18px;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  min-width: 160px;
+  flex: 1 1 160px;
+}
+.field.wide {
+  flex: 2 1 240px;
+}
+.field select,
+.field input {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  min-height: 38px;
+  width: 100%;
+  color-scheme: light dark;
+}
+.field select:focus-visible,
+.field input:focus-visible,
+.filter-actions button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.field input[aria-invalid='true'],
+.field select[aria-invalid='true'] {
+  border-color: var(--chart-4, #dc2626);
+}
+.filter-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.filter-actions button {
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 9px 16px;
+  min-height: 38px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+}
+.filter-actions button.primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--surface);
+}
+.filter-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.filter-error,
+.filter-hint {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.filter-error {
+  color: var(--chart-4, #dc2626);
+  font-weight: 600;
+}
+.filter-hint {
+  color: var(--muted);
+}
+
+/* Gráfico + tabla */
+.report-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 28px;
+  align-items: start;
+}
+.report-grid.stacked {
+  grid-template-columns: minmax(0, 1fr);
+}
+.report-note {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0 0 14px;
+}
+.subheading {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 26px 0 10px;
+}
+
+/* Tablas */
+.table-scroll {
+  overflow: auto;
+  max-height: 26rem;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+caption {
+  text-align: left;
+  font-size: 11px;
+  color: var(--muted);
+  padding-bottom: 8px;
+}
+th,
+td {
+  padding: 9px 6px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  font-weight: 400;
+  vertical-align: top;
+}
+thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+tbody th {
+  overflow-wrap: anywhere;
+}
+tfoot th,
+tfoot td {
+  font-weight: 600;
+  border-bottom: 0;
+}
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: 8px;
+  vertical-align: baseline;
+}
+
+@media (max-width: 1000px) {
+  .report-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .filters {
+    padding: 14px;
+  }
+  .field {
+    min-width: 100%;
+  }
+}

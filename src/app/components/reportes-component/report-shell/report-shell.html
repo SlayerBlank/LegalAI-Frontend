@@ -1,0 +1,37 @@
+<section class="report" aria-labelledby="report-title">
+  <a class="back" routerLink="/reportes"
+    ><span aria-hidden="true">←</span> {{ 'reports.back' | t }}</a
+  >
+  <header class="report-heading">
+    <p class="eyebrow">{{ 'reports.eyebrow' | t: { hu: hu() } }}</p>
+    <h1 id="report-title">{{ titleKey() | t }}</h1>
+    <p class="intro">{{ descriptionKey() | t }}</p>
+  </header>
+
+  <ng-content select="[reportFilters]" />
+
+  <div class="report-body">
+    @switch (query().status()) {
+      @case ('idle') {
+        <p class="state">{{ idleKey() | t }}</p>
+      }
+      @case ('loading') {
+        <p class="state" role="status" aria-live="polite">{{ 'common.loading' | t }}</p>
+      }
+      @case ('error') {
+        <div class="state error" role="alert">
+          <p>{{ 'reports.error' | t }} {{ query().error() }}</p>
+          <button class="retry" type="button" (click)="query().retry()">
+            {{ 'reports.retry' | t }}
+          </button>
+        </div>
+      }
+      @case ('ready') {
+        @if (query().empty()) {
+          <p class="state empty" role="status">{{ emptyKey() | t }}</p>
+        }
+      }
+    }
+    <ng-content />
+  </div>
+</section>

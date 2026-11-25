@@ -20,6 +20,10 @@ interface WorkspaceLink {
   title: string;
   path: string;
   icon: string;
+  /** Clave i18n del título; si existe, tiene prioridad sobre title. */
+  titleKey?: string;
+  /** Activo también en las rutas hijas (p. ej. /reportes/...). */
+  prefix?: boolean;
 }
 @Component({
   selector: 'app-sidebar',
@@ -35,6 +39,7 @@ export class SidebarComponent {
     matrixParams: 'ignored',
     fragment: 'ignored',
   } as const;
+  readonly prefixMatch = { ...this.activeMatch, paths: 'subset' } as const;
   readonly open = input(false);
   readonly compact = input(false);
   readonly closeRequested = output<void>();
@@ -50,6 +55,7 @@ export class SidebarComponent {
     { title: 'Clientes', path: '/clientes', icon: 'clients' },
     { title: 'Expedientes', path: '/expedientes', icon: 'cases' },
     { title: 'Documentos', path: '/documentos', icon: 'documents' },
+    { title: 'Reportes', titleKey: 'reports.nav', path: '/reportes', icon: 'reports', prefix: true },
   ];
   readonly aiLinks: WorkspaceLink[] = [
     { title: 'Chat IA', path: '/chat-ia', icon: 'ai' },

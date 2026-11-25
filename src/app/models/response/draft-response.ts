@@ -6,3 +6,11 @@ export interface DraftResponse extends DraftRequest {
   createdAt: string;
   updatedAt: string;
 }
+
+/** DraftsConsultaResponseDTO: GET /api/drafts/filter (HU-64). */
+export interface DraftFilterResponse {
+  draftId: number;
+  title: string;
+  status: string;
+  updatedAt: string;
+}

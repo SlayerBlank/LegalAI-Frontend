@@ -23,6 +23,7 @@ export class WorkspaceIcon {
       'M3 21v-2a4 4 0 0 1 4-4h4M13 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0M18 14l1 1 2 1-1 2 1 2-2 1-1 1-1-1-2-1 1-2-1-2 2-1z',
     roles: 'm12 2 8 4v6c0 5-8 10-8 10S4 17 4 12V6zm-4 10 3 3 5-6',
     audit: 'M3 11a9 9 0 1 1 2 7M3 3v8h8M12 7v6l4 2',
+    reports: 'M3 3v18h18M7 16v-4M12 16V8M17 16v-6',
     tasks: 'M8 3h8v4H8zM8 5H4v16h16V5h-4M8 12l2 2 5-5M8 18h8',
     calendar: 'M4 5h16v16H4zM4 10h16M8 2v6M16 2v6M8 14h2M14 14h2M8 18h2',
     clock: 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M12 7v6l4 2',

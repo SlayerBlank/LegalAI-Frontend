@@ -1,0 +1,62 @@
+<app-report-shell
+  hu="HU-129"
+  titleKey="reports.r129.title"
+  descriptionKey="reports.r129.description"
+  emptyKey="reports.emptyFiltered"
+  [query]="query"
+>
+  <form
+    reportFilters
+    class="filters"
+    novalidate
+    [attr.aria-label]="'reports.filters' | t"
+    (ngSubmit)="apply()"
+  >
+    <label class="field">
+      <span>{{ 'reports.openedFrom' | t }}</span>
+      <input
+        type="date"
+        name="from"
+        [(ngModel)]="from"
+        [attr.aria-invalid]="rangeError() ? 'true' : null"
+        aria-describedby="r129-filter-error"
+      />
+    </label>
+    <label class="field">
+      <span>{{ 'reports.openedTo' | t }}</span>
+      <input
+        type="date"
+        name="to"
+        [(ngModel)]="to"
+        [attr.aria-invalid]="rangeError() ? 'true' : null"
+        aria-describedby="r129-filter-error"
+      />
+    </label>
+    <div class="filter-actions">
+      <button class="primary" type="submit">{{ 'reports.apply' | t }}</button>
+      <button type="button" (click)="clear()">{{ 'reports.clear' | t }}</button>
+    </div>
+    <p class="filter-error" id="r129-filter-error" role="alert">
+      @if (filterError()) {
+        {{ filterError() | t }}
+      }
+    </p>
+  </form>
+
+  @if (query.hasData()) {
+    <div class="report-grid">
+      <app-report-chart
+        type="bar"
+        [rows]="rows()"
+        [seriesLabel]="'reports.colCases' | t"
+        [label]="'reports.r129.title' | t"
+      />
+      <app-report-table
+        [rows]="rows()"
+        [caption]="'reports.r129.caption' | t"
+        [labelHeader]="'reports.colStatus' | t"
+        [countHeader]="'reports.colCases' | t"
+      />
+    </div>
+  }
+</app-report-shell>

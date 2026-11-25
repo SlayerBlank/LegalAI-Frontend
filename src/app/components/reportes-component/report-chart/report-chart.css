@@ -1,0 +1,13 @@
+/* Contenedor del gráfico: Chart.js ocupa el alto fijado desde el componente. */
+:host {
+  display: block;
+}
+.chart {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  min-width: 0;
+}
+canvas {
+  display: block;
+}

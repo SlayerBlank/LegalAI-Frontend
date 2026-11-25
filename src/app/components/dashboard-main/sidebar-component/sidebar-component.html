@@ -34,10 +34,12 @@
           <a
             [routerLink]="link.path"
             routerLinkActive="active"
-            [routerLinkActiveOptions]="activeMatch"
+            [routerLinkActiveOptions]="link.prefix ? prefixMatch : activeMatch"
             ariaCurrentWhenActive="page"
             (click)="closeRequested.emit()"
-            ><app-workspace-icon [name]="link.icon" /><span>{{ link.title }}</span></a
+            ><app-workspace-icon [name]="link.icon" /><span>{{
+              link.titleKey ? (link.titleKey | t) : link.title
+            }}</span></a
           >
         }
       </div>

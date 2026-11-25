@@ -7,6 +7,7 @@ import {
   DocumentPreparationResponse,
   DocumentResponse,
   DocumentTextResponse,
+  ProcessingStatus,
   EmbeddingGenerationResponse,
 } from '../models/documento';
 
@@ -69,5 +70,16 @@ export class DocumentoService {
 
   remove(id: number): Observable<void> {
     return this.http.delete<void>(`${this.documents}/${id}`);
+  }
+
+  /** HU-67: documentos del abogado pendientes de revisión (UPLOADED, PROCESSING y ERROR). */
+  pendingReview(
+    abogadoId: number,
+    status: ProcessingStatus | null = null,
+  ): Observable<DocumentResponse[]> {
+    const params = status ? new HttpParams().set('status', status) : new HttpParams();
+    return this.http.get<DocumentResponse[]>(`${this.documents}/pending-review/${abogadoId}`, {
+      params,
+    });
   }
 }

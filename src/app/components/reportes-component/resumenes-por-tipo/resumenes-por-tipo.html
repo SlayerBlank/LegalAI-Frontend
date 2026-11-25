@@ -1,0 +1,71 @@
+<app-report-shell
+  hu="HU-128"
+  titleKey="reports.r128.title"
+  descriptionKey="reports.r128.description"
+  emptyKey="reports.emptyFiltered"
+  [query]="query"
+>
+  <form
+    reportFilters
+    class="filters"
+    novalidate
+    [attr.aria-label]="'reports.filters' | t"
+    (ngSubmit)="apply()"
+  >
+    <label class="field wide">
+      <span>{{ 'reports.case' | t }}</span>
+      <select name="caseId" [(ngModel)]="caseId">
+        <option [ngValue]="null">{{ 'reports.allCases' | t }}</option>
+        @for (item of cases(); track item.caseId) {
+          <option [ngValue]="item.caseId">{{ item.title }}</option>
+        }
+      </select>
+    </label>
+    <label class="field">
+      <span>{{ 'reports.createdFrom' | t }}</span>
+      <input
+        type="date"
+        name="from"
+        [(ngModel)]="from"
+        [attr.aria-invalid]="rangeError() ? 'true' : null"
+        aria-describedby="r128-filter-error"
+      />
+    </label>
+    <label class="field">
+      <span>{{ 'reports.createdTo' | t }}</span>
+      <input
+        type="date"
+        name="to"
+        [(ngModel)]="to"
+        [attr.aria-invalid]="rangeError() ? 'true' : null"
+        aria-describedby="r128-filter-error"
+      />
+    </label>
+    <div class="filter-actions">
+      <button class="primary" type="submit">{{ 'reports.apply' | t }}</button>
+      <button type="button" (click)="clear()">{{ 'reports.clear' | t }}</button>
+    </div>
+    <p class="filter-error" id="r128-filter-error" role="alert">
+      @if (filterError()) {
+        {{ filterError() | t }}
+      }
+    </p>
+  </form>
+
+  @if (query.hasData()) {
+    <div class="report-grid">
+      <app-report-chart
+        type="bar"
+        [rows]="rows()"
+        [seriesLabel]="'reports.colSummaries' | t"
+        [label]="'reports.r128.title' | t"
+      />
+      <app-report-table
+        [rows]="rows()"
+        [caption]="'reports.r128.caption' | t"
+        [labelHeader]="'reports.colType' | t"
+        [countHeader]="'reports.colSummaries' | t"
+      />
+    </div>
+  }
+</app-report-shell>

@@ -1,0 +1,49 @@
+<app-report-shell
+  hu="HU-130"
+  titleKey="reports.r130.title"
+  descriptionKey="reports.r130.description"
+  emptyKey="reports.r130.empty"
+  [query]="query"
+>
+  @if (query.hasData()) {
+    <div class="report-grid">
+      <app-report-chart
+        type="doughnut"
+        [rows]="rows()"
+        [seriesLabel]="'reports.colDocuments' | t"
+        [label]="'reports.r130.title' | t"
+      />
+      <app-report-table
+        [rows]="rows()"
+        [swatches]="true"
+        [caption]="'reports.r130.caption' | t"
+        [labelHeader]="'reports.colStatus' | t"
+        [countHeader]="'reports.colDocuments' | t"
+      />
+    </div>
+
+    <h2 class="subheading" id="r130-detail">{{ 'reports.r130.detailTitle' | t }}</h2>
+    <div class="table-scroll">
+      <table aria-labelledby="r130-detail">
+        <thead>
+          <tr>
+            <th scope="col">{{ 'reports.colDocument' | t }}</th>
+            <th scope="col">{{ 'reports.colCase' | t }}</th>
+            <th scope="col">{{ 'reports.colStatus' | t }}</th>
+            <th scope="col">{{ 'reports.colUploadedAt' | t }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (doc of detail(); track doc.documentId) {
+            <tr>
+              <th scope="row">{{ doc.fileName }}</th>
+              <td>{{ caseTitle(doc.caseId) }}</td>
+              <td>{{ 'status.' + doc.processingStatus | t }}</td>
+              <td>{{ doc.createdAt | ldate }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</app-report-shell>

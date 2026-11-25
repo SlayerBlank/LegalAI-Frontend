@@ -1,0 +1,10 @@
+<figure class="chart" [style.height.px]="height()">
+  <canvas
+    baseChart
+    role="img"
+    [attr.aria-label]="summary()"
+    [type]="config().type"
+    [data]="config().data"
+    [options]="config().options"
+  ></canvas>
+</figure>

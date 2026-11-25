@@ -5,3 +5,12 @@ export interface SummaryResponse extends SummaryRequest {
   generatedByUserId: number;
   createdAt: string;
 }
+
+/** SummariesConsultaResponseDTO: GET /api/summaries/filter (HU-65). */
+export interface SummaryFilterResponse {
+  summaryId: number;
+  documentId: number | null;
+  summaryType: string;
+  content: string;
+  createdAt: string;
+}

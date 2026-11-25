@@ -47,6 +47,24 @@ Los módulos funcionales usan `PlaceholderPageComponent` mientras el equipo defi
 
 `/` redirige a `/landing`; también están disponibles `/dashboard`, `/clientes`, `/expedientes`, `/documentos`, `/chat-ia`, `/borradores`, `/resumenes`, `/citaciones-ia`, `/gestionusuarios`, `/roles`, `/auditoria`, `/usuarios/registrar`, `/usuarios/login` y `/**`. Landing, Login y Registro son públicos; las rutas internas están protegidas por `authGuard` y comparten el layout administrativo.
 
+## Reportes (Sprint 4)
+
+Módulo con lazy loading dentro del layout protegido por `authGuard`. Cada reporte tiene gráfico (Chart.js con `ng2-charts`), estados de carga, vacío y error con reintento, y una tabla con los datos. Los colores salen de los tokens `--chart-1` a `--chart-8` de `src/styles.scss` (tema claro y oscuro).
+
+| Ruta | HU | Endpoint |
+|---|---|---|
+| `/reportes` | Índice | — |
+| `/reportes/sesiones-por-expediente` | HU-124 | `GET /api/cases/chat-session-count` |
+| `/reportes/documentos-por-cliente` | HU-125 | `GET /api/clients/document-count` |
+| `/reportes/expedientes-abiertos-por-abogado` | HU-126 | `GET /api/cases/open-with-lawyer` |
+| `/reportes/borradores-por-estado` | HU-127 | `GET /api/drafts` y `GET /api/drafts/filter` |
+| `/reportes/resumenes-por-tipo` | HU-128 | `GET /api/summaries` y `GET /api/summaries/filter` |
+| `/reportes/expedientes-por-estado` | HU-129 | `GET /api/cases?openedFrom&openedTo` |
+| `/reportes/documentos-pendientes` | HU-130 | `GET /api/documents/pending-review/{abogadoId}` |
+| `/reportes/expedientes-de-cliente` | HU-131 | `GET /api/clients/{clientId}/cases/filter` |
+| `/reportes/actividad-chat` | HU-132 | `GET /api/chat/sessions` |
+| `/reportes/auditoria-por-accion` | HU-133 (solo ADMIN, `adminGuard`) | `GET /api/audit-logs/advanced-search` |
+
 ## Tema claro y oscuro
 
 `ThemeService` en `src/app/services/theme.service.ts` mantiene el estado con Angular Signals, aplica `data-theme` al elemento raíz, guarda la elección en `localStorage` y usa la preferencia del sistema cuando no existe una elección guardada. El selector está disponible en Landing, Login, Registro y el header administrativo.

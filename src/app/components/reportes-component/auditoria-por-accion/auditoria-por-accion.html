@@ -1,0 +1,111 @@
+<app-report-shell
+  hu="HU-133"
+  titleKey="reports.r133.title"
+  descriptionKey="reports.r133.description"
+  emptyKey="reports.emptyFiltered"
+  idleKey="reports.r133.idle"
+  [query]="query"
+>
+  <form
+    reportFilters
+    class="filters"
+    novalidate
+    [attr.aria-label]="'reports.filters' | t"
+    (ngSubmit)="apply()"
+  >
+    <label class="field">
+      <span>{{ 'reports.user' | t }}</span>
+      @if (usersError()) {
+        <input
+          type="number"
+          name="userId"
+          min="1"
+          inputmode="numeric"
+          [ngModel]="userId()"
+          (ngModelChange)="setUserId($event)"
+        />
+      } @else {
+        <select name="userId" [(ngModel)]="userId">
+          <option [ngValue]="null">{{ 'reports.any' | t }}</option>
+          @for (user of users(); track user.userId) {
+            <option [ngValue]="user.userId">{{ user.fullName }}</option>
+          }
+        </select>
+      }
+    </label>
+    <label class="field">
+      <span>{{ 'reports.action' | t }}</span>
+      <select name="action" [(ngModel)]="action">
+        <option value="">{{ 'reports.any' | t }}</option>
+        @for (item of actions; track item) {
+          <option [value]="item">{{ actionLabel(item) }}</option>
+        }
+      </select>
+    </label>
+    <label class="field">
+      <span>{{ 'reports.entity' | t }}</span>
+      <select name="entityType" [(ngModel)]="entityType">
+        <option value="">{{ 'reports.any' | t }}</option>
+        @for (item of entityTypes; track item) {
+          <option [value]="item">{{ item }}</option>
+        }
+      </select>
+    </label>
+    <label class="field">
+      <span>{{ 'reports.from' | t }}</span>
+      <input
+        type="date"
+        name="from"
+        [(ngModel)]="from"
+        [attr.aria-invalid]="rangeError() ? 'true' : null"
+        aria-describedby="r133-filter-error"
+      />
+    </label>
+    <label class="field">
+      <span>{{ 'reports.to' | t }}</span>
+      <input
+        type="date"
+        name="to"
+        [(ngModel)]="to"
+        [attr.aria-invalid]="rangeError() ? 'true' : null"
+        aria-describedby="r133-filter-error"
+      />
+    </label>
+    <div class="filter-actions">
+      <button class="primary" type="submit">{{ 'reports.consult' | t }}</button>
+      <button type="button" (click)="clear()">{{ 'reports.clear' | t }}</button>
+    </div>
+    <p class="filter-hint">{{ 'reports.r133.criteria' | t: { count: criteria() } }}</p>
+    <p class="filter-error" id="r133-filter-error" role="alert">
+      @if (filterError()) {
+        {{ filterError() | t }}
+      }
+    </p>
+  </form>
+
+  @if (query.hasData()) {
+    @if (truncated()) {
+      <p class="report-note">
+        {{
+          'reports.r133.truncated'
+            | t: { shown: (query.data().length | lnumber), total: (serverTotal() | lnumber) }
+        }}
+      </p>
+    }
+    <div class="report-grid">
+      <app-report-chart
+        type="bar"
+        [horizontal]="true"
+        [rows]="rows()"
+        [seriesLabel]="'reports.colEvents' | t"
+        [label]="'reports.r133.title' | t"
+      />
+      <app-report-table
+        [rows]="rows()"
+        [caption]="'reports.r133.caption' | t"
+        [labelHeader]="'reports.action' | t"
+        [countHeader]="'reports.colEvents' | t"
+      />
+    </div>
+  }
+</app-report-shell>
