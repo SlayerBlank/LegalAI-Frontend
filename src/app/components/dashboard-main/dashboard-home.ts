@@ -5,10 +5,11 @@ import { DestroyRef } from '@angular/core';
 import { LoginService } from '../../services/login-service';
 import { ClienteService } from '../../services/cliente-service';
 import { WorkspaceIcon } from './workspace-icon';
+import { DashboardQueriesComponent } from './dashboard-queries/dashboard-queries';
 @Component({
   selector: 'app-dashboard-home',
   standalone: true,
-  imports: [RouterLink, WorkspaceIcon],
+  imports: [RouterLink, WorkspaceIcon, DashboardQueriesComponent],
   templateUrl: './dashboard-home.html',
   styleUrls: ['./dashboard-home.css', './dashboard-home-responsive.css'],
 })

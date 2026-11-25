@@ -1,4 +1,5 @@
-import { Component, HostListener, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, HostListener, OnInit, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { ClientResponse, ClientRequest, ClientCaseResponse } from '../../models/management';
@@ -20,6 +21,9 @@ export class ClienteComponent extends ManagementHttpState<ClientResponse> implem
   private readonly api = inject(ClienteService);
   clients: ClientResponse[] = [];
   clientCases: ClientCaseResponse[] = [];
+  /** Documentos por cliente (GET /clients/document-count); null = no disponible, nunca 0. */
+  readonly documentCounts = signal<Map<number, number> | null>(null);
+  private readonly countsDestroy = inject(DestroyRef);
   ngOnInit() {
     this.load();
   }
@@ -28,6 +32,24 @@ export class ClienteComponent extends ManagementHttpState<ClientResponse> implem
     this.clients = [];
     this.resetPage();
     this.run(this.api.list(), 'loading', (rows) => (this.clients = rows));
+    this.loadDocumentCounts();
+  }
+  loadDocumentCounts() {
+    this.documentCounts.set(null);
+    this.api
+      .getDocumentCount()
+      .pipe(takeUntilDestroyed(this.countsDestroy))
+      .subscribe({
+        next: (rows) =>
+          this.documentCounts.set(new Map(rows.map((r) => [r.clientId, r.cantidadDocumentos]))),
+        error: () => this.documentCounts.set(null),
+      });
+  }
+  documentsOf(clientId: number): string {
+    const counts = this.documentCounts();
+    const value = counts?.get(clientId);
+    // Un cliente recién creado aún no figura en el conteo: tiene 0 documentos solo si el conteo cargó.
+    return counts === null ? '—' : String(value ?? 0);
   }
   get naturalCount() {
     return this.clients.filter((c) => c.clientType === 'PERSON').length;
