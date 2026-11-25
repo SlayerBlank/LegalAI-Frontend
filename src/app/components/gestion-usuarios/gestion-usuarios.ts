@@ -1,5 +1,6 @@
 import { Component, HostListener, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { UserResponse, RoleResponse } from '../../models/management';
 import { UsuarioService } from '../../services/usuario-service';
@@ -7,10 +8,11 @@ import { RolService } from '../../services/rol-service';
 import { LoginService } from '../../services/login-service';
 import { ManagementHttpState } from '../../shared/management-http-state';
 import { ManagementDialogDirective } from '../../shared/management-dialog.directive';
+import { I18N_PIPES } from '../../shared/i18n/i18n.pipes';
 @Component({
   selector: 'app-gestion-usuarios',
   standalone: true,
-  imports: [FormsModule, ManagementDialogDirective],
+  imports: [FormsModule, RouterLink, ManagementDialogDirective, ...I18N_PIPES],
   templateUrl: './gestion-usuarios.html',
   styleUrls: [
     '../../shared/management.css',

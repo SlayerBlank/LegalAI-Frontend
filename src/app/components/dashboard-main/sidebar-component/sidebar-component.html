@@ -92,8 +92,8 @@
         type="button"
         [attr.aria-expanded]="profileOpen"
         aria-controls="workspace-profile"
-        aria-label="Ver u ocultar mi perfil"
-        (click)="profileOpen = !profileOpen"
+        [attr.aria-label]="'profile.toggle' | t"
+        (click)="toggleProfile()"
       >
         <span class="avatar" aria-hidden="true">{{ userInitials() }}</span
         ><span class="user-name">{{ user.fullName }}</span>
@@ -110,11 +110,30 @@
         ><button type="button" (click)="logout()">Cerrar sesión</button>
       </div>
       @if (profileOpen) {
-        <section class="profile-details" id="workspace-profile" aria-label="Mi perfil">
+        <section
+          class="profile-details"
+          id="workspace-profile"
+          [attr.aria-label]="'profile.region' | t"
+          [attr.aria-busy]="profileLoading()"
+        >
           <strong>{{ user.fullName }}</strong
           ><span>{{ user.email }}</span
-          ><span>Rol: {{ user.roleName }}</span
-          ><span>Estado: {{ user.status }}</span>
+          ><span>{{ 'profile.role' | t: { role: user.roleName } }}</span
+          ><span>{{ 'profile.status' | t: { status: user.status } }}</span>
+          @if (user.createdAt) {
+            <span>{{ 'profile.since' | t: { date: (user.createdAt | ldate) } }}</span>
+          }
+          @if (profileLoading()) {
+            <span class="profile-status" role="status">{{ 'profile.loading' | t }}</span>
+          }
+          @if (profileError()) {
+            <span class="profile-status error" role="alert"
+              >{{ 'profile.error' | t }}
+              <button type="button" (click)="refreshProfile()">
+                {{ 'profile.retry' | t }}
+              </button></span
+            >
+          }
         </section>
       }
     } @else {

@@ -87,6 +87,12 @@
                 <div class="row-actions">
                   <button (click)="showDetail(user)">Ver detalle</button
                   ><button (click)="openForm(user)">Editar</button
+                  ><a
+                    class="row-link"
+                    routerLink="/auditoria"
+                    [queryParams]="{ userId: user.userId }"
+                    [attr.aria-label]="'audit.viewUserActivityFor' | t: { name: user.fullName }"
+                    >{{ 'audit.viewUserActivity' | t }}</a
                   ><button
                     class="danger"
                     [disabled]="busy || !canDeactivate(user)"

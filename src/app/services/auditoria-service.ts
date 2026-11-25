@@ -82,4 +82,15 @@ export class AuditoriaService {
   get(id: number): Observable<AuditLogResponse> {
     return this.http.get<AuditLogResponse>(`${this.url}/${id}`);
   }
+
+  /** HU-121: todos los eventos de un usuario; se garantiza el orden del más reciente al más antiguo. */
+  byUser(userId: number): Observable<AuditLogResponse[]> {
+    return this.http
+      .get<AuditLogResponse[]>(`${this.url}/usuario/${userId}`)
+      .pipe(map((logs) => [...(logs ?? [])].sort(newestFirst)));
+  }
+}
+
+function newestFirst(a: AuditLogResponse, b: AuditLogResponse): number {
+  return b.createdAt.localeCompare(a.createdAt) || b.logId - a.logId;
 }

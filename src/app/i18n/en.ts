@@ -113,6 +113,14 @@ export const EN: Record<keyof typeof ES, string> = {
   'docs.errTooLarge': 'The file exceeds the {max} limit.',
   'docs.errNotPdf': 'Only PDF files are allowed.',
   'docs.errName': 'The file name is not valid. Rename it and try again.',
+  'docs.process': 'Process',
+  'docs.retryProcess': 'Retry',
+  'docs.processFor': 'Process {name}',
+  'docs.retryProcessFor': 'Retry processing {name}',
+  'docs.processedNotice': 'Document processed. Status: {status}.',
+  'docs.generateEmbeddings': 'Generate embeddings',
+  'docs.regenerateEmbeddings': 'Regenerate embeddings',
+  'docs.embeddingsNotice': 'Embeddings generated: {generated} of {chunks} chunks.',
 
   // Chunks
   'chunks.back': '← Back to Documents',
@@ -181,6 +189,14 @@ export const EN: Record<keyof typeof ES, string> = {
   'audit.userFallback': 'User #{id}',
   'audit.errDates': 'The “from” date cannot be after the “to” date.',
   'audit.errLength': 'Action and entity must not exceed 80 characters.',
+  'audit.activity': 'View user activity',
+  'audit.activityTitle': 'Activity of {name}',
+  'audit.activityCount': '{count} events, newest first.',
+  'audit.activityEmpty': 'This user has no audit events.',
+  'audit.activityLoading': 'Loading user activity...',
+  'audit.retry': 'Retry',
+  'audit.viewUserActivity': 'View audit',
+  'audit.viewUserActivityFor': 'View the audit trail of {name}',
 
   // Actions recorded by the backend
   'action.LOGIN': 'Sign in',
@@ -463,4 +479,13 @@ export const EN: Record<keyof typeof ES, string> = {
   'reports.r133.errMinFilters': 'At least two search criteria are required.',
   'reports.r133.criteria': 'Active criteria: {count} (minimum 2).',
   'reports.r133.truncated': 'Showing {shown} of {total} events.',
+  /** HU-77: perfil del usuario autenticado */
+  'profile.region': 'My profile',
+  'profile.toggle': 'Show or hide my profile',
+  'profile.loading': 'Refreshing profile...',
+  'profile.role': 'Role: {role}',
+  'profile.status': 'Status: {status}',
+  'profile.since': 'Member since {date}',
+  'profile.error': 'The profile could not be refreshed.',
+  'profile.retry': 'Retry',
 };

@@ -8,6 +8,7 @@ import {
   DocumentResponse,
   DocumentTextResponse,
   ProcessingStatus,
+  EmbeddingGenerationResponse,
 } from '../models/documento';
 
 @Injectable({ providedIn: 'root' })
@@ -43,6 +44,19 @@ export class DocumentoService {
 
   prepare(id: number): Observable<DocumentPreparationResponse> {
     return this.http.post<DocumentPreparationResponse>(`${this.documents}/${id}/prepare`, null);
+  }
+
+  /** HU-99: extrae el texto del PDF y devuelve el documento con su nuevo estado. */
+  process(id: number): Observable<DocumentResponse> {
+    return this.http.post<DocumentResponse>(`${this.documents}/${id}/process`, null);
+  }
+
+  /** HU-101: genera los embeddings de los fragmentos; force=true los vuelve a calcular. */
+  generateEmbeddings(id: number, force = false): Observable<EmbeddingGenerationResponse> {
+    const params = new HttpParams().set('force', force);
+    return this.http.post<EmbeddingGenerationResponse>(`${this.documents}/${id}/embeddings`, null, {
+      params,
+    });
   }
 
   text(id: number): Observable<DocumentTextResponse> {

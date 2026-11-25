@@ -81,3 +81,10 @@ export interface ChunkGenerationResponse {
   chunkSize: number;
   overlap: number;
 }
+
+/** HU-101: EmbeddingGenerationResponseDTO de POST /api/documents/{id}/embeddings */
+export interface EmbeddingGenerationResponse {
+  documentId: number;
+  chunksProcessed: number;
+  embeddingsGenerated: number;
+}

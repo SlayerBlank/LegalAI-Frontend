@@ -236,6 +236,66 @@ export class DocumentoComponent extends ManagementHttpState<DocumentResponse> im
     );
   }
 
+  /** HU-99: solo se procesan documentos subidos o con error; reprocesar uno listo borraría sus fragmentos. */
+  canProcess(doc: DocumentResponse): boolean {
+    return doc.processingStatus === 'UPLOADED' || doc.processingStatus === 'ERROR';
+  }
+
+  /** HU-99: POST /process y luego el estado de /preparation, sin recargar la lista. */
+  process(doc: DocumentResponse) {
+    if (this.busy || this.loading || !this.canProcess(doc)) return;
+    const id = doc.documentId;
+    const source = this.api.process(id).pipe(
+      switchMap((fresh) =>
+        this.api.preparation(id).pipe(
+          map((prep) => ({ fresh, prep: prep as DocumentPreparationResponse | null })),
+          catchError(() => of({ fresh, prep: null })),
+        ),
+      ),
+    );
+    this.run(
+      source,
+      'busy',
+      ({ fresh, prep }) => {
+        this.replace(fresh);
+        if (this.selected?.documentId === id) {
+          this.selected = fresh;
+          this.preparation = prep;
+          this.text = null;
+        }
+        this.notice = this.i18n.t('docs.processedNotice', {
+          status: this.statusLabel(fresh.processingStatus),
+        });
+      },
+      /** HU-99: si falla la extracción, se muestra el estado ERROR que deja el backend. */
+      () => this.refreshQuietly(id),
+    );
+  }
+
+  /** HU-101: genera (o regenera con force) los embeddings del documento abierto. */
+  generateEmbeddings(force = false) {
+    const doc = this.selected;
+    if (!doc || this.busy) return;
+    const id = doc.documentId;
+    const source = this.api
+      .generateEmbeddings(id, force)
+      .pipe(
+        switchMap((result) => this.api.preparation(id).pipe(map((prep) => ({ result, prep })))),
+      );
+    this.run(
+      source,
+      'busy',
+      ({ result, prep }) => {
+        this.preparation = prep;
+        this.notice = this.i18n.t('docs.embeddingsNotice', {
+          generated: result.embeddingsGenerated,
+          chunks: result.chunksProcessed,
+        });
+      },
+      () => this.refreshQuietly(id),
+    );
+  }
+
   loadText() {
     const doc = this.selected;
     if (!doc || this.busy) return;
