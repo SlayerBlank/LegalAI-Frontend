@@ -346,4 +346,91 @@ describe('DocumentoComponent - transporte HTTP aislado', () => {
     expect(c.uploadFile?.name).toBe('demanda.pdf');
     expect(c.uploadError).toBe('');
   });
+
+  /** HU-99: procesar y reintentar desde la tabla sin recargar la lista. */
+  it('procesa un documento subido y muestra su nuevo estado sin recargar', async () => {
+    const uploaded: DocumentResponse = {
+      ...doc,
+      processingStatus: 'UPLOADED',
+      hasExtractedText: false,
+      extractedTextLength: 0,
+    };
+    const f = mount(undefined, [uploaded]);
+    const c = f.componentInstance;
+    await f.whenStable();
+    f.detectChanges();
+    const button = Array.from<HTMLButtonElement>(
+      f.nativeElement.querySelectorAll('.row-actions button'),
+    ).find((b) => b.textContent?.trim() === 'Procesar');
+    expect(button?.getAttribute('aria-label')).toBe('Procesar contrato.pdf');
+    button!.click();
+    const req = http.expectOne('/api/documents/31/process');
+    expect(req.request.method).toBe('POST');
+    expect(c.busy).toBe(true);
+    req.flush(doc);
+    http
+      .expectOne('/api/documents/31/preparation')
+      .flush({ ...prep, stage: 'CHUNKS_REQUIRED', chunks: 0 });
+    expect(c.documents[0].processingStatus).toBe('PROCESSED');
+    expect(c.notice).toBe('Documento procesado. Estado: Procesado.');
+    expect(c.canProcess(c.documents[0])).toBe(false);
+  });
+
+  it('si el procesamiento falla muestra el error y deja el estado ERROR para reintentar', () => {
+    const c = mount(undefined, [{ ...doc, processingStatus: 'UPLOADED' }]).componentInstance;
+    c.process(c.documents[0]);
+    http
+      .expectOne('/api/documents/31/process')
+      .flush(
+        { message: 'No se pudo extraer texto del PDF. El documento puede ser escaneado.' },
+        { status: 400, statusText: 'Bad Request' },
+      );
+    http.expectOne('/api/documents/31').flush({ ...doc, processingStatus: 'ERROR' });
+    http.expectOne('/api/documents/31/preparation').flush({ ...prep, stage: 'EXTRACTION_ERROR' });
+    expect(c.error).toContain('documento puede ser escaneado');
+    expect(c.documents[0].processingStatus).toBe('ERROR');
+    expect(c.canProcess(c.documents[0])).toBe(true);
+  });
+
+  it('no procesa documentos ya procesados para no borrar sus fragmentos', () => {
+    const c = mount().componentInstance;
+    c.process(doc);
+    http.expectNone('/api/documents/31/process');
+  });
+
+  /** HU-101: generación de embeddings desde el detalle del documento. */
+  it('genera los embeddings del documento y refresca la preparación', () => {
+    const c = mount().componentInstance;
+    c.showDetail(doc);
+    http.expectOne('/api/documents/31').flush(doc);
+    http.expectOne('/api/documents/31/preparation').flush(prep);
+    c.generateEmbeddings();
+    const req = http.expectOne((r) => r.url === '/api/documents/31/embeddings');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.params.get('force')).toBe('false');
+    req.flush({ documentId: 31, chunksProcessed: 3, embeddingsGenerated: 3 });
+    http
+      .expectOne('/api/documents/31/preparation')
+      .flush({ ...prep, stage: 'READY', readyForRag: true, embeddedChunks: 3 });
+    expect(c.preparation?.readyForRag).toBe(true);
+    expect(c.notice).toBe('Embeddings generados: 3 de 3 fragmentos.');
+  });
+
+  it('muestra el error del servicio de embeddings y conserva el estado real', () => {
+    const c = mount().componentInstance;
+    c.showDetail(doc);
+    http.expectOne('/api/documents/31').flush(doc);
+    http.expectOne('/api/documents/31/preparation').flush(prep);
+    c.generateEmbeddings(true);
+    const req = http.expectOne((r) => r.url === '/api/documents/31/embeddings');
+    expect(req.request.params.get('force')).toBe('true');
+    req.flush(
+      { message: 'Lote de embeddings incompleto' },
+      { status: 503, statusText: 'Unavailable' },
+    );
+    http.expectOne('/api/documents/31').flush(doc);
+    http.expectOne('/api/documents/31/preparation').flush(prep);
+    expect(c.error).toContain('Lote de embeddings incompleto');
+    expect(c.preparation?.embeddedChunks).toBe(0);
+  });
 });

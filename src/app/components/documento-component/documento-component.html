@@ -111,6 +111,24 @@
                 <td>{{ doc.createdAt | ldate }}</td>
                 <td>
                   <div class="row-actions">
+                    @if (canProcess(doc)) {
+                      <button
+                        class="primary"
+                        (click)="process(doc)"
+                        [disabled]="busy"
+                        [attr.aria-label]="
+                          (doc.processingStatus === 'ERROR'
+                            ? 'docs.retryProcessFor'
+                            : 'docs.processFor'
+                          ) | t: { name: doc.fileName }
+                        "
+                      >
+                        {{
+                          (doc.processingStatus === 'ERROR' ? 'docs.retryProcess' : 'docs.process')
+                            | t
+                        }}
+                      </button>
+                    }
                     <button (click)="showDetail(doc)" [disabled]="busy">
                       {{ 'common.viewDetail' | t }}</button
                     ><button (click)="openChunks(doc)" [disabled]="busy">
@@ -286,6 +304,9 @@
         <h2>{{ 'docs.extracted' | t }}</h2>
         <pre class="extracted" tabindex="0">{{ text || ('docs.noText' | t) }}</pre>
       }
+      @if (notice) {
+        <p class="notice" role="status">{{ notice }}</p>
+      }
       @if (error) {
         <p class="notice error" role="alert">{{ error }}</p>
       }
@@ -293,6 +314,24 @@
         <p role="status">{{ 'common.processing' | t }}</p>
       }
       <div class="actions">
+        @if (canProcess(doc)) {
+          <button class="primary" [disabled]="busy" (click)="process(doc)">
+            {{ (doc.processingStatus === 'ERROR' ? 'docs.retryProcess' : 'docs.process') | t }}
+          </button>
+        }
+        @if (preparation && preparation.chunks > 0) {
+          <button
+            [disabled]="busy"
+            (click)="generateEmbeddings(preparation.embeddedChunks >= preparation.chunks)"
+          >
+            {{
+              (preparation.embeddedChunks >= preparation.chunks
+                ? 'docs.regenerateEmbeddings'
+                : 'docs.generateEmbeddings'
+              ) | t
+            }}
+          </button>
+        }
         @if (preparation && !preparation.readyForRag) {
           <button
             class="primary"
