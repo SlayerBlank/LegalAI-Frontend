@@ -114,6 +114,14 @@ export const ES = {
   'docs.errTooLarge': 'El archivo supera el máximo de {max}.',
   'docs.errNotPdf': 'Solo se permiten archivos PDF.',
   'docs.errName': 'El nombre del archivo no es válido. Renómbralo e inténtalo de nuevo.',
+  'docs.process': 'Procesar',
+  'docs.retryProcess': 'Reintentar',
+  'docs.processFor': 'Procesar {name}',
+  'docs.retryProcessFor': 'Reintentar el procesamiento de {name}',
+  'docs.processedNotice': 'Documento procesado. Estado: {status}.',
+  'docs.generateEmbeddings': 'Generar embeddings',
+  'docs.regenerateEmbeddings': 'Regenerar embeddings',
+  'docs.embeddingsNotice': 'Embeddings generados: {generated} de {chunks} fragmentos.',
 
   // Fragmentos
   'chunks.back': '← Volver a Documentos',
@@ -184,6 +192,14 @@ export const ES = {
   'audit.userFallback': 'Usuario #{id}',
   'audit.errDates': 'La fecha “desde” no puede ser posterior a la fecha “hasta”.',
   'audit.errLength': 'La acción y la entidad no deben superar los 80 caracteres.',
+  'audit.activity': 'Ver actividad del usuario',
+  'audit.activityTitle': 'Actividad de {name}',
+  'audit.activityCount': '{count} eventos, del más reciente al más antiguo.',
+  'audit.activityEmpty': 'Este usuario no tiene eventos de auditoría.',
+  'audit.activityLoading': 'Cargando la actividad del usuario...',
+  'audit.retry': 'Reintentar',
+  'audit.viewUserActivity': 'Ver auditoría',
+  'audit.viewUserActivityFor': 'Ver la auditoría de {name}',
 
   // Acciones registradas por el backend
   'action.LOGIN': 'Inicio de sesión',
@@ -352,4 +368,14 @@ export const ES = {
   'queries.documentsEmpty': 'Aún no tienes clientes. Cuando los registres, verás aquí sus documentos.',
   'queries.colClient': 'Cliente',
   'queries.colDocuments': 'Documentos',
+
+  /** HU-77: perfil del usuario autenticado */
+  'profile.region': 'Mi perfil',
+  'profile.toggle': 'Ver u ocultar mi perfil',
+  'profile.loading': 'Actualizando perfil...',
+  'profile.role': 'Rol: {role}',
+  'profile.status': 'Estado: {status}',
+  'profile.since': 'Miembro desde {date}',
+  'profile.error': 'No se pudo actualizar el perfil.',
+  'profile.retry': 'Reintentar',
 } as const;

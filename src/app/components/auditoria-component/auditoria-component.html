@@ -10,10 +10,10 @@
 @if (loading) {
   <div class="notice" role="status" aria-live="polite">{{ 'common.loading' | t }}</div>
 }
-@if (busy && !selected) {
+@if (busy && !selected && !activity) {
   <div class="notice" role="status" aria-live="polite">{{ 'common.processing' | t }}</div>
 }
-@if (error && !selected) {
+@if (error && !selected && !activity) {
   <div class="notice error" role="alert">
     {{ error }}
     <button type="button" (click)="load()" [disabled]="loading || busy">
@@ -194,10 +194,75 @@
       <h2 class="section">{{ 'audit.details' | t }}</h2>
       <pre class="detail-text">{{ log.details || ('audit.noDetails' | t) }}</pre>
       <div class="actions">
-        <button class="primary" (click)="filterByUser(log.userId)">
+        <button [disabled]="busy" (click)="showActivity(log.userId)">
+          {{ 'audit.activity' | t }}</button
+        ><button class="primary" (click)="filterByUser(log.userId)">
           {{ 'audit.byUser' | t }}
         </button>
       </div>
+    </section>
+  </div>
+}
+@if (activity; as act) {
+  <div class="overlay" (click)="close()">
+    <section
+      class="dialog activity-dialog"
+      managementDialog
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="audit-activity-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="dialog-head">
+        <h2 id="audit-activity-title">
+          {{ 'audit.activityTitle' | t: { name: userName(act.userId) } }}
+        </h2>
+        <button type="button" [attr.aria-label]="'common.close' | t" (click)="close()">×</button>
+      </div>
+      @if (busy) {
+        <p class="notice" role="status" aria-live="polite">{{ 'audit.activityLoading' | t }}</p>
+      }
+      @if (error) {
+        <p class="notice error" role="alert">
+          {{ error }}
+          <button type="button" [disabled]="busy" (click)="showActivity(act.userId)">
+            {{ 'audit.retry' | t }}
+          </button>
+        </p>
+      }
+      @if (act.logs; as logs) {
+        @if (logs.length) {
+          <p class="activity-count">{{ 'audit.activityCount' | t: { count: logs.length } }}</p>
+          <div class="table-scroll activity-scroll" tabindex="0">
+            <table>
+              <thead>
+                <tr>
+                  <th>{{ 'audit.colDate' | t }}</th>
+                  <th>{{ 'audit.colAction' | t }}</th>
+                  <th>{{ 'audit.colEntity' | t }}</th>
+                  <th>{{ 'audit.colDetails' | t }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (log of logs; track log.logId) {
+                  <tr>
+                    <td class="nowrap">{{ log.createdAt | ldate: true }}</td>
+                    <td>
+                      <span class="badge" [title]="log.action">{{ actionLabel(log.action) }}</span>
+                    </td>
+                    <td class="nowrap">
+                      {{ log.entityType }}{{ log.entityId !== null ? ' #' + log.entityId : '' }}
+                    </td>
+                    <td class="details" [title]="log.details || ''">{{ log.details || '—' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <p class="empty">{{ 'audit.activityEmpty' | t }}</p>
+        }
+      }
     </section>
   </div>
 }

@@ -139,9 +139,33 @@ describe('Private workspace: navigation, real metrics and drawer', () => {
     expect(f.nativeElement.querySelector('.user-name').textContent).toBe(user.fullName);
     expect(f.nativeElement.querySelector('.avatar').textContent).toBe('AG');
     f.nativeElement.querySelector('.profile-trigger').click();
+    /** HU-77: al abrir el perfil se consultan los datos vigentes de /api/users/me. */
+    const me = http.expectOne('/api/users/me');
+    expect(me.request.method).toBe('GET');
+    me.flush({ ...user, email: 'actualizado@example.com' });
     await f.whenStable();
-    expect(f.nativeElement.querySelector('#workspace-profile').textContent).toContain(user.email);
+    f.detectChanges();
+    expect(f.nativeElement.querySelector('#workspace-profile').textContent).toContain(
+      'actualizado@example.com',
+    );
     expect(f.nativeElement.querySelector('#workspace-profile').textContent).toContain('ADMIN');
+  });
+  it('HU-77: reports a profile refresh error and retries it', async () => {
+    const f = await dashboard();
+    f.nativeElement.querySelector('.profile-trigger').click();
+    http.expectOne('/api/users/me').flush(null, { status: 500, statusText: 'Error' });
+    await f.whenStable();
+    f.detectChanges();
+    const alert = f.nativeElement.querySelector('#workspace-profile [role="alert"]');
+    expect(alert.textContent).toContain('No se pudo actualizar el perfil.');
+    expect(f.nativeElement.querySelector('#workspace-profile').textContent).toContain(user.email);
+    alert.querySelector('button').click();
+    http.expectOne('/api/users/me').flush({ ...user, roleName: 'USER' });
+    await f.whenStable();
+    f.detectChanges();
+    expect(f.nativeElement.querySelector('#workspace-profile [role="alert"]')).toBeNull();
+    /** HU-77: el rol vigente oculta al instante las opciones de administración. */
+    expect(f.nativeElement.querySelector('app-sidebar a[href="/gestionusuarios"]')).toBeNull();
   });
   it('does not offer administrative navigation to USER sessions', async () => {
     login.currentUser.set({ ...user, roleName: 'USER' });

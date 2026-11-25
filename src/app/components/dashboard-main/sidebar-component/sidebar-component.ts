@@ -1,6 +1,20 @@
-import { Component, ElementRef, HostListener, effect, inject, input, output } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  HostListener,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { finalize } from 'rxjs';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { LoginService } from '../../../services/login-service';
+import { UsuarioService } from '../../../services/usuario-service';
+import { I18N_PIPES } from '../../../shared/i18n/i18n.pipes';
 import { WorkspaceIcon } from '../workspace-icon';
 interface WorkspaceLink {
   title: string;
@@ -10,7 +24,7 @@ interface WorkspaceLink {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, WorkspaceIcon],
+  imports: [RouterLink, RouterLinkActive, WorkspaceIcon, ...I18N_PIPES],
   templateUrl: './sidebar-component.html',
   styleUrl: './sidebar-component.css',
 })
@@ -25,6 +39,10 @@ export class SidebarComponent {
   readonly compact = input(false);
   readonly closeRequested = output<void>();
   readonly login = inject(LoginService);
+  private readonly users = inject(UsuarioService);
+  private readonly destroyRef = inject(DestroyRef);
+  readonly profileLoading = signal(false);
+  readonly profileError = signal(false);
   private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
   profileOpen = false;
   readonly mainLinks: WorkspaceLink[] = [
@@ -67,6 +85,30 @@ export class SidebarComponent {
           .toUpperCase()
       : 'U';
   }
+  /** HU-77: al abrir el perfil se consultan los datos vigentes de GET /api/users/me. */
+  toggleProfile(): void {
+    this.profileOpen = !this.profileOpen;
+    if (this.profileOpen) this.refreshProfile();
+  }
+
+  refreshProfile(): void {
+    if (this.profileLoading()) return;
+    this.profileLoading.set(true);
+    this.profileError.set(false);
+    this.users
+      .getCurrentUser()
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.profileLoading.set(false)),
+      )
+      .subscribe({
+        /** HU-77: un rol distinto actualiza al instante el menú de administración. */
+        next: (user) => this.login.currentUser.set(user),
+        /** HU-77: un 401 lo resuelve jwtInterceptor y lleva al login. */
+        error: () => this.profileError.set(true),
+      });
+  }
+
   logout(): void {
     this.profileOpen = false;
     this.closeRequested.emit();

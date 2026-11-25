@@ -316,3 +316,21 @@ nav a.active::before {
     transform: none;
   }
 }
+/** HU-77: estados de la consulta del perfil */
+.profile-status {
+  font-style: italic;
+}
+.profile-status.error {
+  font-style: normal;
+  color: var(--bad, #dc5353);
+}
+.profile-status button {
+  border: 0;
+  padding: 0;
+  margin-left: 4px;
+  background: none;
+  color: var(--primary);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}

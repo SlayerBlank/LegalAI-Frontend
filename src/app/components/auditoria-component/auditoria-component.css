@@ -78,3 +78,18 @@ dd small {
     grid-template-columns: 1fr;
   }
 }
+/** HU-121: diálogo de actividad de un usuario */
+.activity-dialog {
+  width: min(56rem, 100%);
+}
+.activity-count {
+  margin: 0 0 0.8rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.activity-scroll {
+  max-height: 60vh;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}

@@ -1,5 +1,6 @@
 import { Component, HostListener, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { catchError, forkJoin, of } from 'rxjs';
 import {
   AUDIT_ACTIONS,
@@ -39,6 +40,7 @@ const EMPTY_FILTERS: AuditLogFilters = {
 export class AuditoriaComponent extends ManagementHttpState<AuditLogResponse> implements OnInit {
   private readonly api = inject(AuditoriaService);
   private readonly usersApi = inject(UsuarioService);
+  private readonly route = inject(ActivatedRoute);
   readonly i18n = inject(I18nService);
 
   readonly actions = Object.keys(AUDIT_ACTIONS);
@@ -57,9 +59,14 @@ export class AuditoriaComponent extends ManagementHttpState<AuditLogResponse> im
   };
   users: UserResponse[] = [];
   usersAvailable = true;
+  /** HU-121: actividad de un usuario; logs es null mientras carga o si falló. */
+  activity: { userId: number; logs: AuditLogResponse[] | null } | null = null;
 
   ngOnInit() {
     this.load();
+    /** HU-121: acceso directo desde Gestión de usuarios con /auditoria?userId=7 */
+    const userId = Number(this.route.snapshot.queryParamMap.get('userId'));
+    if (Number.isInteger(userId) && userId > 0) this.showActivity(userId, true);
   }
 
   /** Primera carga: registros y usuarios. Si /users falla, la auditoría sigue mostrando los IDs. */
@@ -144,6 +151,29 @@ export class AuditoriaComponent extends ManagementHttpState<AuditLogResponse> im
 
   userEmail(log: AuditLogResponse): string {
     return log.userEmail ?? this.users.find((u) => u.userId === log.userId)?.email ?? '';
+  }
+
+  /** HU-121: GET /api/audit-logs/usuario/{userId} en un diálogo propio. */
+  showActivity(userId: number, force = false) {
+    if (this.busy || (this.loading && !force)) return;
+    this.selected = null;
+    this.activity = { userId, logs: null };
+    this.run(this.api.byUser(userId), 'busy', (logs) => {
+      if (this.activity?.userId === userId) this.activity = { userId, logs };
+    });
+  }
+
+  userName(userId: number): string {
+    return (
+      this.users.find((u) => u.userId === userId)?.fullName ??
+      this.i18n.t('audit.userFallback', { id: userId })
+    );
+  }
+
+  override close(): void {
+    if (this.busy) return;
+    super.close();
+    this.activity = null;
   }
 
   showDetail(log: AuditLogResponse) {
