@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { map } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { DraftResponse } from '../models/response/draft-response';
+import { DraftFilterResponse, DraftResponse } from '../models/response/draft-response';
 import { DraftRequest } from '../models/request/draft-request';
 
 @Injectable({ providedIn: 'root' })
@@ -15,11 +15,16 @@ export class BorradorService {
   }
 
   filter(caseId: number, status: string, updatedFrom: string, updatedTo: string) {
-    return this.http
-      .get<Pick<DraftResponse, 'draftId'>[]>(`${this.url}/filter`, {
-        params: { caseId, status, updatedFrom, updatedTo },
-      })
-      .pipe(map((drafts) => new Set(drafts.map(({ draftId }) => draftId))));
+    return this.filterRecords(caseId, status, updatedFrom, updatedTo).pipe(
+      map((drafts) => new Set(drafts.map(({ draftId }) => draftId))),
+    );
+  }
+
+  /** GET /api/drafts/filter: el backend exige expediente, estado y ambas fechas. */
+  filterRecords(caseId: number, status: string, updatedFrom: string, updatedTo: string) {
+    return this.http.get<DraftFilterResponse[]>(`${this.url}/filter`, {
+      params: { caseId, status, updatedFrom, updatedTo },
+    });
   }
 
   get(id: number) {

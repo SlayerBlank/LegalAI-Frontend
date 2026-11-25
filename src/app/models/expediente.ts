@@ -1,5 +1,6 @@
 // Contratos reales de ExpedienteController (/api/cases) y sus DTOs.
 import { CaseResponse, CaseStatus } from './documento';
+import { CurrentUserResponse } from './response/current-user-response';
 
 export type { CaseResponse, CaseStatus };
 
@@ -38,4 +39,18 @@ export interface CaseSessionCountResponse {
   caseId: number;
   tituloExpediente: string;
   cantidadSesiones: number;
+}
+
+/**
+ * ExpedienteAbiertoConAbogadoResponseDTO: GET /api/cases/open-with-lawyer (HU-63).
+ * Solo expedientes OPEN del usuario autenticado; abogado es el UsuarioResponseDTO del propietario.
+ */
+export interface OpenCaseWithLawyerResponse {
+  caseId: number;
+  title: string;
+  description: string | null;
+  status: CaseStatus;
+  openedAt: string;
+  updatedAt: string;
+  abogado: CurrentUserResponse | null;
 }

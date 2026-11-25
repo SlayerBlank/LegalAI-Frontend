@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from '../core/http/api.config';
 import {
@@ -7,6 +7,7 @@ import {
   DocumentPreparationResponse,
   DocumentResponse,
   DocumentTextResponse,
+  ProcessingStatus,
 } from '../models/documento';
 
 @Injectable({ providedIn: 'root' })
@@ -55,5 +56,16 @@ export class DocumentoService {
 
   remove(id: number): Observable<void> {
     return this.http.delete<void>(`${this.documents}/${id}`);
+  }
+
+  /** HU-67: documentos del abogado pendientes de revisión (UPLOADED, PROCESSING y ERROR). */
+  pendingReview(
+    abogadoId: number,
+    status: ProcessingStatus | null = null,
+  ): Observable<DocumentResponse[]> {
+    const params = status ? new HttpParams().set('status', status) : new HttpParams();
+    return this.http.get<DocumentResponse[]>(`${this.documents}/pending-review/${abogadoId}`, {
+      params,
+    });
   }
 }

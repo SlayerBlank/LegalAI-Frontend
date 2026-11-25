@@ -1,0 +1,47 @@
+<app-report-shell
+  hu="HU-126"
+  titleKey="reports.r126.title"
+  descriptionKey="reports.r126.description"
+  emptyKey="reports.r126.empty"
+  [query]="query"
+>
+  @if (query.hasData()) {
+    <div class="report-grid">
+      <app-report-chart
+        type="bar"
+        [horizontal]="true"
+        [rows]="rows()"
+        [seriesLabel]="'reports.colOpenCases' | t"
+        [label]="'reports.r126.title' | t"
+      />
+      <app-report-table
+        [rows]="rows()"
+        [caption]="'reports.r126.caption' | t"
+        [labelHeader]="'reports.colLawyer' | t"
+        [countHeader]="'reports.colOpenCases' | t"
+      />
+    </div>
+
+    <h2 class="subheading" id="r126-detail">{{ 'reports.r126.detailTitle' | t }}</h2>
+    <div class="table-scroll">
+      <table aria-labelledby="r126-detail">
+        <thead>
+          <tr>
+            <th scope="col">{{ 'reports.colCase' | t }}</th>
+            <th scope="col">{{ 'reports.colLawyer' | t }}</th>
+            <th scope="col">{{ 'reports.colOpenedAt' | t }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of detail(); track item.caseId) {
+            <tr>
+              <th scope="row">{{ item.title }}</th>
+              <td>{{ lawyerName(item) }}</td>
+              <td>{{ day(item.openedAt) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</app-report-shell>

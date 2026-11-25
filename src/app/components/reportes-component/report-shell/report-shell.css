@@ -1,0 +1,87 @@
+/* Marco de los reportes; mismas medidas y tokens que el panel principal. */
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+.report {
+  min-width: 0;
+}
+.back {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: none;
+  margin-bottom: 18px;
+  border-radius: 4px;
+}
+.back:hover {
+  color: var(--primary);
+}
+.back:focus-visible,
+.retry:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.report-heading {
+  margin-bottom: 24px;
+}
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+h1 {
+  font: 700 clamp(26px, 2.4vw, 36px) / 1.15 var(--font-display);
+  letter-spacing: -0.025em;
+  margin: 0 0 10px;
+  overflow-wrap: anywhere;
+}
+.intro {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 0;
+  max-width: 70ch;
+}
+.report-body {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+  min-width: 0;
+}
+.state {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 0;
+  padding: 8px 0;
+}
+.state.error {
+  color: var(--text);
+}
+.state.error p {
+  margin: 0 0 10px;
+}
+.retry {
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 14px;
+  min-height: 36px;
+  cursor: pointer;
+}
+@media (max-width: 700px) {
+  .report-body {
+    padding: 16px;
+  }
+}

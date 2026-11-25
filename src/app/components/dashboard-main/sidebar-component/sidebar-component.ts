@@ -1,16 +1,21 @@
 import { Component, ElementRef, HostListener, effect, inject, input, output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { LoginService } from '../../../services/login-service';
+import { I18N_PIPES } from '../../../shared/i18n/i18n.pipes';
 import { WorkspaceIcon } from '../workspace-icon';
 interface WorkspaceLink {
   title: string;
   path: string;
   icon: string;
+  /** Clave i18n del título; si existe, tiene prioridad sobre title. */
+  titleKey?: string;
+  /** Activo también en las rutas hijas (p. ej. /reportes/...). */
+  prefix?: boolean;
 }
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, WorkspaceIcon],
+  imports: [RouterLink, RouterLinkActive, WorkspaceIcon, ...I18N_PIPES],
   templateUrl: './sidebar-component.html',
   styleUrl: './sidebar-component.css',
 })
@@ -21,6 +26,7 @@ export class SidebarComponent {
     matrixParams: 'ignored',
     fragment: 'ignored',
   } as const;
+  readonly prefixMatch = { ...this.activeMatch, paths: 'subset' } as const;
   readonly open = input(false);
   readonly compact = input(false);
   readonly closeRequested = output<void>();
@@ -32,6 +38,7 @@ export class SidebarComponent {
     { title: 'Clientes', path: '/clientes', icon: 'clients' },
     { title: 'Expedientes', path: '/expedientes', icon: 'cases' },
     { title: 'Documentos', path: '/documentos', icon: 'documents' },
+    { title: 'Reportes', titleKey: 'reports.nav', path: '/reportes', icon: 'reports', prefix: true },
   ];
   readonly aiLinks: WorkspaceLink[] = [
     { title: 'Chat IA', path: '/chat-ia', icon: 'ai' },

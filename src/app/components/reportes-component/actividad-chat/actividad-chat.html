@@ -1,0 +1,45 @@
+<app-report-shell
+  hu="HU-132"
+  titleKey="reports.r132.title"
+  descriptionKey="reports.r132.description"
+  emptyKey="reports.r132.empty"
+  [query]="query"
+>
+  <form
+    reportFilters
+    class="filters"
+    novalidate
+    [attr.aria-label]="'reports.filters' | t"
+    (ngSubmit)="apply()"
+  >
+    <label class="field wide">
+      <span>{{ 'reports.case' | t }}</span>
+      <select name="caseId" [(ngModel)]="caseId">
+        <option [ngValue]="null">{{ 'reports.allCases' | t }}</option>
+        @for (item of cases(); track item.caseId) {
+          <option [ngValue]="item.caseId">{{ item.title }}</option>
+        }
+      </select>
+    </label>
+    <div class="filter-actions">
+      <button class="primary" type="submit">{{ 'reports.apply' | t }}</button>
+    </div>
+  </form>
+
+  @if (query.hasData()) {
+    <div class="report-grid">
+      <app-report-chart
+        type="line"
+        [rows]="series()"
+        [seriesLabel]="'reports.colSessions' | t"
+        [label]="'reports.r132.title' | t"
+      />
+      <app-report-table
+        [rows]="activeDays()"
+        [caption]="'reports.r132.caption' | t"
+        [labelHeader]="'reports.colDay' | t"
+        [countHeader]="'reports.colSessions' | t"
+      />
+    </div>
+  }
+</app-report-shell>

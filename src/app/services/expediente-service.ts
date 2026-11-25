@@ -7,6 +7,7 @@ import {
   CaseRequest,
   CaseResponse,
   CaseSessionCountResponse,
+  OpenCaseWithLawyerResponse,
 } from '../models/expediente';
 
 @Injectable({ providedIn: 'root' })
@@ -45,5 +46,10 @@ export class ExpedienteService {
   /** Cantidad de sesiones de chat por expediente propio. */
   sessionCounts(): Observable<CaseSessionCountResponse[]> {
     return this.http.get<CaseSessionCountResponse[]>(`${this.url}/chat-session-count`);
+  }
+
+  /** HU-63: expedientes abiertos propios con los datos del abogado responsable. */
+  openWithLawyer(): Observable<OpenCaseWithLawyerResponse[]> {
+    return this.http.get<OpenCaseWithLawyerResponse[]>(`${this.url}/open-with-lawyer`);
   }
 }

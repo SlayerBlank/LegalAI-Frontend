@@ -1,8 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { EMPTY, Observable, expand, map, reduce } from 'rxjs';
 import { API_BASE_URL } from '../core/http/api.config';
 import {
+  CHAT_PAGE_SIZE_MAX,
   ChatCreateSessionRequest,
   ChatMessage,
   ChatMessageResponse,
@@ -22,6 +23,19 @@ export class ChatIaService {
     let params = pageParams(paging);
     if (caseId !== null) params = params.set('caseId', caseId);
     return this.http.get<ChatSession[]>(this.url, { params });
+  }
+
+  /** Todas las sesiones propias, recorriendo las páginas con el tamaño máximo permitido. */
+  listAllSessions(caseId: number | null = null, maxPages = 50): Observable<ChatSession[]> {
+    const size = CHAT_PAGE_SIZE_MAX;
+    const fetch = (page: number) =>
+      this.listSessions(caseId, { page, size }).pipe(map((rows) => ({ page, rows: rows ?? [] })));
+    return fetch(0).pipe(
+      expand(({ page, rows }) =>
+        rows.length === size && page + 1 < maxPages ? fetch(page + 1) : EMPTY,
+      ),
+      reduce((all, { rows }) => all.concat(rows), [] as ChatSession[]),
+    );
   }
 
   getSession(id: number): Observable<ChatSession> {

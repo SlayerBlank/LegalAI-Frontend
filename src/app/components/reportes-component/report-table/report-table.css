@@ -1,0 +1,5 @@
+/* La tabla usa los estilos de report-common.css. */
+:host {
+  display: block;
+  min-width: 0;
+}

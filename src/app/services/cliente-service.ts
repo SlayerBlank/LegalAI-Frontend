@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from '../core/http/api.config';
+import { CaseStatus } from '../models/documento';
 import {
   ClientRequest,
   ClientResponse,
@@ -33,5 +34,18 @@ export class ClienteService {
   /** Cantidad de documentos por cliente propio, ordenada por cantidad descendente. */
   getDocumentCount(): Observable<ClientDocumentCountResponse[]> {
     return this.http.get<ClientDocumentCountResponse[]>(`${this.url}/document-count`);
+  }
+  /** HU-68: expedientes del cliente con un estado y abiertos en el rango (todos obligatorios). */
+  casesByFilter(
+    clientId: number,
+    status: CaseStatus,
+    openedFrom: string,
+    openedTo: string,
+  ): Observable<ClientCaseResponse[]> {
+    const params = new HttpParams()
+      .set('status', status)
+      .set('openedFrom', openedFrom)
+      .set('openedTo', openedTo);
+    return this.http.get<ClientCaseResponse[]>(`${this.url}/${clientId}/cases/filter`, { params });
   }
 }

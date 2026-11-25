@@ -1,0 +1,25 @@
+<app-report-shell
+  hu="HU-125"
+  titleKey="reports.r125.title"
+  descriptionKey="reports.r125.description"
+  emptyKey="reports.r125.empty"
+  [query]="query"
+>
+  @if (query.hasData()) {
+    <div class="report-grid">
+      <app-report-chart
+        type="bar"
+        [horizontal]="true"
+        [rows]="rows()"
+        [seriesLabel]="'reports.colDocuments' | t"
+        [label]="'reports.r125.title' | t"
+      />
+      <app-report-table
+        [rows]="rows()"
+        [caption]="'reports.r125.caption' | t"
+        [labelHeader]="'reports.colClient' | t"
+        [countHeader]="'reports.colDocuments' | t"
+      />
+    </div>
+  }
+</app-report-shell>

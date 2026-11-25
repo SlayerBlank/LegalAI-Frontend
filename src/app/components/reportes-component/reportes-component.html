@@ -1,0 +1,33 @@
+<section class="reports" aria-labelledby="reports-title">
+  <header class="reports-heading">
+    <p class="eyebrow">{{ 'reports.indexEyebrow' | t }}</p>
+    <h1 id="reports-title">{{ 'reports.title' | t }}</h1>
+    <p class="intro">{{ 'reports.subtitle' | t }}</p>
+  </header>
+
+  <ul class="report-cards" role="list">
+    @for (report of reports(); track report.slug) {
+      <li>
+        <a class="report-card" [routerLink]="report.slug">
+          <span class="card-top">
+            <span class="card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="20" height="20">
+                <path [attr.d]="icons[report.chart]" />
+              </svg>
+            </span>
+            <span class="hu">{{ report.hu }}</span>
+            @if (report.adminOnly) {
+              <span class="badge">{{ 'reports.adminOnly' | t }}</span>
+            }
+          </span>
+          <strong class="card-title">{{ report.titleKey | t }}</strong>
+          <span class="card-text">{{ report.descriptionKey | t }}</span>
+          <span class="card-foot">
+            {{ 'reports.chart.' + report.chart | t }}
+            <span aria-hidden="true">→</span>
+          </span>
+        </a>
+      </li>
+    }
+  </ul>
+</section>
