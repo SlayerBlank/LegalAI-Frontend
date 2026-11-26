@@ -84,7 +84,19 @@
       } @empty {
         @if (sessionsLoaded() && !loadingSessions()) {
           <li class="empty">
-            {{ (cases().length || casesError() ? 'chat.emptySessions' : 'chat.noCases') | t }}
+            @if (caseFilter() !== null) {
+              <p>{{ 'chat.emptyCaseSessions' | t }}</p>
+              <button
+                type="button"
+                class="primary"
+                [disabled]="busy() || sending()"
+                (click)="openCreate()"
+              >
+                {{ 'chat.newForCase' | t }}
+              </button>
+            } @else {
+              {{ (cases().length || casesError() ? 'chat.emptySessions' : 'chat.noCases') | t }}
+            }
           </li>
         }
       }
@@ -152,10 +164,21 @@
                           'chat.sourceRef' | t: { name: src.documentName, index: src.chunkIndex + 1 }
                         }}</strong>
                         <blockquote>{{ src.excerpt }}</blockquote>
+                        <a
+                          class="source-link"
+                          routerLink="/documentos"
+                          [queryParams]="documentLink(src.documentId)"
+                          [attr.aria-label]="'chat.openDocumentFor' | t: { name: src.documentName }"
+                          >{{ 'chat.openDocument' | t }}</a
+                        >
                       </li>
                     }
                   </ol>
                 </details>
+              } @else {
+                <p class="no-sources">
+                  {{ (m.sources === null ? 'chat.sourcesUnknown' : 'chat.noSources') | t }}
+                </p>
               }
             }
           </article>

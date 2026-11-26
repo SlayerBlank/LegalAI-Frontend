@@ -75,6 +75,7 @@
         'chunks.countOf' | t: { count: filtered.length, total: chunks.length }
       }}</span>
     </div>
+    <p class="page-hint">{{ 'chunks.noPage' | t }}</p>
     <ol class="chunk-list">
       @for (chunk of paginate(filtered); track chunk.chunkId) {
         <li class="chunk">

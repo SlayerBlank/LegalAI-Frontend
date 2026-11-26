@@ -55,6 +55,17 @@ export const EN: Record<keyof typeof ES, string> = {
   'stage.EMBEDDINGS_REQUIRED': 'Embeddings pending',
   'stage.EMBEDDINGS_UNAVAILABLE': 'Embeddings unavailable on the server',
 
+  // HU-124: reason for each stage while the document is not ready
+  'stageReason.PROCESSING':
+    'The server is extracting the text. Check the status again in a few seconds.',
+  'stageReason.EXTRACTION_ERROR':
+    'The server could not extract text from the PDF. This usually happens with scanned, damaged or protected PDFs.',
+  'stageReason.EXTRACTION_REQUIRED': 'The PDF still has to be processed to extract its text.',
+  'stageReason.CHUNKS_REQUIRED': 'The text was extracted but has not been split into chunks yet.',
+  'stageReason.EMBEDDINGS_REQUIRED':
+    'Some chunks have no embedding: the AI cannot search the whole document yet.',
+  'stageReason.EMBEDDINGS_UNAVAILABLE': 'The server embedding service is unavailable.',
+
   // Documents
   'docs.title': 'Documents',
   'docs.subtitle': 'Upload the PDFs of each case and prepare them for AI analysis.',
@@ -114,13 +125,37 @@ export const EN: Record<keyof typeof ES, string> = {
   'docs.errNotPdf': 'Only PDF files are allowed.',
   'docs.errName': 'The file name is not valid. Rename it and try again.',
   'docs.process': 'Process',
-  'docs.retryProcess': 'Retry',
   'docs.processFor': 'Process {name}',
-  'docs.retryProcessFor': 'Retry processing {name}',
   'docs.processedNotice': 'Document processed. Status: {status}.',
   'docs.generateEmbeddings': 'Generate embeddings',
   'docs.regenerateEmbeddings': 'Regenerate embeddings',
   'docs.embeddingsNotice': 'Embeddings generated: {generated} of {chunks} chunks.',
+  'docs.retry': 'Retry',
+  'docs.retryFor': 'Retry preparing {name}',
+  'docs.retriedNotice': 'Preparation retried. Status: {stage}.',
+  'docs.errorReason': 'The text could not be extracted. You can retry.',
+  'docs.notReadyYet': 'Not ready yet: still processing.',
+  'docs.refreshState': 'Refresh status',
+  // HU-101: semantic search in the document detail
+  'search.title': 'Semantic search',
+  'search.query': 'Query',
+  'search.placeholder': 'E.g.: What is the penalty for breach?',
+  'search.topK': 'Results',
+  'search.submit': 'Search',
+  'search.searching': 'Searching related chunks...',
+  'search.errEmpty': 'Type some text to search.',
+  'search.notReady':
+    'The document is not ready for AI yet: search only finds chunks that have an embedding.',
+  'search.resultsCount': '{count} chunks, from most to least relevant.',
+  'search.chunk': 'Chunk {index}',
+  'search.score': 'Relevance {score}',
+  'search.scoreHint': 'Relevance = 1 − cosine distance; it is not a confidence measure.',
+  'search.empty':
+    'No chunks were found. If the document is not prepared for AI, generate its embeddings first.',
+  'docs.generateChunks': 'Generate chunks',
+  'docs.chunksNeedText':
+    'The document has no extracted text. Process it first and then generate its chunks.',
+  'docs.chunksNotice': '{count} chunks generated. Generate their embeddings so the AI can use them.',
 
   // Chunks
   'chunks.back': '← Back to Documents',
@@ -150,6 +185,8 @@ export const EN: Record<keyof typeof ES, string> = {
     'The current {count} chunks will be replaced with new ones from the extracted text. Their embeddings will be lost and the document must be prepared for AI again.',
   'chunks.regenerating': 'Regenerating chunks...',
   'chunks.confirmSubmit': 'Regenerate',
+  'chunks.noPage':
+    'The server does not store the page number of each chunk; its position in the extracted text is shown instead.',
   'chunks.generatedNotice':
     '{count} chunks generated (size {size}, overlap {overlap}). Prepare the document for AI again to generate its embeddings.',
 
@@ -197,6 +234,12 @@ export const EN: Record<keyof typeof ES, string> = {
   'audit.retry': 'Retry',
   'audit.viewUserActivity': 'View audit',
   'audit.viewUserActivityFor': 'View the audit trail of {name}',
+  // HU-131: advanced search (GET /api/audit-logs/advanced-search)
+  'audit.advanced': 'Advanced search',
+  'audit.advancedHint': 'Combine at least two criteria. “From” and “To” count as separate criteria.',
+  'audit.criteriaCount': '{count} of 2 minimum criteria',
+  'audit.errMinCriteria': 'Advanced search needs at least two criteria (you have {count}).',
+  'audit.advancedActive': 'Showing advanced search results.',
 
   // Actions recorded by the backend
   'action.LOGIN': 'Sign in',
@@ -299,6 +342,8 @@ export const EN: Record<keyof typeof ES, string> = {
   'chat.casesError': 'Cases could not be loaded: {error}',
   'chat.noCases': 'Create a case with documents first to chat with the AI.',
   'chat.emptySessions': 'There are no conversations yet. Create the first one.',
+  'chat.emptyCaseSessions': 'This case has no conversations yet.',
+  'chat.newForCase': '+ New conversation in this case',
   'chat.loadMore': 'Load more conversations',
   'chat.untitled': 'Untitled conversation',
   'chat.caseFallback': 'Case #{id}',
@@ -317,6 +362,27 @@ export const EN: Record<keyof typeof ES, string> = {
   'chat.sources': 'Consulted fragments ({count})',
   'chat.sourcesNote': 'These are fragments sent to the model, not claim-verified citations.',
   'chat.sourceRef': '{name} · fragment {index}',
+  'chat.noSources': 'This answer did not use any document chunks.',
+  'chat.sourcesUnknown': 'The source information for this answer was not kept.',
+  'chat.openDocument': 'View document',
+  'chat.openDocumentFor': 'Open the document {name}',
+  // HU-129: chunk cited in an answer
+  'cite.colActions': 'Actions',
+  'cite.view': 'View chunk',
+  'cite.viewFor': 'View the chunk of reference #{id}',
+  'cite.title': 'Cited chunk · reference #{id}',
+  'cite.loading': 'Fetching the document and the chunk...',
+  'cite.retry': 'Retry',
+  'cite.document': 'Document',
+  'cite.documentGone': 'Document deleted',
+  'cite.score': 'Relevance score',
+  'cite.scoreNone': 'Not available',
+  'cite.scoreHint': '1 − cosine distance; it is not a confidence measure.',
+  'cite.chunkRef': 'Chunk {index} · characters {start}–{end}',
+  'cite.documentMissing': 'The cited document no longer exists; only the reference is kept.',
+  'cite.chunkMissing':
+    'The cited chunk no longer exists: the document was re-chunked after the answer.',
+  'cite.openChunks': 'View all chunks of the document',
   'chat.composer': 'Write your question',
   'chat.placeholder': 'Ask about the case documents… (Enter sends, Shift+Enter new line)',
   'chat.counter': '{count}/{max}',

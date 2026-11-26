@@ -121,6 +121,21 @@ time {
   padding-left: 1.2rem;
   margin: 0.4rem 0 0;
 }
+.source-link {
+  display: inline-block;
+  margin-top: 0.3rem;
+  font-size: 0.82rem;
+  color: var(--primary);
+}
+.no-sources {
+  margin: 0.4rem 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-style: italic;
+}
+.empty p {
+  margin: 0 0 0.6rem;
+}
 blockquote {
   margin: 0.3rem 0 0.6rem;
   padding-left: 0.7rem;

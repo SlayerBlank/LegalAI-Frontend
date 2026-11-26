@@ -12,13 +12,13 @@ export class DocumentChunkService {
     return `${API_BASE_URL}/documents/${documentId}/chunks`;
   }
 
-  /** Fragmentos ordenados por chunkIndex; el backend valida que el documento sea propio. */
+  /** HU-123: fragmentos ordenados por chunkIndex; el backend valida que el documento sea propio. */
   list(documentId: number): Observable<DocumentChunkResponse[]> {
     return this.http.get<DocumentChunkResponse[]>(this.url(documentId));
   }
 
   /**
-   * Regenera los fragmentos desde el texto extraído (requiere estado PROCESSED).
+   * HU-122: genera (o regenera) los fragmentos desde el texto extraído (requiere estado PROCESSED).
    * Reemplaza los anteriores, por lo que sus embeddings deben generarse de nuevo.
    */
   regenerate(documentId: number): Observable<ChunkGenerationResponse> {

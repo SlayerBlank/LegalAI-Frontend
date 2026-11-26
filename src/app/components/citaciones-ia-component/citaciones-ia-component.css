@@ -83,3 +83,31 @@
     flex-direction: column;
   }
 }
+
+/* HU-129: diálogo del fragmento citado */
+.fragment-title {
+  margin: 1rem 0 0.5rem;
+  font-size: 0.95rem;
+}
+.fragment-text {
+  margin: 0;
+  max-height: 16rem;
+  overflow: auto;
+  padding: 0.9rem 1rem;
+  border-left: 4px solid var(--primary);
+  background: var(--bg);
+  border-radius: 8px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+.hint-inline {
+  display: block;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+.button-link {
+  color: var(--primary);
+  font-size: 0.9rem;
+}
