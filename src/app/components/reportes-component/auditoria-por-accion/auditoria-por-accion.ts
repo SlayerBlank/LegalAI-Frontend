@@ -29,7 +29,7 @@ export function activeCriteria(filters: AuditLogFilters): number {
   ].filter(Boolean).length;
 }
 
-/** HU-133: eventos de auditoría por acción con al menos dos filtros (consume HU-70). Solo ADMIN. */
+/** HU-143: eventos de auditoría por acción con al menos dos filtros (consume HU-70). Solo ADMIN. */
 @Component({
   selector: 'app-reporte-auditoria-por-accion',
   standalone: true,
@@ -99,7 +99,7 @@ export class AuditoriaPorAccionComponent {
     this.filterError.set('');
     const filters = this.filters();
     if (activeCriteria(filters) < 2) {
-      this.filterError.set('reports.r133.errMinFilters');
+      this.filterError.set('reports.r143.errMinFilters');
       return;
     }
     if (this.rangeError()) {

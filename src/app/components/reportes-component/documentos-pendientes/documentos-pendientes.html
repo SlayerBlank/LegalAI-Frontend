@@ -1,8 +1,8 @@
 <app-report-shell
-  hu="HU-130"
-  titleKey="reports.r130.title"
-  descriptionKey="reports.r130.description"
-  emptyKey="reports.r130.empty"
+  hu="HU-140"
+  titleKey="reports.r140.title"
+  descriptionKey="reports.r140.description"
+  emptyKey="reports.r140.empty"
   [query]="query"
 >
   @if (query.hasData()) {
@@ -11,20 +11,20 @@
         type="doughnut"
         [rows]="rows()"
         [seriesLabel]="'reports.colDocuments' | t"
-        [label]="'reports.r130.title' | t"
+        [label]="'reports.r140.title' | t"
       />
       <app-report-table
         [rows]="rows()"
         [swatches]="true"
-        [caption]="'reports.r130.caption' | t"
+        [caption]="'reports.r140.caption' | t"
         [labelHeader]="'reports.colStatus' | t"
         [countHeader]="'reports.colDocuments' | t"
       />
     </div>
 
-    <h2 class="subheading" id="r130-detail">{{ 'reports.r130.detailTitle' | t }}</h2>
+    <h2 class="subheading" id="r140-detail">{{ 'reports.r140.detailTitle' | t }}</h2>
     <div class="table-scroll">
-      <table aria-labelledby="r130-detail">
+      <table aria-labelledby="r140-detail">
         <thead>
           <tr>
             <th scope="col">{{ 'reports.colDocument' | t }}</th>

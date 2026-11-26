@@ -1,8 +1,8 @@
 <app-report-shell
-  hu="HU-124"
-  titleKey="reports.r124.title"
-  descriptionKey="reports.r124.description"
-  emptyKey="reports.r124.empty"
+  hu="HU-134"
+  titleKey="reports.r134.title"
+  descriptionKey="reports.r134.description"
+  emptyKey="reports.r134.empty"
   [query]="query"
 >
   @if (query.hasData()) {
@@ -12,11 +12,11 @@
         [horizontal]="true"
         [rows]="rows()"
         [seriesLabel]="'reports.colSessions' | t"
-        [label]="'reports.r124.title' | t"
+        [label]="'reports.r134.title' | t"
       />
       <app-report-table
         [rows]="rows()"
-        [caption]="'reports.r124.caption' | t"
+        [caption]="'reports.r134.caption' | t"
         [labelHeader]="'reports.colCase' | t"
         [countHeader]="'reports.colSessions' | t"
       />

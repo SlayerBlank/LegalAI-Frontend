@@ -38,15 +38,15 @@ describe('ReportesComponent (índice del Sprint 4)', () => {
     expect(f.nativeElement.querySelector('a[href="/auditoria-por-accion"]')).not.toBeNull();
   });
 
-  it('sin rol ADMIN se oculta la tarjeta de auditoría (HU-133 CA-03)', () => {
+  it('sin rol ADMIN se oculta la tarjeta de auditoría (HU-143 CA-03)', () => {
     const f = mount('USER');
     expect(f.nativeElement.querySelectorAll('.report-card').length).toBe(9);
-    expect(f.nativeElement.textContent).not.toContain('HU-133');
+    expect(f.nativeElement.textContent).not.toContain('HU-143');
   });
 
-  it('el catálogo cubre HU-124 a HU-133 con rutas únicas', () => {
+  it('el catálogo cubre HU-134 a HU-143 con rutas únicas', () => {
     expect(REPORTS.map((r) => r.hu)).toEqual(
-      Array.from({ length: 10 }, (_, i) => `HU-${124 + i}`),
+      Array.from({ length: 10 }, (_, i) => `HU-${134 + i}`),
     );
     expect(new Set(REPORTS.map((r) => r.slug)).size).toBe(10);
   });

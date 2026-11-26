@@ -7,7 +7,7 @@ import { ReportShellComponent } from '../report-shell/report-shell';
 import { ReportQuery, ReportRow } from '../report-state';
 import { ReportTableComponent } from '../report-table/report-table';
 
-/** HU-125: documentos por cliente (consume HU-62). */
+/** HU-135: documentos por cliente (consume HU-62). */
 @Component({
   selector: 'app-reporte-documentos-por-cliente',
   standalone: true,

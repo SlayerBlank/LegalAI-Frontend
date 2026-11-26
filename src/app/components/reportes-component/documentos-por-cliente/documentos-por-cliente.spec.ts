@@ -11,7 +11,7 @@ const data: ClientDocumentCountResponse[] = [
   { clientId: 8, nombreCliente: 'Inversiones Lima SAC', cantidadDocumentos: 15 },
 ];
 
-describe('DocumentosPorClienteComponent (HU-125)', () => {
+describe('DocumentosPorClienteComponent (HU-135)', () => {
   let http: HttpTestingController;
 
   beforeEach(() => {

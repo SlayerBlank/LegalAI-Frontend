@@ -27,7 +27,7 @@ const summaries = [
   summary(3, 11, 'Técnico', '2026-11-20T10:00:00'),
 ];
 
-describe('ResumenesPorTipoComponent (HU-128)', () => {
+describe('ResumenesPorTipoComponent (HU-138)', () => {
   let http: HttpTestingController;
 
   beforeEach(() => {

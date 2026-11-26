@@ -24,7 +24,7 @@ function item(caseId: number, status: CaseStatus): CaseResponse {
 
 const cases = [item(1, 'OPEN'), item(2, 'OPEN'), item(3, 'CLOSED'), item(4, 'IN_PROGRESS')];
 
-describe('ExpedientesPorEstadoComponent (HU-129)', () => {
+describe('ExpedientesPorEstadoComponent (HU-139)', () => {
   let http: HttpTestingController;
 
   beforeEach(() => {

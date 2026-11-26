@@ -23,7 +23,7 @@ function item(caseId: number, status: CaseStatus): ClientCaseResponse {
   };
 }
 
-describe('ExpedientesDeClienteComponent (HU-131)', () => {
+describe('ExpedientesDeClienteComponent (HU-141)', () => {
   let http: HttpTestingController;
 
   beforeEach(() => {

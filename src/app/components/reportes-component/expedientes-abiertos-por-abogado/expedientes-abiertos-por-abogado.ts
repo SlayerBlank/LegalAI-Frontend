@@ -8,7 +8,7 @@ import { ReportShellComponent } from '../report-shell/report-shell';
 import { ReportQuery, ReportRow, countBy, formatDay } from '../report-state';
 import { ReportTableComponent } from '../report-table/report-table';
 
-/** HU-126: expedientes abiertos agrupados por abogado responsable (consume HU-63). */
+/** HU-136: expedientes abiertos agrupados por abogado responsable (consume HU-63). */
 @Component({
   selector: 'app-reporte-expedientes-abiertos-por-abogado',
   standalone: true,
@@ -47,6 +47,6 @@ export class ExpedientesAbiertosPorAbogadoComponent {
   }
 
   lawyerName(item: OpenCaseWithLawyerResponse): string {
-    return item.abogado?.fullName?.trim() || this.i18n.t('reports.r126.noLawyer');
+    return item.abogado?.fullName?.trim() || this.i18n.t('reports.r136.noLawyer');
   }
 }

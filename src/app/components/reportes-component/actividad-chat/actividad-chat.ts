@@ -41,7 +41,7 @@ export function fillDays(counts: Map<string, number>): [string, number][] {
   return days.map((day) => [day, counts.get(day)!]);
 }
 
-/** HU-132: actividad de sesiones de chat por día, con filtro por expediente (consume HU-69). */
+/** HU-142: actividad de sesiones de chat por día, con filtro por expediente (consume HU-69). */
 @Component({
   selector: 'app-reporte-actividad-chat',
   standalone: true,

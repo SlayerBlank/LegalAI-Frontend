@@ -11,16 +11,16 @@ export interface ReportEntry {
   adminOnly?: boolean;
 }
 
-/** Sprint 4: HU-124 a HU-133. El orden es el del índice. */
+/** Sprint 4: HU-134 a HU-143. El orden es el del índice. */
 export const REPORTS: readonly ReportEntry[] = [
-  { slug: 'sesiones-por-expediente', hu: 'HU-124', titleKey: 'reports.r124.title', descriptionKey: 'reports.r124.card', chart: 'bar' },
-  { slug: 'documentos-por-cliente', hu: 'HU-125', titleKey: 'reports.r125.title', descriptionKey: 'reports.r125.card', chart: 'bar' },
-  { slug: 'expedientes-abiertos-por-abogado', hu: 'HU-126', titleKey: 'reports.r126.title', descriptionKey: 'reports.r126.card', chart: 'bar' },
-  { slug: 'borradores-por-estado', hu: 'HU-127', titleKey: 'reports.r127.title', descriptionKey: 'reports.r127.card', chart: 'doughnut' },
-  { slug: 'resumenes-por-tipo', hu: 'HU-128', titleKey: 'reports.r128.title', descriptionKey: 'reports.r128.card', chart: 'bar' },
-  { slug: 'expedientes-por-estado', hu: 'HU-129', titleKey: 'reports.r129.title', descriptionKey: 'reports.r129.card', chart: 'bar' },
-  { slug: 'documentos-pendientes', hu: 'HU-130', titleKey: 'reports.r130.title', descriptionKey: 'reports.r130.card', chart: 'doughnut' },
-  { slug: 'expedientes-de-cliente', hu: 'HU-131', titleKey: 'reports.r131.title', descriptionKey: 'reports.r131.card', chart: 'doughnut' },
-  { slug: 'actividad-chat', hu: 'HU-132', titleKey: 'reports.r132.title', descriptionKey: 'reports.r132.card', chart: 'line' },
-  { slug: 'auditoria-por-accion', hu: 'HU-133', titleKey: 'reports.r133.title', descriptionKey: 'reports.r133.card', chart: 'bar', adminOnly: true },
+  { slug: 'sesiones-por-expediente', hu: 'HU-134', titleKey: 'reports.r134.title', descriptionKey: 'reports.r134.card', chart: 'bar' },
+  { slug: 'documentos-por-cliente', hu: 'HU-135', titleKey: 'reports.r135.title', descriptionKey: 'reports.r135.card', chart: 'bar' },
+  { slug: 'expedientes-abiertos-por-abogado', hu: 'HU-136', titleKey: 'reports.r136.title', descriptionKey: 'reports.r136.card', chart: 'bar' },
+  { slug: 'borradores-por-estado', hu: 'HU-137', titleKey: 'reports.r137.title', descriptionKey: 'reports.r137.card', chart: 'doughnut' },
+  { slug: 'resumenes-por-tipo', hu: 'HU-138', titleKey: 'reports.r138.title', descriptionKey: 'reports.r138.card', chart: 'bar' },
+  { slug: 'expedientes-por-estado', hu: 'HU-139', titleKey: 'reports.r139.title', descriptionKey: 'reports.r139.card', chart: 'bar' },
+  { slug: 'documentos-pendientes', hu: 'HU-140', titleKey: 'reports.r140.title', descriptionKey: 'reports.r140.card', chart: 'doughnut' },
+  { slug: 'expedientes-de-cliente', hu: 'HU-141', titleKey: 'reports.r141.title', descriptionKey: 'reports.r141.card', chart: 'doughnut' },
+  { slug: 'actividad-chat', hu: 'HU-142', titleKey: 'reports.r142.title', descriptionKey: 'reports.r142.card', chart: 'line' },
+  { slug: 'auditoria-por-accion', hu: 'HU-143', titleKey: 'reports.r143.title', descriptionKey: 'reports.r143.card', chart: 'bar', adminOnly: true },
 ];

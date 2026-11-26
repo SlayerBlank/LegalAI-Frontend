@@ -54,16 +54,16 @@ Módulo con lazy loading dentro del layout protegido por `authGuard`. Cada repor
 | Ruta | HU | Endpoint |
 |---|---|---|
 | `/reportes` | Índice | — |
-| `/reportes/sesiones-por-expediente` | HU-124 | `GET /api/cases/chat-session-count` |
-| `/reportes/documentos-por-cliente` | HU-125 | `GET /api/clients/document-count` |
-| `/reportes/expedientes-abiertos-por-abogado` | HU-126 | `GET /api/cases/open-with-lawyer` |
-| `/reportes/borradores-por-estado` | HU-127 | `GET /api/drafts` y `GET /api/drafts/filter` |
-| `/reportes/resumenes-por-tipo` | HU-128 | `GET /api/summaries` y `GET /api/summaries/filter` |
-| `/reportes/expedientes-por-estado` | HU-129 | `GET /api/cases?openedFrom&openedTo` |
-| `/reportes/documentos-pendientes` | HU-130 | `GET /api/documents/pending-review/{abogadoId}` |
-| `/reportes/expedientes-de-cliente` | HU-131 | `GET /api/clients/{clientId}/cases/filter` |
-| `/reportes/actividad-chat` | HU-132 | `GET /api/chat/sessions` |
-| `/reportes/auditoria-por-accion` | HU-133 (solo ADMIN, `adminGuard`) | `GET /api/audit-logs/advanced-search` |
+| `/reportes/sesiones-por-expediente` | HU-134 | `GET /api/cases/chat-session-count` |
+| `/reportes/documentos-por-cliente` | HU-135 | `GET /api/clients/document-count` |
+| `/reportes/expedientes-abiertos-por-abogado` | HU-136 | `GET /api/cases/open-with-lawyer` |
+| `/reportes/borradores-por-estado` | HU-137 | `GET /api/drafts` y `GET /api/drafts/filter` |
+| `/reportes/resumenes-por-tipo` | HU-138 | `GET /api/summaries` y `GET /api/summaries/filter` |
+| `/reportes/expedientes-por-estado` | HU-139 | `GET /api/cases?openedFrom&openedTo` |
+| `/reportes/documentos-pendientes` | HU-140 | `GET /api/documents/pending-review/{abogadoId}` |
+| `/reportes/expedientes-de-cliente` | HU-141 | `GET /api/clients/{clientId}/cases/filter` |
+| `/reportes/actividad-chat` | HU-142 | `GET /api/chat/sessions` |
+| `/reportes/auditoria-por-accion` | HU-143 (solo ADMIN, `adminGuard`) | `GET /api/audit-logs/advanced-search` |
 
 ## Tema claro y oscuro
 
