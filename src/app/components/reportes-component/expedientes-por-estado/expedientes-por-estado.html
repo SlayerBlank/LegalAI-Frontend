@@ -1,7 +1,7 @@
 <app-report-shell
-  hu="HU-129"
-  titleKey="reports.r129.title"
-  descriptionKey="reports.r129.description"
+  hu="HU-139"
+  titleKey="reports.r139.title"
+  descriptionKey="reports.r139.description"
   emptyKey="reports.emptyFiltered"
   [query]="query"
 >
@@ -19,7 +19,7 @@
         name="from"
         [(ngModel)]="from"
         [attr.aria-invalid]="rangeError() ? 'true' : null"
-        aria-describedby="r129-filter-error"
+        aria-describedby="r139-filter-error"
       />
     </label>
     <label class="field">
@@ -29,14 +29,14 @@
         name="to"
         [(ngModel)]="to"
         [attr.aria-invalid]="rangeError() ? 'true' : null"
-        aria-describedby="r129-filter-error"
+        aria-describedby="r139-filter-error"
       />
     </label>
     <div class="filter-actions">
       <button class="primary" type="submit">{{ 'reports.apply' | t }}</button>
       <button type="button" (click)="clear()">{{ 'reports.clear' | t }}</button>
     </div>
-    <p class="filter-error" id="r129-filter-error" role="alert">
+    <p class="filter-error" id="r139-filter-error" role="alert">
       @if (filterError()) {
         {{ filterError() | t }}
       }
@@ -49,11 +49,11 @@
         type="bar"
         [rows]="rows()"
         [seriesLabel]="'reports.colCases' | t"
-        [label]="'reports.r129.title' | t"
+        [label]="'reports.r139.title' | t"
       />
       <app-report-table
         [rows]="rows()"
-        [caption]="'reports.r129.caption' | t"
+        [caption]="'reports.r139.caption' | t"
         [labelHeader]="'reports.colStatus' | t"
         [countHeader]="'reports.colCases' | t"
       />

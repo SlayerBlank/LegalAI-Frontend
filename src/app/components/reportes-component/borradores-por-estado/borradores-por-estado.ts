@@ -16,7 +16,7 @@ import { ReportTableComponent } from '../report-table/report-table';
 /** Estados que ofrece hoy el módulo Borradores; se suman los que existan en los datos. */
 export const DRAFT_STATUSES = ['Borrador', 'En revisión', 'Revisado'] as const;
 
-/** HU-127: borradores por estado, con filtro de expediente y fecha de modificación (HU-64). */
+/** HU-137: borradores por estado, con filtro de expediente y fecha de modificación (HU-64). */
 @Component({
   selector: 'app-reporte-borradores-por-estado',
   standalone: true,

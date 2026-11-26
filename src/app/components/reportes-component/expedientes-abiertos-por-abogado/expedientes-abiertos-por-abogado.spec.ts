@@ -41,7 +41,7 @@ const data = [
   openCase(3, 'Divorcio', ana),
 ];
 
-describe('ExpedientesAbiertosPorAbogadoComponent (HU-126)', () => {
+describe('ExpedientesAbiertosPorAbogadoComponent (HU-136)', () => {
   let http: HttpTestingController;
 
   beforeEach(() => {
@@ -81,7 +81,7 @@ describe('ExpedientesAbiertosPorAbogadoComponent (HU-126)', () => {
     f.detectChanges();
     await f.whenStable();
     const detail = Array.from(
-      f.nativeElement.querySelectorAll('table[aria-labelledby="r126-detail"] tbody tr'),
+      f.nativeElement.querySelectorAll('table[aria-labelledby="r136-detail"] tbody tr'),
     ).map((tr) => Array.from((tr as HTMLTableRowElement).cells).map((c) => c.textContent!.trim()));
     expect(detail.map((r) => r.slice(0, 2))).toEqual([
       ['Demanda laboral', 'Ana García'],

@@ -28,7 +28,7 @@ const sessions = [
   session(4, 11, null, '2026-11-05T10:00:00'),
 ];
 
-describe('ActividadChatComponent (HU-132)', () => {
+describe('ActividadChatComponent (HU-142)', () => {
   let http: HttpTestingController;
 
   beforeEach(() => {

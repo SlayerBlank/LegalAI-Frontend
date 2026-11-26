@@ -28,7 +28,7 @@ function doc(documentId: number, caseId: number, status: ProcessingStatus): Docu
 
 const docs = [doc(1, 10, 'UPLOADED'), doc(2, 10, 'ERROR'), doc(3, 11, 'UPLOADED')];
 
-describe('DocumentosPendientesComponent (HU-130)', () => {
+describe('DocumentosPendientesComponent (HU-140)', () => {
   let http: HttpTestingController;
 
   beforeEach(() => {
@@ -79,7 +79,7 @@ describe('DocumentosPendientesComponent (HU-130)', () => {
   it('CA-02: detalle de documentos con su expediente', async () => {
     const f = await mount(docs);
     const detail = Array.from(
-      f.nativeElement.querySelectorAll('table[aria-labelledby="r130-detail"] tbody tr'),
+      f.nativeElement.querySelectorAll('table[aria-labelledby="r140-detail"] tbody tr'),
     ).map((tr) => Array.from((tr as HTMLTableRowElement).cells).map((c) => c.textContent!.trim()));
     expect(detail.map((r) => r.slice(0, 3))).toEqual([
       ['doc-1.pdf', 'Demanda laboral', 'Subido'],

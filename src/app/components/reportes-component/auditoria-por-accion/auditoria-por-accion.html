@@ -1,9 +1,9 @@
 <app-report-shell
-  hu="HU-133"
-  titleKey="reports.r133.title"
-  descriptionKey="reports.r133.description"
+  hu="HU-143"
+  titleKey="reports.r143.title"
+  descriptionKey="reports.r143.description"
   emptyKey="reports.emptyFiltered"
-  idleKey="reports.r133.idle"
+  idleKey="reports.r143.idle"
   [query]="query"
 >
   <form
@@ -58,7 +58,7 @@
         name="from"
         [(ngModel)]="from"
         [attr.aria-invalid]="rangeError() ? 'true' : null"
-        aria-describedby="r133-filter-error"
+        aria-describedby="r143-filter-error"
       />
     </label>
     <label class="field">
@@ -68,15 +68,15 @@
         name="to"
         [(ngModel)]="to"
         [attr.aria-invalid]="rangeError() ? 'true' : null"
-        aria-describedby="r133-filter-error"
+        aria-describedby="r143-filter-error"
       />
     </label>
     <div class="filter-actions">
       <button class="primary" type="submit">{{ 'reports.consult' | t }}</button>
       <button type="button" (click)="clear()">{{ 'reports.clear' | t }}</button>
     </div>
-    <p class="filter-hint">{{ 'reports.r133.criteria' | t: { count: criteria() } }}</p>
-    <p class="filter-error" id="r133-filter-error" role="alert">
+    <p class="filter-hint">{{ 'reports.r143.criteria' | t: { count: criteria() } }}</p>
+    <p class="filter-error" id="r143-filter-error" role="alert">
       @if (filterError()) {
         {{ filterError() | t }}
       }
@@ -87,7 +87,7 @@
     @if (truncated()) {
       <p class="report-note">
         {{
-          'reports.r133.truncated'
+          'reports.r143.truncated'
             | t: { shown: (query.data().length | lnumber), total: (serverTotal() | lnumber) }
         }}
       </p>
@@ -98,11 +98,11 @@
         [horizontal]="true"
         [rows]="rows()"
         [seriesLabel]="'reports.colEvents' | t"
-        [label]="'reports.r133.title' | t"
+        [label]="'reports.r143.title' | t"
       />
       <app-report-table
         [rows]="rows()"
-        [caption]="'reports.r133.caption' | t"
+        [caption]="'reports.r143.caption' | t"
         [labelHeader]="'reports.action' | t"
         [countHeader]="'reports.colEvents' | t"
       />

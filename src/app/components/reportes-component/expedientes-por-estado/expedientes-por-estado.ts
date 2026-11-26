@@ -9,7 +9,7 @@ import { ReportShellComponent } from '../report-shell/report-shell';
 import { ReportQuery, ReportRow, countByKeys, invalidRange } from '../report-state';
 import { ReportTableComponent } from '../report-table/report-table';
 
-/** HU-129: expedientes propios por estado dentro de un rango de apertura (consume HU-66). */
+/** HU-139: expedientes propios por estado dentro de un rango de apertura (consume HU-66). */
 @Component({
   selector: 'app-reporte-expedientes-por-estado',
   standalone: true,

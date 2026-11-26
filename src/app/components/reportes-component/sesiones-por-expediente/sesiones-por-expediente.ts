@@ -7,7 +7,7 @@ import { ReportShellComponent } from '../report-shell/report-shell';
 import { ReportQuery, ReportRow } from '../report-state';
 import { ReportTableComponent } from '../report-table/report-table';
 
-/** HU-124: sesiones de chat por expediente (consume HU-61). */
+/** HU-134: sesiones de chat por expediente (consume HU-61). */
 @Component({
   selector: 'app-reporte-sesiones-por-expediente',
   standalone: true,

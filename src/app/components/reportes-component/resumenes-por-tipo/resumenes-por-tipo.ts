@@ -13,7 +13,7 @@ import { ReportShellComponent } from '../report-shell/report-shell';
 import { ReportQuery, ReportRow, countBy, invalidRange } from '../report-state';
 import { ReportTableComponent } from '../report-table/report-table';
 
-/** HU-128: resúmenes por tipo, con filtro de expediente y fecha de creación (HU-65). */
+/** HU-138: resúmenes por tipo, con filtro de expediente y fecha de creación (HU-65). */
 @Component({
   selector: 'app-reporte-resumenes-por-tipo',
   standalone: true,

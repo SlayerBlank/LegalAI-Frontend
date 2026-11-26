@@ -1,8 +1,8 @@
 <app-report-shell
-  hu="HU-132"
-  titleKey="reports.r132.title"
-  descriptionKey="reports.r132.description"
-  emptyKey="reports.r132.empty"
+  hu="HU-142"
+  titleKey="reports.r142.title"
+  descriptionKey="reports.r142.description"
+  emptyKey="reports.r142.empty"
   [query]="query"
 >
   <form
@@ -32,11 +32,11 @@
         type="line"
         [rows]="series()"
         [seriesLabel]="'reports.colSessions' | t"
-        [label]="'reports.r132.title' | t"
+        [label]="'reports.r142.title' | t"
       />
       <app-report-table
         [rows]="activeDays()"
-        [caption]="'reports.r132.caption' | t"
+        [caption]="'reports.r142.caption' | t"
         [labelHeader]="'reports.colDay' | t"
         [countHeader]="'reports.colSessions' | t"
       />

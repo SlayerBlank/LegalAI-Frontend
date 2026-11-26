@@ -51,7 +51,7 @@ export const routes: Routes = [
         loadComponent: () => import('./components/resumen-component/resumen-component').then((module) => module.ResumenComponent),
       },
       { path: 'citaciones-ia', component: CitacionesIaComponent },
-      // Sprint 4: módulo Reportes (HU-124 a HU-133), cada reporte en su propio chunk.
+      // Sprint 4: módulo Reportes (HU-134 a HU-143), cada reporte en su propio chunk.
       {
         path: 'reportes',
         children: [

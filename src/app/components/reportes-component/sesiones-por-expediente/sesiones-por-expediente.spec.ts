@@ -12,7 +12,7 @@ const data: CaseSessionCountResponse[] = [
   { caseId: 3, tituloExpediente: 'Sucesión intestada', cantidadSesiones: 0 },
 ];
 
-describe('SesionesPorExpedienteComponent (HU-124)', () => {
+describe('SesionesPorExpedienteComponent (HU-134)', () => {
   let http: HttpTestingController;
 
   beforeEach(() => {

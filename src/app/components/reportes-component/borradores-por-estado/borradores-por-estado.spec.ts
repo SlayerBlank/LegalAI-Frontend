@@ -30,7 +30,7 @@ const drafts = [
   draft(4, 10, 'Archivado', '2026-11-12T10:00:00'),
 ];
 
-describe('BorradoresPorEstadoComponent (HU-127)', () => {
+describe('BorradoresPorEstadoComponent (HU-137)', () => {
   let http: HttpTestingController;
 
   beforeEach(() => {

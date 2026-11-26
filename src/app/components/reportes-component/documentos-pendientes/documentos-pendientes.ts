@@ -14,7 +14,7 @@ import { ReportTableComponent } from '../report-table/report-table';
 /** Estados que el backend considera pendientes de revisión (ESTADOS_PENDIENTES_REVISION). */
 export const PENDING_STATUSES: readonly ProcessingStatus[] = ['UPLOADED', 'PROCESSING', 'ERROR'];
 
-/** HU-130: documentos pendientes de revisión por estado de procesamiento (consume HU-67). */
+/** HU-140: documentos pendientes de revisión por estado de procesamiento (consume HU-67). */
 @Component({
   selector: 'app-reporte-documentos-pendientes',
   standalone: true,

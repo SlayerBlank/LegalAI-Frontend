@@ -1,9 +1,9 @@
 <app-report-shell
-  hu="HU-131"
-  titleKey="reports.r131.title"
-  descriptionKey="reports.r131.description"
-  emptyKey="reports.r131.empty"
-  idleKey="reports.r131.idle"
+  hu="HU-141"
+  titleKey="reports.r141.title"
+  descriptionKey="reports.r141.description"
+  emptyKey="reports.r141.empty"
+  idleKey="reports.r141.idle"
   [query]="query"
 >
   <form
@@ -18,8 +18,8 @@
       <select
         name="clientId"
         [(ngModel)]="clientId"
-        [attr.aria-invalid]="filterError() === 'reports.r131.errClient' ? 'true' : null"
-        aria-describedby="r131-filter-error"
+        [attr.aria-invalid]="filterError() === 'reports.r141.errClient' ? 'true' : null"
+        aria-describedby="r141-filter-error"
       >
         <option [ngValue]="null">{{ 'reports.selectClient' | t }}</option>
         @for (client of clients(); track client.clientId) {
@@ -35,7 +35,7 @@
         required
         [(ngModel)]="from"
         [attr.aria-invalid]="rangeError() ? 'true' : null"
-        aria-describedby="r131-filter-error"
+        aria-describedby="r141-filter-error"
       />
     </label>
     <label class="field">
@@ -46,7 +46,7 @@
         required
         [(ngModel)]="to"
         [attr.aria-invalid]="rangeError() ? 'true' : null"
-        aria-describedby="r131-filter-error"
+        aria-describedby="r141-filter-error"
       />
     </label>
     <div class="filter-actions">
@@ -54,13 +54,13 @@
     </div>
     @if (clientsError()) {
       <p class="filter-hint">
-        {{ 'reports.r131.clientsError' | t }}
+        {{ 'reports.r141.clientsError' | t }}
         <button class="link-button" type="button" (click)="loadClients()">
           {{ 'reports.retry' | t }}
         </button>
       </p>
     }
-    <p class="filter-error" id="r131-filter-error" role="alert">
+    <p class="filter-error" id="r141-filter-error" role="alert">
       @if (filterError()) {
         {{ filterError() | t }}
       }
@@ -73,12 +73,12 @@
         type="doughnut"
         [rows]="rows()"
         [seriesLabel]="'reports.colCases' | t"
-        [label]="'reports.r131.title' | t"
+        [label]="'reports.r141.title' | t"
       />
       <app-report-table
         [rows]="rows()"
         [swatches]="true"
-        [caption]="'reports.r131.caption' | t"
+        [caption]="'reports.r141.caption' | t"
         [labelHeader]="'reports.colStatus' | t"
         [countHeader]="'reports.colCases' | t"
       />

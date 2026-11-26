@@ -12,7 +12,7 @@ import { ReportShellComponent } from '../report-shell/report-shell';
 import { ReportQuery, ReportRow, countByKeys, invalidRange, isoDay } from '../report-state';
 import { ReportTableComponent } from '../report-table/report-table';
 
-/** HU-131: expedientes de un cliente por estado en un rango de apertura (consume HU-68). */
+/** HU-141: expedientes de un cliente por estado en un rango de apertura (consume HU-68). */
 @Component({
   selector: 'app-reporte-expedientes-de-cliente',
   standalone: true,
@@ -71,7 +71,7 @@ export class ExpedientesDeClienteComponent {
     const from = this.from();
     const to = this.to();
     if (clientId === null) {
-      this.filterError.set('reports.r131.errClient');
+      this.filterError.set('reports.r141.errClient');
       return;
     }
     if (!from || !to) {

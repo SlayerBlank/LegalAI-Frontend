@@ -22,7 +22,7 @@ function log(logId: number, action: string): AuditLogResponse {
 
 const logs = [log(1, 'UPLOAD_DOCUMENT'), log(2, 'LOGIN'), log(3, 'UPLOAD_DOCUMENT'), log(4, 'CUSTOM')];
 
-describe('AuditoriaPorAccionComponent (HU-133)', () => {
+describe('AuditoriaPorAccionComponent (HU-143)', () => {
   let http: HttpTestingController;
 
   beforeEach(() => {
