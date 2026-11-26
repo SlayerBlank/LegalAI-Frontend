@@ -7,6 +7,7 @@ import {
   CaseRequest,
   CaseResponse,
   CaseSessionCountResponse,
+  CaseStatus,
   OpenCaseWithLawyerResponse,
 } from '../models/expediente';
 
@@ -25,6 +26,18 @@ export class ExpedienteService {
     if (filters.openedFrom) params = params.set('openedFrom', filters.openedFrom);
     if (filters.openedTo) params = params.set('openedTo', filters.openedTo);
     return this.http.get<CaseResponse[]>(this.url, { params });
+  }
+
+  /**
+   * HU-139 (TA-01): consulta de HU-66, que trae los expedientes propios por estado y por rango
+   * de fecha de apertura. Si un parámetro es null, no se envía.
+   */
+  listByStatusAndDate(
+    status: CaseStatus | null,
+    openedFrom: string | null,
+    openedTo: string | null,
+  ): Observable<CaseResponse[]> {
+    return this.list({ status, openedFrom, openedTo });
   }
 
   get(id: number): Observable<CaseResponse> {

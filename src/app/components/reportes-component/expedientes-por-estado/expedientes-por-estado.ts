@@ -46,15 +46,16 @@ export class ExpedientesPorEstadoComponent {
     this.apply();
   }
 
-  /** GET /api/cases con openedFrom/openedTo; el backend responde 400 si el rango es inválido. */
+  /** TA-01: listByStatusAndDate (GET /api/cases con openedFrom/openedTo); 400 si el rango es inválido. */
   apply(): void {
     this.filterError.set('');
     if (this.rangeError()) {
       this.filterError.set('reports.errRange');
       return;
     }
-    const filters = { openedFrom: this.from() || null, openedTo: this.to() || null };
-    this.query.run(() => this.cases.list(filters));
+    const from = this.from() || null;
+    const to = this.to() || null;
+    this.query.run(() => this.cases.listByStatusAndDate(null, from, to));
   }
 
   clear(): void {
