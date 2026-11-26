@@ -1,6 +1,6 @@
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
-import { catchError, forkJoin, map, of, switchMap, tap } from 'rxjs';
-import { DocumentResponse, ProcessingStatus } from '../../../models/documento';
+import { Component, DestroyRef, computed, inject } from '@angular/core';
+import { map, of, switchMap } from 'rxjs';
+import { PendingDocumentResponse, ProcessingStatus } from '../../../models/documento';
 import { DocumentoService } from '../../../services/documento-service';
 import { I18nService } from '../../../services/i18n.service';
 import { LoginService } from '../../../services/login-service';
@@ -28,8 +28,7 @@ export class DocumentosPendientesComponent {
   private readonly users = inject(UsuarioService);
   private readonly i18n = inject(I18nService);
 
-  readonly query = new ReportQuery<DocumentResponse>(inject(DestroyRef));
-  private readonly caseTitles = signal(new Map<number, string>());
+  readonly query = new ReportQuery<PendingDocumentResponse>(inject(DestroyRef));
 
   readonly rows = computed<ReportRow[]>(() =>
     countByKeys(
@@ -49,23 +48,12 @@ export class DocumentosPendientesComponent {
       const userId$ = current
         ? of(current.userId)
         : this.users.getCurrentUser().pipe(map((user) => user.userId));
-      return userId$.pipe(
-        switchMap((userId) =>
-          forkJoin([
-            this.documents.pendingReview(userId),
-            // Sin títulos de expediente el reporte sigue siendo útil: se muestra el identificador.
-            this.documents.listCases().pipe(catchError(() => of([]))),
-          ]),
-        ),
-        tap(([, cases]) =>
-          this.caseTitles.set(new Map(cases.map((item) => [item.caseId, item.title]))),
-        ),
-        map(([docs]) => docs),
-      );
+      return userId$.pipe(switchMap((userId) => this.documents.pendingReview(userId)));
     });
   }
 
-  caseTitle(caseId: number): string {
-    return this.caseTitles().get(caseId) ?? this.i18n.t('reports.caseFallback', { id: caseId });
+  /** CA-02: el backend ya envía el título del expediente; si faltara, se muestra su número. */
+  caseTitle(doc: PendingDocumentResponse): string {
+    return doc.caseTitle?.trim() || this.i18n.t('reports.caseFallback', { id: doc.caseId });
   }
 }

@@ -9,6 +9,7 @@ import {
   DocumentTextResponse,
   ProcessingStatus,
   EmbeddingGenerationResponse,
+  PendingDocumentResponse,
 } from '../models/documento';
 import {
   SEARCH_TOP_K_DEFAULT,
@@ -116,14 +117,20 @@ export class DocumentoService {
     return this.http.delete<void>(`${this.documents}/${id}`);
   }
 
-  /** HU-67: documentos del abogado pendientes de revisión (UPLOADED, PROCESSING y ERROR). */
+  /**
+   * HU-67: documentos del abogado pendientes de revisión (UPLOADED, PROCESSING y ERROR),
+   * cada uno con el título de su expediente (caseTitle).
+   */
   pendingReview(
     abogadoId: number,
     status: ProcessingStatus | null = null,
-  ): Observable<DocumentResponse[]> {
+  ): Observable<PendingDocumentResponse[]> {
     const params = status ? new HttpParams().set('status', status) : new HttpParams();
-    return this.http.get<DocumentResponse[]>(`${this.documents}/pending-review/${abogadoId}`, {
-      params,
-    });
+    return this.http.get<PendingDocumentResponse[]>(
+      `${this.documents}/pending-review/${abogadoId}`,
+      {
+        params,
+      },
+    );
   }
 }
