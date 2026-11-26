@@ -60,6 +60,7 @@ export class DocumentoChunkComponent
     this.load();
   }
 
+  /** HU-123: documento, fragmentos y estado; si falla se muestra el error con "Volver a cargar". */
   load() {
     const id = this.documentId;
     if (id === null || this.loading || this.busy) return;
@@ -75,7 +76,7 @@ export class DocumentoChunkComponent
       'loading',
       ({ doc, chunks, prep }) => {
         this.document = doc;
-        this.chunks = chunks;
+        this.chunks = byIndex(chunks);
         this.preparation = prep;
       },
     );
@@ -143,6 +144,7 @@ export class DocumentoChunkComponent
     this.confirmRegenerate = true;
   }
 
+  /** HU-122: POST /chunks tras confirmar, porque reemplaza los fragmentos y sus embeddings. */
   regenerate() {
     const id = this.documentId;
     if (id === null || this.busy) return;
@@ -159,7 +161,7 @@ export class DocumentoChunkComponent
       'busy',
       ({ generation, chunks, prep }) => {
         this.lastGeneration = generation;
-        this.chunks = chunks;
+        this.chunks = byIndex(chunks);
         this.preparation = prep;
         this.expanded.clear();
         this.resetPage();
@@ -182,4 +184,9 @@ export class DocumentoChunkComponent
   @HostListener('document:keydown.escape') dismiss() {
     this.close();
   }
+}
+
+/** HU-123: el backend ya los ordena, pero la vista garantiza el orden por chunkIndex. */
+function byIndex(chunks: DocumentChunkResponse[]): DocumentChunkResponse[] {
+  return [...(chunks ?? [])].sort((a, b) => a.chunkIndex - b.chunkIndex);
 }

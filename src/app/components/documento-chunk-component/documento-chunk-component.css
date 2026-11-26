@@ -12,6 +12,12 @@
 .back:hover {
   text-decoration: underline;
 }
+.page-hint {
+  margin: 0;
+  padding: 0.6rem 1rem 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
 .count {
   font-size: 0.85rem;
   color: var(--muted);

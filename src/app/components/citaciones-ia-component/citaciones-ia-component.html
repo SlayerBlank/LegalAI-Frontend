@@ -145,6 +145,7 @@
                 <th scope="col">Document ID</th>
                 <th scope="col">Chunk ID</th>
                 <th scope="col">Relevance score</th>
+                <th scope="col">{{ 'cite.colActions' | t }}</th>
               </tr>
             </thead>
             <tbody>
@@ -167,10 +168,19 @@
                       {{ citation.relevanceScore | number: '1.3-3' }}
                     }
                   </td>
+                  <td>
+                    <button
+                      type="button"
+                      (click)="inspect(citation)"
+                      [attr.aria-label]="'cite.viewFor' | t: { id: citation.citationId }"
+                    >
+                      {{ 'cite.view' | t }}
+                    </button>
+                  </td>
                 </tr>
               } @empty {
                 <tr>
-                  <td colspan="5" class="empty">
+                  <td colspan="6" class="empty">
                     No hay referencias para esta respuesta o los filtros no devolvieron resultados.
                   </td>
                 </tr>
@@ -198,4 +208,81 @@
       de confianza. El backend no proporciona páginas en este recurso.
     </p>
   }
+}
+
+@if (inspecting; as citation) {
+  <div class="overlay" (click)="closeFragment()">
+    <section
+      class="dialog"
+      managementDialog
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="cite-fragment-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="dialog-head">
+        <h2 id="cite-fragment-title">
+          {{ 'cite.title' | t: { id: citation.citationId } }}
+        </h2>
+        <button type="button" [attr.aria-label]="'common.close' | t" (click)="closeFragment()">
+          ×
+        </button>
+      </div>
+      @if (fragmentLoading) {
+        <p class="notice" role="status" aria-live="polite">{{ 'cite.loading' | t }}</p>
+      }
+      @if (fragmentError) {
+        <p class="notice error" role="alert">
+          {{ fragmentError }}
+          <button type="button" (click)="inspect(citation)">{{ 'cite.retry' | t }}</button>
+        </p>
+      }
+      @if (fragment; as f) {
+        <dl>
+          <dt>{{ 'cite.document' | t }}</dt>
+          <dd>
+            @if (f.document) {
+              {{ f.document.fileName }} <small>#{{ f.document.documentId }}</small>
+            } @else {
+              <span class="badge inactive">{{ 'cite.documentGone' | t }}</span>
+            }
+          </dd>
+          <dt>{{ 'cite.score' | t }}</dt>
+          <dd>
+            @if (citation.relevanceScore === null) {
+              {{ 'cite.scoreNone' | t }}
+            } @else {
+              {{ citation.relevanceScore | lnumber: 3 }}
+            }
+            <small class="hint-inline">{{ 'cite.scoreHint' | t }}</small>
+          </dd>
+        </dl>
+        @if (f.documentMissing) {
+          <p class="notice error" role="status">{{ 'cite.documentMissing' | t }}</p>
+        } @else if (f.chunkMissing) {
+          <p class="notice error" role="status">{{ 'cite.chunkMissing' | t }}</p>
+        } @else if (f.chunk; as chunk) {
+          <h3 class="fragment-title">
+            {{
+              'cite.chunkRef'
+                | t
+                  : {
+                      index: chunk.chunkIndex,
+                      start: (chunk.charStart | lnumber),
+                      end: (chunk.charEnd | lnumber),
+                    }
+            }}
+          </h3>
+          <blockquote class="fragment-text" tabindex="0">{{ chunk.content }}</blockquote>
+        }
+        @if (f.document) {
+          <div class="actions">
+            <a class="button-link" [routerLink]="['/documentos', f.document.documentId, 'fragmentos']">{{
+              'cite.openChunks' | t
+            }}</a>
+          </div>
+        }
+      }
+    </section>
+  </div>
 }

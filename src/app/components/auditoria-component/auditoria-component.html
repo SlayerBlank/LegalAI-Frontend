@@ -29,6 +29,26 @@
 <section class="panel filters" [attr.aria-label]="'audit.filters' | t">
   <form (ngSubmit)="search()">
     <fieldset [disabled]="loading || busy">
+      <div class="advanced-toggle">
+        <label class="switch"
+          ><input
+            type="checkbox"
+            name="advanced"
+            [ngModel]="advanced"
+            (ngModelChange)="setAdvanced($event)"
+            aria-describedby="audit-advanced-hint"
+          />
+          {{ 'audit.advanced' | t }}</label
+        >
+        @if (advanced) {
+          <small id="audit-advanced-hint"
+            >{{ 'audit.advancedHint' | t }} ·
+            <strong [class.ok]="criteriaCount(form) >= 2">{{
+              'audit.criteriaCount' | t: { count: criteriaCount(form) }
+            }}</strong></small
+          >
+        }
+      </div>
       <div class="filter-grid">
         <label
           >{{ 'audit.user' | t }}
@@ -79,6 +99,9 @@
   </form>
 </section>
 @if (loaded) {
+  @if (appliedAdvanced) {
+    <p class="notice" role="status">{{ 'audit.advancedActive' | t }}</p>
+  }
   <section class="stats" [attr.aria-label]="'audit.summary' | t">
     <article class="stat">
       <span>{{ 'audit.statFound' | t }}</span

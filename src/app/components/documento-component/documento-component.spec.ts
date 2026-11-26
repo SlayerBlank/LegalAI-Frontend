@@ -389,7 +389,9 @@ describe('DocumentoComponent - transporte HTTP aislado', () => {
     http.expectOne('/api/documents/31/preparation').flush({ ...prep, stage: 'EXTRACTION_ERROR' });
     expect(c.error).toContain('documento puede ser escaneado');
     expect(c.documents[0].processingStatus).toBe('ERROR');
-    expect(c.canProcess(c.documents[0])).toBe(true);
+    // HU-125: un documento en ERROR ya no se reprocesa con /process, se reintenta con /prepare.
+    expect(c.canProcess(c.documents[0])).toBe(false);
+    expect(c.canRetry(c.documents[0])).toBe(true);
   });
 
   it('no procesa documentos ya procesados para no borrar sus fragmentos', () => {
@@ -398,7 +400,7 @@ describe('DocumentoComponent - transporte HTTP aislado', () => {
     http.expectNone('/api/documents/31/process');
   });
 
-  /** HU-101: generación de embeddings desde el detalle del documento. */
+  /** HU-126: generación de embeddings desde el detalle del documento. */
   it('genera los embeddings del documento y refresca la preparación', () => {
     const c = mount().componentInstance;
     c.showDetail(doc);

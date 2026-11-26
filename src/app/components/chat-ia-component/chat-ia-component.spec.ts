@@ -137,7 +137,9 @@ describe('ChatIaComponent - transporte HTTP aislado', () => {
     expect(list.request.params.get('caseId')).toBe('1');
     list.flush([]);
     fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toContain('Todavía no hay conversaciones');
+    expect(fixture.nativeElement.textContent).toContain(
+      'Este expediente aún no tiene conversaciones.',
+    );
   });
 
   it('abre la última página del historial y carga mensajes anteriores', () => {

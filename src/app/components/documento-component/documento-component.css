@@ -31,8 +31,32 @@
   border-radius: 8px;
   font-size: 0.9rem;
 }
-.prep.ready {
+.prep.ready,
+.prep[data-tone='ready'] {
   border-left-color: #16a34a;
+}
+/* HU-124: color por etapa; el texto de la etapa acompaña siempre al color. */
+.prep[data-tone='error'] {
+  border-left-color: #dc2626;
+  background: color-mix(in srgb, #dc2626 6%, var(--surface));
+}
+.prep[data-tone='pending'] {
+  border-left-color: #d97706;
+}
+.prep button.link {
+  align-self: flex-start;
+  border: 0;
+  background: none;
+  padding: 0.2rem 0;
+  color: var(--primary);
+  font-size: 0.85rem;
+}
+.status-reason {
+  display: block;
+  margin-top: 0.3rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  max-width: 14rem;
 }
 .prep span {
   color: var(--muted);
@@ -54,6 +78,49 @@
 }
 .dialog .actions {
   flex-wrap: wrap;
+}
+/* HU-101: búsqueda semántica en el detalle */
+.semantic-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.6rem;
+}
+.semantic-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+}
+.semantic-query {
+  flex: 1 1 14rem;
+}
+.semantic-results {
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+  max-height: 18rem;
+  overflow: auto;
+}
+.semantic-results li {
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: 8px;
+}
+.semantic-results p {
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.semantic-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  align-items: center;
 }
 /* Zona para arrastrar y soltar el PDF */
 .dropzone {

@@ -117,6 +117,21 @@ describe('DocumentoChunkComponent - transporte HTTP aislado', () => {
     http.expectNone(() => true);
   });
 
+  /** HU-123: lista ordenada por índice, con posición en el texto y aviso de que no hay páginas. */
+  it('ordena los fragmentos por índice y muestra su posición en el texto', () => {
+    const f = mount([chunks[1], chunks[0]]);
+    f.detectChanges();
+    const c = f.componentInstance;
+    expect(c.chunks.map((x) => x.chunkIndex)).toEqual([0, 1]);
+    const heads = Array.from<HTMLElement>(f.nativeElement.querySelectorAll('.chunk-head'));
+    expect(heads[0].textContent).toContain('#0');
+    expect(heads[1].textContent).toContain('#1');
+    expect(heads[1].textContent).toContain('Caracteres 500–546');
+    expect(f.nativeElement.querySelector('.page-hint')?.textContent).toContain(
+      'no registra el número de página',
+    );
+  });
+
   it('calcula estadísticas sobre los fragmentos recibidos', () => {
     const c = mount().componentInstance;
     expect(c.averageLength).toBe(Math.round((longText.length + chunks[1].content.length) / 2));

@@ -107,6 +107,11 @@
                     [class.inactive]="doc.processingStatus === 'ERROR'"
                     >{{ statusLabel(doc.processingStatus) }}</span
                   >
+                  @if (doc.processingStatus === 'ERROR') {
+                    <small class="status-reason">{{ 'docs.errorReason' | t }}</small>
+                  } @else if (doc.processingStatus === 'PROCESSING') {
+                    <small class="status-reason">{{ 'docs.notReadyYet' | t }}</small>
+                  }
                 </td>
                 <td>{{ doc.createdAt | ldate }}</td>
                 <td>
@@ -116,17 +121,19 @@
                         class="primary"
                         (click)="process(doc)"
                         [disabled]="busy"
-                        [attr.aria-label]="
-                          (doc.processingStatus === 'ERROR'
-                            ? 'docs.retryProcessFor'
-                            : 'docs.processFor'
-                          ) | t: { name: doc.fileName }
-                        "
+                        [attr.aria-label]="'docs.processFor' | t: { name: doc.fileName }"
                       >
-                        {{
-                          (doc.processingStatus === 'ERROR' ? 'docs.retryProcess' : 'docs.process')
-                            | t
-                        }}
+                        {{ 'docs.process' | t }}
+                      </button>
+                    }
+                    @if (canRetry(doc)) {
+                      <button
+                        class="primary"
+                        (click)="retry(doc)"
+                        [disabled]="busy"
+                        [attr.aria-label]="'docs.retryFor' | t: { name: doc.fileName }"
+                      >
+                        {{ 'docs.retry' | t }}
                       </button>
                     }
                     <button (click)="showDetail(doc)" [disabled]="busy">
@@ -279,7 +286,14 @@
         <dt>{{ 'docs.colSize' | t }}</dt>
         <dd>{{ formatSize(doc.sizeBytes) }}</dd>
         <dt>{{ 'docs.colStatus' | t }}</dt>
-        <dd>{{ statusLabel(doc.processingStatus) }}</dd>
+        <dd>
+          <span
+            class="badge status"
+            [attr.data-status]="doc.processingStatus"
+            [class.inactive]="doc.processingStatus === 'ERROR'"
+            >{{ statusLabel(doc.processingStatus) }}</span
+          >
+        </dd>
         <dt>{{ 'docs.extracted' | t }}</dt>
         <dd>
           {{
@@ -293,13 +307,87 @@
       </dl>
       @if (preparation; as prep) {
         <h2>{{ 'docs.preparation' | t }}</h2>
-        <div class="prep" [class.ready]="prep.readyForRag">
+        <div
+          class="prep"
+          role="status"
+          [class.ready]="prep.readyForRag"
+          [attr.data-tone]="stageTone(prep.stage)"
+        >
           <strong>{{ stageLabel(prep.stage) }}</strong>
+          @if (!prep.readyForRag) {
+            <span class="prep-reason">
+              @if (prep.stage === 'PROCESSING') {
+                {{ 'docs.notReadyYet' | t }}
+              }
+              {{ stageReason(prep.stage) }}
+            </span>
+          }
           <span>{{
             'docs.prepCounts' | t: { chunks: prep.chunks, embedded: prep.embeddedChunks }
           }}</span>
+          @if (prep.stage === 'PROCESSING') {
+            <button type="button" class="link" [disabled]="busy" (click)="refreshPreparation()">
+              {{ 'docs.refreshState' | t }}
+            </button>
+          }
         </div>
       }
+      <h2 id="semantic-title">{{ 'search.title' | t }}</h2>
+      <section class="semantic" aria-labelledby="semantic-title">
+        @if (preparation && !preparation.readyForRag) {
+          <p class="hint">{{ 'search.notReady' | t }}</p>
+        }
+        <form class="semantic-form" role="search" (ngSubmit)="search()" novalidate>
+          <label class="semantic-query"
+            >{{ 'search.query' | t }}
+            <input
+              name="semanticQuery"
+              maxlength="500"
+              [placeholder]="'search.placeholder' | t"
+              [(ngModel)]="searchQuery"
+              [attr.aria-invalid]="searchError && !searchQuery.trim() ? 'true' : null"
+          /></label>
+          <label
+            >{{ 'search.topK' | t }}
+            <select name="semanticTopK" [(ngModel)]="searchTopK">
+              @for (k of topKOptions; track k) {
+                <option [ngValue]="k">{{ k }}</option>
+              }
+            </select>
+          </label>
+          <button class="primary" type="submit" [disabled]="searching">
+            {{ 'search.submit' | t }}
+          </button>
+        </form>
+        @if (searching) {
+          <p role="status" aria-live="polite">{{ 'search.searching' | t }}</p>
+        }
+        @if (searchError) {
+          <p class="notice error" role="alert">{{ searchError }}</p>
+        }
+        @if (searchResults; as results) {
+          @if (results.length) {
+            <p class="hint">{{ 'search.resultsCount' | t: { count: results.length } }}</p>
+            <ol class="semantic-results">
+              @for (r of results; track r.chunkId) {
+                <li>
+                  <div class="semantic-head">
+                    <strong>{{ 'search.chunk' | t: { index: r.chunkIndex } }}</strong>
+                    <span
+                      class="badge"
+                      [title]="'search.scoreHint' | t"
+                      >{{ 'search.score' | t: { score: (score(r) | lnumber: 3) } }}</span
+                    >
+                  </div>
+                  <p>{{ r.content }}</p>
+                </li>
+              }
+            </ol>
+          } @else {
+            <p class="empty">{{ 'search.empty' | t }}</p>
+          }
+        }
+      </section>
       @if (text !== null) {
         <h2>{{ 'docs.extracted' | t }}</h2>
         <pre class="extracted" tabindex="0">{{ text || ('docs.noText' | t) }}</pre>
@@ -316,7 +404,17 @@
       <div class="actions">
         @if (canProcess(doc)) {
           <button class="primary" [disabled]="busy" (click)="process(doc)">
-            {{ (doc.processingStatus === 'ERROR' ? 'docs.retryProcess' : 'docs.process') | t }}
+            {{ 'docs.process' | t }}
+          </button>
+        }
+        @if (canRetry(doc)) {
+          <button class="primary" [disabled]="busy" (click)="retry(doc)">
+            {{ 'docs.retry' | t }}
+          </button>
+        }
+        @if (preparation && preparation.chunks === 0 && preparation.stage !== 'PROCESSING') {
+          <button [disabled]="busy" (click)="generateChunks()">
+            {{ 'docs.generateChunks' | t }}
           </button>
         }
         @if (preparation && preparation.chunks > 0) {
@@ -332,7 +430,7 @@
             }}
           </button>
         }
-        @if (preparation && !preparation.readyForRag) {
+        @if (preparation && !preparation.readyForRag && !canRetry(doc)) {
           <button
             class="primary"
             [disabled]="busy || preparation.stage === 'PROCESSING'"
