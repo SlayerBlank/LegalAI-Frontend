@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Observable, finalize } from 'rxjs';
 import {
   CHAT_MESSAGE_MAX,
@@ -49,7 +49,7 @@ function newClientMessageId(): string {
 @Component({
   selector: 'app-chat-ia',
   standalone: true,
-  imports: [ReactiveFormsModule, ManagementDialogDirective, ...I18N_PIPES],
+  imports: [ReactiveFormsModule, RouterLink, ManagementDialogDirective, ...I18N_PIPES],
   templateUrl: './chat-ia-component.html',
   styleUrls: [
     '../../shared/management.css',
@@ -180,6 +180,7 @@ export class ChatIaComponent implements OnInit {
       });
   }
 
+  /** HU-130: el selector de expediente filtra las sesiones con GET /api/chat/sessions?caseId= */
   setCaseFilter(value: string) {
     if (this.loadingSessions() || this.busy()) return;
     const id = value ? Number(value) : null;
@@ -202,6 +203,7 @@ export class ChatIaComponent implements OnInit {
 
   // ---- Conversación ----------------------------------------------------------
 
+  /** HU-127: abre la conversación con su historial ordenado (USER e IA diferenciados). */
   select(session: ChatSession) {
     if (this.sending() || this.loadingHistory() || session.sessionId === this.activeId()) return;
     this.activeId.set(session.sessionId);
@@ -214,6 +216,7 @@ export class ChatIaComponent implements OnInit {
     this.loadHistory(session.sessionId, last, false);
   }
 
+  /** HU-127: carga la página anterior del historial y la antepone sin duplicar mensajes. */
   loadOlder() {
     const id = this.activeId();
     if (id === null || !this.hasOlder() || this.loadingHistory()) return;
@@ -290,8 +293,15 @@ export class ChatIaComponent implements OnInit {
       });
   }
 
+  /** HU-128: fragmentos (documento y fragmento) usados por una respuesta de la IA. */
   sourcesOf(m: ChatMessage) {
     return m.sources ?? [];
+  }
+
+  /** HU-128: enlace al documento de una fuente; abre su detalle en Documentos. */
+  documentLink(documentId: number) {
+    const caseId = this.active()?.caseId;
+    return caseId === undefined ? { documentId } : { caseId, documentId };
   }
 
   // ---- Alta, renombrado y eliminación ----------------------------------------

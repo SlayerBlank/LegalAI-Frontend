@@ -38,10 +38,12 @@ export class DocumentoService {
     return this.http.get<DocumentResponse>(`${this.documents}/${id}`);
   }
 
+  /** HU-124: estado de preparación calculado por el backend (etapa, fragmentos y embeddings). */
   preparation(id: number): Observable<DocumentPreparationResponse> {
     return this.http.get<DocumentPreparationResponse>(`${this.documents}/${id}/preparation`);
   }
 
+  /** HU-125: reintenta la preparación completa (texto, fragmentos y embeddings) y devuelve el estado. */
   prepare(id: number): Observable<DocumentPreparationResponse> {
     return this.http.post<DocumentPreparationResponse>(`${this.documents}/${id}/prepare`, null);
   }
@@ -51,7 +53,7 @@ export class DocumentoService {
     return this.http.post<DocumentResponse>(`${this.documents}/${id}/process`, null);
   }
 
-  /** HU-101: genera los embeddings de los fragmentos; force=true los vuelve a calcular. */
+  /** HU-126: genera los embeddings de los fragmentos; force=true los vuelve a calcular. */
   generateEmbeddings(id: number, force = false): Observable<EmbeddingGenerationResponse> {
     const params = new HttpParams().set('force', force);
     return this.http.post<EmbeddingGenerationResponse>(`${this.documents}/${id}/embeddings`, null, {

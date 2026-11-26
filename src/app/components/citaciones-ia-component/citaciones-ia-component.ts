@@ -1,4 +1,7 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, HostListener, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -6,13 +9,15 @@ import {
   ChatSessionResponseDTO,
   CitacionIAResponseDTO,
 } from '../../models/management';
-import { CitacionesIaService } from '../../services/citaciones-ia-service';
-import { ManagementHttpState } from '../../shared/management-http-state';
+import { CitacionesIaService, CitedFragment } from '../../services/citaciones-ia-service';
+import { ManagementHttpState, managementError } from '../../shared/management-http-state';
+import { ManagementDialogDirective } from '../../shared/management-dialog.directive';
+import { I18N_PIPES } from '../../shared/i18n/i18n.pipes';
 
 @Component({
   selector: 'app-citaciones-ia',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink, ManagementDialogDirective, ...I18N_PIPES],
   templateUrl: './citaciones-ia-component.html',
   styleUrls: [
     '../../shared/management.css',
@@ -25,12 +30,20 @@ export class CitacionesIaComponent
   implements OnInit
 {
   private readonly api = inject(CitacionesIaService);
+  private readonly destroy = inject(DestroyRef);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   sessions: ChatSessionResponseDTO[] = [];
   messages: ChatMessageDTO[] = [];
   citations: CitacionIAResponseDTO[] = [];
   selectedSessionId = '';
   selectedMessageId = '';
+
+  /** HU-129: cita abierta en el diálogo y el fragmento resuelto. */
+  inspecting: CitacionIAResponseDTO | null = null;
+  fragment: CitedFragment | null = null;
+  fragmentLoading = false;
+  fragmentError = '';
 
   ngOnInit(): void {
     this.loadSessions();
@@ -78,6 +91,39 @@ export class CitacionesIaComponent
         .toLocaleLowerCase();
       return matchesDocument && searchable.includes(query);
     });
+  }
+
+  /** HU-129: abre la cita y consulta el documento y su fragmento. */
+  inspect(citation: CitacionIAResponseDTO): void {
+    this.inspecting = citation;
+    this.fragment = null;
+    this.fragmentError = '';
+    this.fragmentLoading = true;
+    this.api
+      .citedFragment(citation)
+      .pipe(
+        takeUntilDestroyed(this.destroy),
+        finalize(() => {
+          this.fragmentLoading = false;
+          this.cdr.markForCheck();
+        }),
+      )
+      .subscribe({
+        next: (result) => {
+          if (this.inspecting === citation) this.fragment = result;
+        },
+        error: (e: unknown) => (this.fragmentError = managementError(e)),
+      });
+  }
+
+  closeFragment(): void {
+    this.inspecting = null;
+    this.fragment = null;
+    this.fragmentError = '';
+  }
+
+  @HostListener('document:keydown.escape') dismiss(): void {
+    this.closeFragment();
   }
 
   loadSessions(): void {

@@ -49,6 +49,9 @@ export class AuditoriaComponent extends ManagementHttpState<AuditLogResponse> im
   form: AuditLogFilters = { ...EMPTY_FILTERS };
   applied: AuditLogFilters = { ...EMPTY_FILTERS };
   formError = '';
+  /** HU-131: modo "búsqueda avanzada" del formulario y modo con el que se hizo la última consulta. */
+  advanced = false;
+  appliedAdvanced = false;
 
   result: PageResult<AuditLogResponse> = {
     content: [],
@@ -88,9 +91,10 @@ export class AuditoriaComponent extends ManagementHttpState<AuditLogResponse> im
 
   search() {
     if (this.loading || this.busy) return;
-    this.formError = this.validate(this.form);
+    this.formError = this.validate(this.form) || this.validateAdvanced(this.form);
     if (this.formError) return;
     this.applied = { ...this.form, action: this.form.action.trim().toUpperCase() };
+    this.appliedAdvanced = this.advanced;
     this.fetch(0);
   }
 
@@ -99,7 +103,37 @@ export class AuditoriaComponent extends ManagementHttpState<AuditLogResponse> im
     this.form = { ...EMPTY_FILTERS };
     this.formError = '';
     this.applied = { ...EMPTY_FILTERS };
+    this.appliedAdvanced = false;
     this.fetch(0);
+  }
+
+  /** HU-131: al salir del modo avanzado se vuelve a la búsqueda normal con los mismos filtros. */
+  setAdvanced(on: boolean) {
+    if (this.loading || this.busy) return;
+    this.advanced = on;
+    this.formError = '';
+    if (!on && this.appliedAdvanced) {
+      this.appliedAdvanced = false;
+      this.fetch(0);
+    }
+  }
+
+  /** HU-131: criterios como los cuenta el backend; from y to cuentan por separado. */
+  criteriaCount(f: AuditLogFilters): number {
+    return [
+      f.userId !== null,
+      !!f.action.trim(),
+      !!f.entityType.trim(),
+      !!f.from,
+      !!f.to,
+    ].filter(Boolean).length;
+  }
+
+  /** HU-131: mínimo dos criterios en modo avanzado, validado antes de llamar a la API. */
+  validateAdvanced(f: AuditLogFilters): string {
+    if (!this.advanced) return '';
+    const count = this.criteriaCount(f);
+    return count < 2 ? this.i18n.t('audit.errMinCriteria', { count }) : '';
   }
 
   goTo(page: number) {
@@ -111,6 +145,7 @@ export class AuditoriaComponent extends ManagementHttpState<AuditLogResponse> im
   filterByUser(userId: number) {
     if (this.busy) return;
     this.close();
+    this.advanced = false;
     this.form = { ...EMPTY_FILTERS, userId };
     this.search();
   }
@@ -221,7 +256,11 @@ export class AuditoriaComponent extends ManagementHttpState<AuditLogResponse> im
   }
 
   private fetch(page: number) {
-    this.run(this.api.search(this.applied, page), 'loading', (result) => (this.result = result));
+    /** HU-131: la paginación respeta el modo de la última consulta. */
+    const source = this.appliedAdvanced
+      ? this.api.advancedSearch(this.applied, page)
+      : this.api.search(this.applied, page);
+    this.run(source, 'loading', (result) => (this.result = result));
   }
 }
 

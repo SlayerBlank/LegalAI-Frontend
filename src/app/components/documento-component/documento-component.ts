@@ -1,8 +1,8 @@
-import { Component, DestroyRef, HostListener, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, HostListener, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, forkJoin, map, of, switchMap } from 'rxjs';
+import { catchError, finalize, forkJoin, map, of, switchMap } from 'rxjs';
 import {
   CaseResponse,
   DOCUMENT_CATEGORY_MAX,
@@ -11,10 +11,20 @@ import {
   DocumentPreparationResponse,
   DocumentResponse,
   PreparationStage,
+  PreparationTone,
   ProcessingStatus,
+  preparationTone,
 } from '../../models/documento';
 import { DocumentoService } from '../../services/documento-service';
-import { ManagementHttpState } from '../../shared/management-http-state';
+import { DocumentChunkService } from '../../services/document-chunk-service';
+import { SemanticSearchService } from '../../services/semantic-search-service';
+import {
+  SEARCH_TOP_K_DEFAULT,
+  SEARCH_TOP_K_OPTIONS,
+  SemanticSearchResult,
+  relevanceScore,
+} from '../../models/semantic-search';
+import { ManagementHttpState, managementError } from '../../shared/management-http-state';
 import { ManagementDialogDirective } from '../../shared/management-dialog.directive';
 import { I18N_PIPES } from '../../shared/i18n/i18n.pipes';
 import { I18nService } from '../../services/i18n.service';
@@ -32,6 +42,9 @@ import { I18nService } from '../../services/i18n.service';
 })
 export class DocumentoComponent extends ManagementHttpState<DocumentResponse> implements OnInit {
   private readonly api = inject(DocumentoService);
+  private readonly chunksApi = inject(DocumentChunkService);
+  private readonly searchApi = inject(SemanticSearchService);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroy = inject(DestroyRef);
@@ -49,9 +62,22 @@ export class DocumentoComponent extends ManagementHttpState<DocumentResponse> im
 
   preparation: DocumentPreparationResponse | null = null;
   text: string | null = null;
+  /** HU-101: búsqueda semántica dentro del documento abierto. */
+  readonly topKOptions = SEARCH_TOP_K_OPTIONS;
+  searchQuery = '';
+  searchTopK = SEARCH_TOP_K_DEFAULT;
+  searchResults: SemanticSearchResult[] | null = null;
+  searchError = '';
+  searching = false;
+
+  /** HU-128: documento que se abre al llegar desde una fuente del chat (?documentId=). */
+  private openOnLoad: number | null = null;
 
   ngOnInit() {
-    const requested = Number(this.route.snapshot.queryParamMap.get('caseId'));
+    const query = this.route.snapshot.queryParamMap;
+    const requested = Number(query.get('caseId'));
+    const documentId = Number(query.get('documentId'));
+    this.openOnLoad = Number.isInteger(documentId) && documentId > 0 ? documentId : null;
     this.load(Number.isInteger(requested) && requested > 0 ? requested : null);
   }
 
@@ -74,6 +100,9 @@ export class DocumentoComponent extends ManagementHttpState<DocumentResponse> im
       this.cases = cases;
       this.caseId = id;
       this.documents = docs;
+      const target = docs.find((d) => d.documentId === this.openOnLoad);
+      this.openOnLoad = null;
+      if (target) setTimeout(() => this.showDetail(target));
     });
   }
 
@@ -113,6 +142,16 @@ export class DocumentoComponent extends ManagementHttpState<DocumentResponse> im
 
   stageLabel(stage: PreparationStage): string {
     return this.i18n.t(`stage.${stage}`);
+  }
+
+  /** HU-124: color de la etapa (verde listo, ámbar en curso o pendiente, rojo con error). */
+  stageTone(stage: PreparationStage): PreparationTone {
+    return preparationTone(stage);
+  }
+
+  /** HU-124: explicación de por qué el documento no está listo, o '' si lo está. */
+  stageReason(stage: PreparationStage): string {
+    return stage === 'READY' ? '' : this.i18n.t(`stageReason.${stage}`);
   }
 
   formatSize(bytes: number | null): string {
@@ -205,6 +244,7 @@ export class DocumentoComponent extends ManagementHttpState<DocumentResponse> im
     if (this.busy || this.loading) return;
     this.preparation = null;
     this.text = null;
+    this.resetSearch();
     this.run(
       forkJoin({ doc: this.api.get(doc.documentId), prep: this.api.preparation(doc.documentId) }),
       'busy',
@@ -216,29 +256,66 @@ export class DocumentoComponent extends ManagementHttpState<DocumentResponse> im
     );
   }
 
-  prepare() {
+  /** HU-124: vuelve a consultar el estado mientras el documento se procesa. */
+  refreshPreparation() {
     const doc = this.selected;
     if (!doc || this.busy) return;
     const id = doc.documentId;
+    this.run(
+      forkJoin({ fresh: this.api.get(id), prep: this.api.preparation(id) }),
+      'busy',
+      ({ fresh, prep }) => {
+        this.selected = fresh;
+        this.preparation = prep;
+        this.replace(fresh);
+      },
+    );
+  }
+
+  /** Completa la preparación para la IA de un documento que aún no está listo. */
+  prepare() {
+    const doc = this.selected;
+    if (!doc || this.busy) return;
+    this.runPrepare(doc.documentId, 'docs.preparedNotice');
+  }
+
+  /** HU-125: el reintento solo se ofrece cuando el backend dejó el documento en ERROR. */
+  canRetry(doc: DocumentResponse): boolean {
+    return doc.processingStatus === 'ERROR';
+  }
+
+  /** HU-125: POST /prepare desde la tabla o el detalle; si vuelve a fallar se muestra el error. */
+  retry(doc: DocumentResponse) {
+    if (this.busy || this.loading || !this.canRetry(doc)) return;
+    this.runPrepare(doc.documentId, 'docs.retriedNotice');
+  }
+
+  private runPrepare(id: number, noticeKey: string) {
     this.run(
       this.api
         .prepare(id)
         .pipe(switchMap((prep) => this.api.get(id).pipe(map((fresh) => ({ prep, fresh }))))),
       'busy',
       ({ prep, fresh }) => {
-        this.preparation = prep;
-        this.selected = fresh;
+        if (this.selected?.documentId === id) {
+          this.preparation = prep;
+          this.selected = fresh;
+          this.text = null;
+        }
         this.replace(fresh);
-        this.notice = this.i18n.t('docs.preparedNotice', { stage: this.stageLabel(prep.stage) });
+        this.notice = this.i18n.t(noticeKey, { stage: this.stageLabel(prep.stage) });
       },
       // Una etapa puede fallar después de que otras se completaron: se refresca el estado sin ocultar el error.
       () => this.refreshQuietly(id),
     );
   }
 
-  /** HU-99: solo se procesan documentos subidos o con error; reprocesar uno listo borraría sus fragmentos. */
+  /**
+   * HU-99: solo se procesan documentos recién subidos; reprocesar uno listo borraría sus
+   * fragmentos. Un documento en ERROR se reintenta con la preparación (HU-125).
+   */
   canProcess(doc: DocumentResponse): boolean {
-    return doc.processingStatus === 'UPLOADED' || doc.processingStatus === 'ERROR';
+    return doc.processingStatus === 'UPLOADED';
   }
 
   /** HU-99: POST /process y luego el estado de /preparation, sin recargar la lista. */
@@ -267,12 +344,38 @@ export class DocumentoComponent extends ManagementHttpState<DocumentResponse> im
           status: this.statusLabel(fresh.processingStatus),
         });
       },
-      /** HU-99: si falla la extracción, se muestra el estado ERROR que deja el backend. */
+      /** HU-99: si falla la extracción, se muestra el estado ERROR que deja el backend (HU-124). */
       () => this.refreshQuietly(id),
     );
   }
 
-  /** HU-101: genera (o regenera con force) los embeddings del documento abierto. */
+  /** HU-122: genera los fragmentos del documento abierto; sin texto extraído no llama a la API. */
+  generateChunks() {
+    const doc = this.selected;
+    if (!doc || this.busy) return;
+    if (!doc.hasExtractedText || doc.processingStatus !== 'PROCESSED') {
+      this.notice = '';
+      this.error = this.i18n.t('docs.chunksNeedText');
+      return;
+    }
+    const id = doc.documentId;
+    const source = this.chunksApi
+      .regenerate(id)
+      .pipe(
+        switchMap((result) => this.api.preparation(id).pipe(map((prep) => ({ result, prep })))),
+      );
+    this.run(
+      source,
+      'busy',
+      ({ result, prep }) => {
+        if (this.selected?.documentId === id) this.preparation = prep;
+        this.notice = this.i18n.t('docs.chunksNotice', { count: result.chunksCreated });
+      },
+      () => this.refreshQuietly(id),
+    );
+  }
+
+  /** HU-126: genera (o regenera con force) los embeddings del documento abierto. */
   generateEmbeddings(force = false) {
     const doc = this.selected;
     if (!doc || this.busy) return;
@@ -294,6 +397,50 @@ export class DocumentoComponent extends ManagementHttpState<DocumentResponse> im
       },
       () => this.refreshQuietly(id),
     );
+  }
+
+  /** HU-101: CA-02 sin texto no se llama a la API; CA-01 resultados por relevancia; CA-03 errores. */
+  search() {
+    const doc = this.selected;
+    if (!doc || this.searching) return;
+    const query = this.searchQuery.trim();
+    if (!query) {
+      this.searchResults = null;
+      this.searchError = this.i18n.t('search.errEmpty');
+      return;
+    }
+    const id = doc.documentId;
+    this.searching = true;
+    this.searchError = '';
+    this.searchApi
+      .searchDocument(id, query, this.searchTopK)
+      .pipe(
+        takeUntilDestroyed(this.destroy),
+        finalize(() => {
+          this.searching = false;
+          this.cdr.markForCheck();
+        }),
+      )
+      .subscribe({
+        next: (rows) => {
+          if (this.selected?.documentId === id) this.searchResults = rows;
+        },
+        error: (e: unknown) => {
+          this.searchResults = null;
+          this.searchError = managementError(e);
+        },
+      });
+  }
+
+  score(result: SemanticSearchResult): number {
+    return relevanceScore(result.distance);
+  }
+
+  private resetSearch() {
+    this.searchQuery = '';
+    this.searchTopK = SEARCH_TOP_K_DEFAULT;
+    this.searchResults = null;
+    this.searchError = '';
   }
 
   loadText() {
@@ -339,6 +486,7 @@ export class DocumentoComponent extends ManagementHttpState<DocumentResponse> im
     this.uploadOpen = false;
     this.preparation = null;
     this.text = null;
+    this.resetSearch();
   }
 
   @HostListener('document:keydown.escape') dismiss() {

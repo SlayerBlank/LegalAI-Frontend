@@ -54,6 +54,17 @@ export const ES = {
   'stage.EMBEDDINGS_REQUIRED': 'Faltan generar los embeddings',
   'stage.EMBEDDINGS_UNAVAILABLE': 'Embeddings no disponibles en el servidor',
 
+  // HU-124: motivo de cada etapa cuando el documento aún no está listo
+  'stageReason.PROCESSING':
+    'El servidor está extrayendo el texto. Vuelve a consultar el estado en unos segundos.',
+  'stageReason.EXTRACTION_ERROR':
+    'El servidor no pudo extraer texto del PDF. Suele ocurrir con PDF escaneados, dañados o protegidos.',
+  'stageReason.EXTRACTION_REQUIRED': 'Falta procesar el PDF para extraer su texto.',
+  'stageReason.CHUNKS_REQUIRED': 'El texto ya se extrajo, pero aún no se dividió en fragmentos.',
+  'stageReason.EMBEDDINGS_REQUIRED':
+    'Hay fragmentos sin embedding: la IA todavía no puede buscar en todo el documento.',
+  'stageReason.EMBEDDINGS_UNAVAILABLE': 'El servicio de embeddings del servidor no está disponible.',
+
   // Documentos
   'docs.title': 'Documentos',
   'docs.subtitle': 'Sube los PDF de cada expediente y prepáralos para el análisis con IA.',
@@ -115,13 +126,38 @@ export const ES = {
   'docs.errNotPdf': 'Solo se permiten archivos PDF.',
   'docs.errName': 'El nombre del archivo no es válido. Renómbralo e inténtalo de nuevo.',
   'docs.process': 'Procesar',
-  'docs.retryProcess': 'Reintentar',
   'docs.processFor': 'Procesar {name}',
-  'docs.retryProcessFor': 'Reintentar el procesamiento de {name}',
   'docs.processedNotice': 'Documento procesado. Estado: {status}.',
   'docs.generateEmbeddings': 'Generar embeddings',
   'docs.regenerateEmbeddings': 'Regenerar embeddings',
   'docs.embeddingsNotice': 'Embeddings generados: {generated} de {chunks} fragmentos.',
+  'docs.retry': 'Reintentar',
+  'docs.retryFor': 'Reintentar la preparación de {name}',
+  'docs.retriedNotice': 'Preparación reintentada. Estado: {stage}.',
+  'docs.errorReason': 'No se pudo extraer el texto. Puedes reintentar.',
+  'docs.notReadyYet': 'Aún no está listo: se está procesando.',
+  'docs.refreshState': 'Actualizar estado',
+  // HU-101: búsqueda semántica en el detalle del documento
+  'search.title': 'Búsqueda semántica',
+  'search.query': 'Consulta',
+  'search.placeholder': 'Ej.: ¿Qué penalidad tiene el incumplimiento?',
+  'search.topK': 'Resultados',
+  'search.submit': 'Buscar',
+  'search.searching': 'Buscando fragmentos relacionados...',
+  'search.errEmpty': 'Escribe un texto para buscar.',
+  'search.notReady':
+    'El documento aún no está listo para la IA: la búsqueda solo encuentra fragmentos con embedding.',
+  'search.resultsCount': '{count} fragmentos, del más al menos relevante.',
+  'search.chunk': 'Fragmento {index}',
+  'search.score': 'Relevancia {score}',
+  'search.scoreHint': 'Relevancia = 1 − distancia coseno; no es una medida de confianza.',
+  'search.empty':
+    'No se encontraron fragmentos. Si el documento no está preparado para la IA, genera primero sus embeddings.',
+  'docs.generateChunks': 'Generar fragmentos',
+  'docs.chunksNeedText':
+    'El documento no tiene texto extraído. Primero procésalo y luego genera sus fragmentos.',
+  'docs.chunksNotice':
+    'Se generaron {count} fragmentos. Genera sus embeddings para que la IA pueda usarlos.',
 
   // Fragmentos
   'chunks.back': '← Volver a Documentos',
@@ -151,6 +187,8 @@ export const ES = {
     'Se reemplazarán los {count} fragmentos actuales por otros nuevos a partir del texto extraído. Sus embeddings se perderán y habrá que preparar el documento para la IA otra vez.',
   'chunks.regenerating': 'Regenerando fragmentos...',
   'chunks.confirmSubmit': 'Regenerar',
+  'chunks.noPage':
+    'El servidor no registra el número de página de cada fragmento; se muestra su posición en el texto extraído.',
   'chunks.generatedNotice':
     'Se generaron {count} fragmentos (tamaño {size}, solapamiento {overlap}). Vuelve a preparar el documento para la IA para generar sus embeddings.',
 
@@ -200,6 +238,13 @@ export const ES = {
   'audit.retry': 'Reintentar',
   'audit.viewUserActivity': 'Ver auditoría',
   'audit.viewUserActivityFor': 'Ver la auditoría de {name}',
+  // HU-131: búsqueda avanzada (GET /api/audit-logs/advanced-search)
+  'audit.advanced': 'Búsqueda avanzada',
+  'audit.advancedHint':
+    'Combina al menos dos criterios. “Desde” y “Hasta” cuentan como criterios distintos.',
+  'audit.criteriaCount': '{count} de 2 criterios mínimos',
+  'audit.errMinCriteria': 'La búsqueda avanzada necesita al menos dos criterios (tienes {count}).',
+  'audit.advancedActive': 'Mostrando resultados de la búsqueda avanzada.',
 
   // Acciones registradas por el backend
   'action.LOGIN': 'Inicio de sesión',
@@ -302,6 +347,8 @@ export const ES = {
   'chat.casesError': 'No se pudieron cargar los expedientes: {error}',
   'chat.noCases': 'Crea primero un expediente con documentos para conversar con la IA.',
   'chat.emptySessions': 'Todavía no hay conversaciones. Crea la primera.',
+  'chat.emptyCaseSessions': 'Este expediente aún no tiene conversaciones.',
+  'chat.newForCase': '+ Nueva conversación en este expediente',
   'chat.loadMore': 'Cargar más conversaciones',
   'chat.untitled': 'Conversación sin título',
   'chat.caseFallback': 'Expediente #{id}',
@@ -320,6 +367,27 @@ export const ES = {
   'chat.sources': 'Fragmentos consultados ({count})',
   'chat.sourcesNote': 'Son fragmentos enviados al modelo, no citas verificadas por afirmación.',
   'chat.sourceRef': '{name} · fragmento {index}',
+  'chat.noSources': 'Esta respuesta no usó fragmentos de documentos.',
+  'chat.sourcesUnknown': 'No se conservó la información de las fuentes de esta respuesta.',
+  'chat.openDocument': 'Ver documento',
+  'chat.openDocumentFor': 'Abrir el documento {name}',
+  // HU-129: fragmento citado en una respuesta
+  'cite.colActions': 'Acciones',
+  'cite.view': 'Ver fragmento',
+  'cite.viewFor': 'Ver el fragmento de la referencia #{id}',
+  'cite.title': 'Fragmento citado · referencia #{id}',
+  'cite.loading': 'Consultando el documento y el fragmento...',
+  'cite.retry': 'Reintentar',
+  'cite.document': 'Documento',
+  'cite.documentGone': 'Documento eliminado',
+  'cite.score': 'Puntaje de relevancia',
+  'cite.scoreNone': 'No disponible',
+  'cite.scoreHint': '1 − distancia coseno; no es una medida de confianza.',
+  'cite.chunkRef': 'Fragmento {index} · caracteres {start}–{end}',
+  'cite.documentMissing': 'El documento citado ya no existe; solo se conserva la referencia.',
+  'cite.chunkMissing':
+    'El fragmento citado ya no existe: el documento se volvió a fragmentar después de la respuesta.',
+  'cite.openChunks': 'Ver todos los fragmentos del documento',
   'chat.composer': 'Escribe tu pregunta',
   'chat.placeholder':
     'Pregunta sobre los documentos del expediente… (Enter envía, Mayús+Enter salto de línea)',

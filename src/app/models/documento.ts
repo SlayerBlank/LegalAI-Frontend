@@ -43,7 +43,16 @@ export type PreparationStage =
   | 'EMBEDDINGS_UNAVAILABLE'
   | 'READY';
 
-/** DocumentoPreparationResponseDTO: GET/POST /api/documents/{id}/preparation|prepare */
+/** HU-124: color con el que se muestra cada etapa (listo, en curso o con error). */
+export type PreparationTone = 'ready' | 'pending' | 'error';
+
+export function preparationTone(stage: PreparationStage): PreparationTone {
+  if (stage === 'READY') return 'ready';
+  if (stage === 'EXTRACTION_ERROR' || stage === 'EMBEDDINGS_UNAVAILABLE') return 'error';
+  return 'pending';
+}
+
+/** HU-124 y HU-125: DocumentoPreparationResponseDTO de GET/POST /api/documents/{id}/preparation|prepare */
 export interface DocumentPreparationResponse {
   documentId: number;
   processingStatus: ProcessingStatus;
@@ -64,7 +73,10 @@ export const DOCUMENT_MAX_FILE_BYTES = 10 * 1024 * 1024;
 export const DOCUMENT_CATEGORY_MAX = 80;
 export const DOCUMENT_FILE_NAME_MAX = 255;
 
-/** DocumentChunkResponseDTO: GET /api/documents/{id}/chunks (offsets sobre el texto normalizado). */
+/**
+ * HU-123: DocumentChunkResponseDTO de GET /api/documents/{id}/chunks. Los offsets son sobre el
+ * texto normalizado; el backend no guarda números de página.
+ */
 export interface DocumentChunkResponse {
   chunkId: number;
   documentId: number;
@@ -74,7 +86,7 @@ export interface DocumentChunkResponse {
   charEnd: number;
 }
 
-/** ChunkGenerationResponseDTO: POST /api/documents/{id}/chunks */
+/** HU-122: ChunkGenerationResponseDTO de POST /api/documents/{id}/chunks */
 export interface ChunkGenerationResponse {
   documentId: number;
   chunksCreated: number;
@@ -82,7 +94,7 @@ export interface ChunkGenerationResponse {
   overlap: number;
 }
 
-/** HU-101: EmbeddingGenerationResponseDTO de POST /api/documents/{id}/embeddings */
+/** HU-126: EmbeddingGenerationResponseDTO de POST /api/documents/{id}/embeddings */
 export interface EmbeddingGenerationResponse {
   documentId: number;
   chunksProcessed: number;
