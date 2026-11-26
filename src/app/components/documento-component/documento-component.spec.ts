@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { HttpEventType, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angular/router';
 import { signal } from '@angular/core';
@@ -193,6 +193,24 @@ describe('DocumentoComponent - transporte HTTP aislado', () => {
     expect(c.notice).toContain('Listo para la IA');
   });
 
+  it('muestra el porcentaje de avance mientras sube el archivo (HU-94 TA-04)', () => {
+    const c = mount().componentInstance;
+    c.openUpload();
+    c.uploadFile = pdf();
+    c.upload();
+    expect(c.uploadProgress).toBe(0);
+    const req = http.expectOne('/api/cases/5/documents/upload');
+    expect(req.request.reportProgress).toBe(true);
+    req.event({ type: HttpEventType.UploadProgress, loaded: 50, total: 200 });
+    expect(c.uploadProgress).toBe(25);
+    req.event({ type: HttpEventType.UploadProgress, loaded: 200, total: 200 });
+    expect(c.uploadProgress).toBe(100);
+    req.flush({ ...doc, documentId: 42 });
+    expect(c.uploadProgress).toBeNull();
+    http.expectOne('/api/documents/42/preparation').flush({ ...prep, documentId: 42 });
+    expect(c.documents.some((d) => d.documentId === 42)).toBe(true);
+  });
+
   it('conserva el documento subido aunque falle la consulta de preparación', () => {
     const c = mount().componentInstance;
     c.openUpload();
@@ -280,10 +298,13 @@ describe('DocumentoComponent - transporte HTTP aislado', () => {
       .spyOn(HTMLAnchorElement.prototype, 'click')
       .mockImplementation(() => undefined);
     c.download(doc);
+    // HU-97 CA-03: mientras se espera la respuesta, el botón indica que se está descargando.
+    expect(c.isDownloading(doc)).toBe(true);
     const req = http.expectOne('/api/documents/31/download');
     expect(req.request.responseType).toBe('blob');
     expect(req.request.headers.get('Authorization')).toBe('Bearer unit-test-token');
     req.flush(new Blob(['%PDF-1.7'], { type: 'application/pdf' }));
+    expect(c.isDownloading(doc)).toBe(false);
     expect(createUrl).toHaveBeenCalled();
     expect(click).toHaveBeenCalled();
     click.mockRestore();

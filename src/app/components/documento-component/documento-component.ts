@@ -59,6 +59,10 @@ export class DocumentoComponent extends ManagementHttpState<DocumentResponse> im
   uploadFile: File | null = null;
   uploadCategory = '';
   uploadError = '';
+  /** HU-94 (TA-04): porcentaje enviado del archivo; null cuando no hay subida en curso. */
+  uploadProgress: number | null = null;
+  /** HU-97 (CA-03): documento que se está descargando, para que el botón lo indique. */
+  downloadingId: number | null = null;
 
   preparation: DocumentPreparationResponse | null = null;
   text: string | null = null;
@@ -219,7 +223,13 @@ export class DocumentoComponent extends ManagementHttpState<DocumentResponse> im
     if (this.uploadError) return;
     const caseId = this.caseId;
     const category = this.uploadCategory.trim() || null;
-    const source = this.api.upload(caseId, this.uploadFile, category).pipe(
+    this.uploadProgress = 0;
+    const onProgress = (percent: number) => {
+      this.uploadProgress = percent;
+      this.cdr.markForCheck();
+    };
+    const source = this.api.upload(caseId, this.uploadFile, category, onProgress).pipe(
+      finalize(() => (this.uploadProgress = null)),
       switchMap((doc) =>
         this.api.preparation(doc.documentId).pipe(
           map((prep) => ({ doc, prep: prep as DocumentPreparationResponse | null })),
@@ -451,7 +461,18 @@ export class DocumentoComponent extends ManagementHttpState<DocumentResponse> im
 
   download(doc: DocumentResponse) {
     if (this.busy) return;
-    this.run(this.api.download(doc.documentId), 'busy', (blob) => saveBlob(blob, doc.fileName));
+    const id = doc.documentId;
+    this.downloadingId = id;
+    this.run(
+      this.api.download(id).pipe(finalize(() => (this.downloadingId = null))),
+      'busy',
+      (blob) => saveBlob(blob, doc.fileName),
+    );
+  }
+
+  /** HU-97 (CA-03): true mientras se descarga ese documento. */
+  isDownloading(doc: DocumentResponse): boolean {
+    return this.downloadingId === doc.documentId;
   }
 
   openChunks(doc: DocumentResponse) {
