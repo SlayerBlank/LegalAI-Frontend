@@ -37,7 +37,7 @@
           @for (doc of detail(); track doc.documentId) {
             <tr>
               <th scope="row">{{ doc.fileName }}</th>
-              <td>{{ caseTitle(doc.caseId) }}</td>
+              <td>{{ caseTitle(doc) }}</td>
               <td>{{ 'status.' + doc.processingStatus | t }}</td>
               <td>{{ doc.createdAt | ldate }}</td>
             </tr>

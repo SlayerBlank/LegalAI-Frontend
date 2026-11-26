@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpEventType, HttpParams, HttpResponse } from '@angular/common/http';
+import { Observable, filter, map, tap } from 'rxjs';
 import { API_BASE_URL } from '../core/http/api.config';
 import {
   CaseResponse,
@@ -9,7 +9,13 @@ import {
   DocumentTextResponse,
   ProcessingStatus,
   EmbeddingGenerationResponse,
+  PendingDocumentResponse,
 } from '../models/documento';
+import {
+  SEARCH_TOP_K_DEFAULT,
+  SemanticSearchRequest,
+  SemanticSearchResult,
+} from '../models/semantic-search';
 
 @Injectable({ providedIn: 'root' })
 export class DocumentoService {
@@ -26,12 +32,34 @@ export class DocumentoService {
     return this.http.get<DocumentResponse[]>(`${this.cases}/${caseId}/documents`);
   }
 
-  /** Sube el PDF; el backend lo guarda y luego intenta extraer texto, chunks y embeddings. */
-  upload(caseId: number, file: File, category: string | null): Observable<DocumentResponse> {
+  /**
+   * Sube el PDF; el backend lo guarda y luego intenta extraer texto, chunks y embeddings.
+   * HU-94 (TA-04): onProgress recibe el porcentaje enviado (0-100) mientras sube el archivo.
+   */
+  upload(
+    caseId: number,
+    file: File,
+    category: string | null,
+    onProgress?: (percent: number) => void,
+  ): Observable<DocumentResponse> {
     const body = new FormData();
     body.append('file', file, file.name);
     if (category) body.append('category', category);
-    return this.http.post<DocumentResponse>(`${this.cases}/${caseId}/documents/upload`, body);
+    return this.http
+      .post<DocumentResponse>(`${this.cases}/${caseId}/documents/upload`, body, {
+        observe: 'events',
+        reportProgress: true,
+      })
+      .pipe(
+        tap((event) => {
+          if (event.type === HttpEventType.UploadProgress && onProgress) {
+            const total = event.total || file.size;
+            onProgress(total > 0 ? Math.min(100, Math.round((event.loaded / total) * 100)) : 0);
+          }
+        }),
+        filter((event): event is HttpResponse<DocumentResponse> => event instanceof HttpResponse),
+        map((event) => event.body as DocumentResponse),
+      );
   }
 
   get(id: number): Observable<DocumentResponse> {
@@ -61,6 +89,21 @@ export class DocumentoService {
     });
   }
 
+  /**
+   * HU-101 (TA-02): búsqueda semántica dentro de un documento propio con
+   * POST /api/documents/{id}/search. Devuelve los fragmentos de más a menos relevante.
+   */
+  semanticSearch(
+    id: number,
+    query: string,
+    topK = SEARCH_TOP_K_DEFAULT,
+  ): Observable<SemanticSearchResult[]> {
+    const body: SemanticSearchRequest = { query: query.trim(), topK };
+    return this.http
+      .post<SemanticSearchResult[]>(`${this.documents}/${id}/search`, body)
+      .pipe(map((rows) => [...(rows ?? [])].sort((a, b) => a.distance - b.distance)));
+  }
+
   text(id: number): Observable<DocumentTextResponse> {
     return this.http.get<DocumentTextResponse>(`${this.documents}/${id}/text`);
   }
@@ -74,14 +117,20 @@ export class DocumentoService {
     return this.http.delete<void>(`${this.documents}/${id}`);
   }
 
-  /** HU-67: documentos del abogado pendientes de revisión (UPLOADED, PROCESSING y ERROR). */
+  /**
+   * HU-67: documentos del abogado pendientes de revisión (UPLOADED, PROCESSING y ERROR),
+   * cada uno con el título de su expediente (caseTitle).
+   */
   pendingReview(
     abogadoId: number,
     status: ProcessingStatus | null = null,
-  ): Observable<DocumentResponse[]> {
+  ): Observable<PendingDocumentResponse[]> {
     const params = status ? new HttpParams().set('status', status) : new HttpParams();
-    return this.http.get<DocumentResponse[]>(`${this.documents}/pending-review/${abogadoId}`, {
-      params,
-    });
+    return this.http.get<PendingDocumentResponse[]>(
+      `${this.documents}/pending-review/${abogadoId}`,
+      {
+        params,
+      },
+    );
   }
 }

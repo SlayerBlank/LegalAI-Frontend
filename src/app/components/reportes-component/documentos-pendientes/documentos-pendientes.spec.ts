@@ -2,17 +2,22 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
-import { DocumentResponse, ProcessingStatus } from '../../../models/documento';
+import { PendingDocumentResponse, ProcessingStatus } from '../../../models/documento';
 import { LoginService } from '../../../services/login-service';
 import { DocumentosPendientesComponent } from './documentos-pendientes';
 
 const PENDING = '/api/documents/pending-review/70';
-const CASES = '/api/cases';
 
-function doc(documentId: number, caseId: number, status: ProcessingStatus): DocumentResponse {
+function doc(
+  documentId: number,
+  caseId: number,
+  status: ProcessingStatus,
+  caseTitle: string | null = caseId === 10 ? 'Demanda laboral' : null,
+): PendingDocumentResponse {
   return {
     documentId,
     caseId,
+    caseTitle,
     fileName: `doc-${documentId}.pdf`,
     fileType: 'application/pdf',
     storageUrl: null,
@@ -54,13 +59,12 @@ describe('DocumentosPendientesComponent (HU-140)', () => {
     vi.restoreAllMocks();
   });
 
-  async function mount(rows: DocumentResponse[], cases: object[] | 'error' = [{ caseId: 10, title: 'Demanda laboral' }]) {
+  async function mount(rows: PendingDocumentResponse[]) {
     const f = TestBed.createComponent(DocumentosPendientesComponent);
     f.detectChanges();
     http.expectOne(PENDING).flush(rows);
-    const casesReq = http.expectOne(CASES);
-    if (cases === 'error') casesReq.flush(null, { status: 500, statusText: 'Error' });
-    else casesReq.flush(cases);
+    // CA-02: el título del expediente llega en la misma respuesta; no se pide /api/cases.
+    http.expectNone('/api/cases');
     f.detectChanges();
     await f.whenStable();
     return f;
@@ -88,8 +92,8 @@ describe('DocumentosPendientesComponent (HU-140)', () => {
     ]);
   });
 
-  it('si falla la lista de expedientes, muestra el identificador', async () => {
-    const f = await mount([doc(4, 12, 'PROCESSING')], 'error');
+  it('si el backend no envía el título del expediente, muestra su número', async () => {
+    const f = await mount([doc(4, 12, 'PROCESSING', null)]);
     expect(f.componentInstance.query.hasData()).toBe(true);
     expect(f.nativeElement.textContent).toContain('Expediente #12');
   });

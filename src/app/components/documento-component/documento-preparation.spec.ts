@@ -12,6 +12,7 @@ import {
 } from '../../models/documento';
 import { SemanticSearchResult, relevanceScore } from '../../models/semantic-search';
 import { SemanticSearchService } from '../../services/semantic-search-service';
+import { DocumentoService } from '../../services/documento-service';
 import { LoginService } from '../../services/login-service';
 import { jwtInterceptor } from '../../services/jwt.interceptor';
 
@@ -342,6 +343,17 @@ describe('Documentos: fragmentos, estado, reintento y búsqueda (HU-122, 124, 12
     const text = f.nativeElement.querySelector('.semantic')?.textContent ?? '';
     expect(text).toContain('El documento aún no está listo para la IA');
     expect(text).toContain('No se encontraron fragmentos');
+  });
+
+  it('HU-101 TA-02: DocumentoService.semanticSearch envía la consulta limpia y ordena por relevancia', () => {
+    const api = TestBed.inject(DocumentoService);
+    let rows: SemanticSearchResult[] = [];
+    api.semanticSearch(31, '  plazo de pago  ', 10).subscribe((r) => (rows = r));
+    const req = http.expectOne('/api/documents/31/search');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ query: 'plazo de pago', topK: 10 });
+    req.flush([...results].reverse());
+    expect(rows.map((r) => r.distance)).toEqual([0.12, 0.31]);
   });
 
   it('HU-101: el servicio también busca en un expediente y acota el puntaje', () => {
