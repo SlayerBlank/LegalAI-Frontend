@@ -439,6 +439,29 @@ describe('DocumentoComponent - transporte HTTP aislado', () => {
     expect(c.notice).toBe('Embeddings generados: 3 de 3 fragmentos.');
   });
 
+  it('HU-126 CA-02: con todos los embeddings ofrece Regenerar y envía force=true', () => {
+    const f = mount();
+    const c = f.componentInstance;
+    c.showDetail(doc);
+    http.expectOne('/api/documents/31').flush(doc);
+    http
+      .expectOne('/api/documents/31/preparation')
+      .flush({ ...prep, stage: 'READY', readyForRag: true, chunks: 3, embeddedChunks: 3 });
+    f.detectChanges();
+    const button = [...f.nativeElement.querySelectorAll('button')].find((b: HTMLButtonElement) =>
+      b.textContent?.includes('Regenerar embeddings'),
+    ) as HTMLButtonElement | undefined;
+    expect(button).toBeTruthy();
+    button!.click();
+    const req = http.expectOne((r) => r.url === '/api/documents/31/embeddings');
+    expect(req.request.params.get('force')).toBe('true');
+    req.flush({ documentId: 31, chunksProcessed: 3, embeddingsGenerated: 3 });
+    http
+      .expectOne('/api/documents/31/preparation')
+      .flush({ ...prep, stage: 'READY', readyForRag: true, chunks: 3, embeddedChunks: 3 });
+    expect(c.notice).toBe('Embeddings generados: 3 de 3 fragmentos.');
+  });
+
   it('muestra el error del servicio de embeddings y conserva el estado real', () => {
     const c = mount().componentInstance;
     c.showDetail(doc);
