@@ -8,22 +8,13 @@ import {
   SemanticSearchResult,
 } from '../models/semantic-search';
 
-/** HU-101: búsqueda semántica sobre los fragmentos con embedding. */
+/**
+ * Búsqueda semántica en todos los documentos de un expediente.
+ * La búsqueda dentro de un documento (HU-101) está en DocumentoService.semanticSearch.
+ */
 @Injectable({ providedIn: 'root' })
 export class SemanticSearchService {
   private readonly http = inject(HttpClient);
-
-  /** Fragmentos de un documento propio más cercanos a la consulta (404 si es ajeno). */
-  searchDocument(
-    documentId: number,
-    query: string,
-    topK = SEARCH_TOP_K_DEFAULT,
-  ): Observable<SemanticSearchResult[]> {
-    return this.post(`${API_BASE_URL}/documents/${documentId}/search`, {
-      query: query.trim(),
-      topK,
-    });
-  }
 
   /** Fragmentos de todos los documentos de un expediente propio (404 si es ajeno). */
   searchCase(

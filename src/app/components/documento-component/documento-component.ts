@@ -17,7 +17,6 @@ import {
 } from '../../models/documento';
 import { DocumentoService } from '../../services/documento-service';
 import { DocumentChunkService } from '../../services/document-chunk-service';
-import { SemanticSearchService } from '../../services/semantic-search-service';
 import {
   SEARCH_TOP_K_DEFAULT,
   SEARCH_TOP_K_OPTIONS,
@@ -43,7 +42,6 @@ import { I18nService } from '../../services/i18n.service';
 export class DocumentoComponent extends ManagementHttpState<DocumentResponse> implements OnInit {
   private readonly api = inject(DocumentoService);
   private readonly chunksApi = inject(DocumentChunkService);
-  private readonly searchApi = inject(SemanticSearchService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -422,8 +420,8 @@ export class DocumentoComponent extends ManagementHttpState<DocumentResponse> im
     const id = doc.documentId;
     this.searching = true;
     this.searchError = '';
-    this.searchApi
-      .searchDocument(id, query, this.searchTopK)
+    this.api
+      .semanticSearch(id, query, this.searchTopK)
       .pipe(
         takeUntilDestroyed(this.destroy),
         finalize(() => {

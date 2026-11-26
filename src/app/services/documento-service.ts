@@ -10,6 +10,11 @@ import {
   ProcessingStatus,
   EmbeddingGenerationResponse,
 } from '../models/documento';
+import {
+  SEARCH_TOP_K_DEFAULT,
+  SemanticSearchRequest,
+  SemanticSearchResult,
+} from '../models/semantic-search';
 
 @Injectable({ providedIn: 'root' })
 export class DocumentoService {
@@ -81,6 +86,21 @@ export class DocumentoService {
     return this.http.post<EmbeddingGenerationResponse>(`${this.documents}/${id}/embeddings`, null, {
       params,
     });
+  }
+
+  /**
+   * HU-101 (TA-02): búsqueda semántica dentro de un documento propio con
+   * POST /api/documents/{id}/search. Devuelve los fragmentos de más a menos relevante.
+   */
+  semanticSearch(
+    id: number,
+    query: string,
+    topK = SEARCH_TOP_K_DEFAULT,
+  ): Observable<SemanticSearchResult[]> {
+    const body: SemanticSearchRequest = { query: query.trim(), topK };
+    return this.http
+      .post<SemanticSearchResult[]>(`${this.documents}/${id}/search`, body)
+      .pipe(map((rows) => [...(rows ?? [])].sort((a, b) => a.distance - b.distance)));
   }
 
   text(id: number): Observable<DocumentTextResponse> {
