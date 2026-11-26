@@ -33,11 +33,6 @@ export interface DocumentResponse {
   hasExtractedText: boolean;
 }
 
-/** HU-67/HU-140: DocumentoPendienteResponseDTO, que es el documento más el título de su expediente. */
-export interface PendingDocumentResponse extends DocumentResponse {
-  caseTitle: string | null;
-}
-
 /** Etapas calculadas por DocumentoPreparationServiceImpl.readState */
 export type PreparationStage =
   | 'PROCESSING'

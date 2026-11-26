@@ -140,12 +140,8 @@
                       {{ 'common.viewDetail' | t }}</button
                     ><button (click)="openChunks(doc)" [disabled]="busy">
                       {{ 'docs.chunks' | t }}</button
-                    ><button
-                      (click)="download(doc)"
-                      [disabled]="busy"
-                      [attr.aria-busy]="isDownloading(doc)"
-                    >
-                      {{ (isDownloading(doc) ? 'docs.downloading' : 'docs.download') | t }}</button
+                    ><button (click)="download(doc)" [disabled]="busy">
+                      {{ 'docs.download' | t }}</button
                     ><button class="danger" (click)="confirmRemove(doc)" [disabled]="busy">
                       {{ 'common.delete' | t }}
                     </button>
@@ -250,14 +246,7 @@
             <p class="notice error" role="alert">{{ error }}</p>
           }
           @if (busy) {
-            @if (uploadProgress !== null && uploadProgress < 100) {
-              <div class="upload-progress" role="status" aria-live="polite">
-                <progress max="100" [value]="uploadProgress"></progress>
-                <span>{{ 'docs.uploadProgress' | t: { percent: uploadProgress } }}</span>
-              </div>
-            } @else {
-              <p role="status">{{ 'docs.uploading' | t }}</p>
-            }
+            <p role="status">{{ 'docs.uploading' | t }}</p>
           }
           <div class="actions">
             <button type="button" (click)="close()">{{ 'common.cancel' | t }}</button
@@ -458,9 +447,7 @@
             {{ 'docs.viewChunks' | t: { count: preparation.chunks } }}
           </button>
         }
-        <button [disabled]="busy" [attr.aria-busy]="isDownloading(doc)" (click)="download(doc)">
-          {{ (isDownloading(doc) ? 'docs.downloading' : 'docs.downloadPdf') | t }}
-        </button>
+        <button [disabled]="busy" (click)="download(doc)">{{ 'docs.downloadPdf' | t }}</button>
       </div>
     </section>
   </div>

@@ -46,27 +46,14 @@ describe('ExpedienteService', () => {
   });
 
   it('envía solo los filtros informados (status, openedFrom, openedTo)', () => {
-    service.list({ status: 'CLOSED', openedFrom: '2026-01-01', openedTo: null }).subscribe();
+    service
+      .list({ status: 'CLOSED', openedFrom: '2026-01-01', openedTo: null })
+      .subscribe();
     const req = http.expectOne((r) => r.url === '/api/cases');
     expect(req.request.params.get('status')).toBe('CLOSED');
     expect(req.request.params.get('openedFrom')).toBe('2026-01-01');
     expect(req.request.params.has('openedTo')).toBe(false);
     req.flush([]);
-  });
-
-  it('HU-139 TA-01: listByStatusAndDate consulta por estado y rango de apertura', () => {
-    let rows: CaseResponse[] = [];
-    service.listByStatusAndDate('OPEN', '2026-01-01', '2026-06-30').subscribe((r) => (rows = r));
-    const req = http.expectOne((r) => r.url === '/api/cases');
-    expect(req.request.method).toBe('GET');
-    expect(req.request.params.get('status')).toBe('OPEN');
-    expect(req.request.params.get('openedFrom')).toBe('2026-01-01');
-    expect(req.request.params.get('openedTo')).toBe('2026-06-30');
-    req.flush([legalCase]);
-    expect(rows).toEqual([legalCase]);
-
-    service.listByStatusAndDate(null, null, null).subscribe();
-    expect(http.expectOne('/api/cases').request.params.keys()).toEqual([]);
   });
 
   it('obtiene, crea, actualiza y elimina con los verbos y cuerpos del contrato', () => {

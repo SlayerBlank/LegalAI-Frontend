@@ -90,7 +90,6 @@ export const EN: Record<keyof typeof ES, string> = {
   'docs.colActions': 'Actions',
   'docs.chunks': 'Chunks',
   'docs.download': 'Download',
-  'docs.downloading': 'Downloading...',
   'docs.emptyCase': 'This case has no documents yet. Upload the first PDF.',
   'docs.emptySearch': 'No documents found. Try another search.',
   'docs.uploadTitle': 'Upload document',
@@ -100,7 +99,6 @@ export const EN: Record<keyof typeof ES, string> = {
   'docs.uploadHint':
     'Max 10 MB. After uploading, the server extracts the text, splits it into chunks and generates the AI embeddings. It may take a few seconds.',
   'docs.uploading': 'Uploading and preparing the document...',
-  'docs.uploadProgress': 'Uploading file: {percent}%',
   'docs.uploadSubmit': 'Upload document',
   'docs.dropHint': 'Drag your PDF here or click to choose it',
   'docs.detailTitle': 'Document details',

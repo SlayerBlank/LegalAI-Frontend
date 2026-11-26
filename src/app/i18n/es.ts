@@ -90,7 +90,6 @@ export const ES = {
   'docs.colActions': 'Acciones',
   'docs.chunks': 'Fragmentos',
   'docs.download': 'Descargar',
-  'docs.downloading': 'Descargando...',
   'docs.emptyCase': 'Este expediente aún no tiene documentos. Sube el primer PDF.',
   'docs.emptySearch': 'No se encontraron documentos. Prueba con otra búsqueda.',
   'docs.uploadTitle': 'Subir documento',
@@ -100,7 +99,6 @@ export const ES = {
   'docs.uploadHint':
     'Máximo 10 MB. Después de subirlo, el servidor extrae el texto, lo divide en fragmentos y genera los embeddings para la IA. Puede tardar unos segundos.',
   'docs.uploading': 'Subiendo y preparando el documento...',
-  'docs.uploadProgress': 'Subiendo archivo: {percent}%',
   'docs.uploadSubmit': 'Subir documento',
   'docs.dropHint': 'Arrastra tu PDF aquí o haz clic para elegirlo',
   'docs.detailTitle': 'Detalle del documento',
