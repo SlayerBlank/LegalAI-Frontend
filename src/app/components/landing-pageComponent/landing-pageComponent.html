@@ -1,4 +1,4 @@
-﻿<a class="skip-link" href="#contenido">Saltar al contenido</a>
+﻿<a class="skip-link" href="#contenido">{{ 'public.skipContent' | t }}</a>
 <svg class="icon-definitions" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
   <defs>
     <symbol id="landing-clients" viewBox="0 0 24 24">
@@ -23,19 +23,19 @@
 </svg>
 <header class="public-header">
   <div class="nav-shell">
-    <a class="brand" routerLink="/landing" aria-label="LegalAI, inicio"
+    <a class="brand" routerLink="/landing" [attr.aria-label]="'public.brandLabel' | t"
       ><span class="brand-mark" aria-hidden="true">a</span>LegalAI</a
     >
-    <nav class="section-nav" aria-label="Navegación principal">
-      <a href="#plataforma">Plataforma</a
-      ><a href="#inteligencia-artificial">Inteligencia artificial</a
-      ><a href="#confianza">Confianza</a>
+    <nav class="section-nav" [attr.aria-label]="'sidebar.mainNav' | t">
+      <a href="#plataforma">{{ 'landing.navPlatform' | t }}</a
+      ><a href="#inteligencia-artificial">{{ 'landing.navAi' | t }}</a
+      ><a href="#confianza">{{ 'landing.navTrust' | t }}</a>
     </nav>
     <div class="header-actions">
       <app-language-switcher />
       <app-region-switcher />
       <app-music-toggle />
-      <div class="theme-switch" role="group" aria-label="Apariencia">
+      <div class="theme-switch" role="group" [attr.aria-label]="'public.appearance' | t">
         @for (option of themes; track option.value) {
           <button
             type="button"
@@ -43,13 +43,13 @@
             [attr.aria-pressed]="theme.preference() === option.value"
             (click)="theme.setPreference(option.value)"
           >
-            {{ option.label }}
+            {{ option.labelKey | t }}
           </button>
         }
       </div>
-      <a class="login-link" routerLink="/usuarios/login">Iniciar sesión</a
+      <a class="login-link" routerLink="/usuarios/login">{{ 'public.login' | t }}</a
       ><a class="button primary header-signup" routerLink="/usuarios/registrar"
-        >Crear cuenta <span aria-hidden="true">→</span></a
+        >{{ 'landing.signup' | t }} <span aria-hidden="true">→</span></a
       >
     </div>
     <button
@@ -59,127 +59,132 @@
       aria-controls="mobile-navigation"
       (click)="menuOpen = !menuOpen"
     >
-      {{ menuOpen ? 'Cerrar' : 'Menú' }} <span aria-hidden="true">{{ menuOpen ? '×' : '☰' }}</span>
+      {{ (menuOpen ? 'landing.menuClose' : 'landing.menu') | t }}
+      <span aria-hidden="true">{{ menuOpen ? '×' : '☰' }}</span>
     </button>
   </div>
   @if (menuOpen) {
-    <nav id="mobile-navigation" class="mobile-navigation" aria-label="Navegación móvil">
-      <a href="#plataforma" (click)="closeMenu()">Plataforma</a
-      ><a href="#inteligencia-artificial" (click)="closeMenu()">Inteligencia artificial</a
-      ><a href="#confianza" (click)="closeMenu()">Confianza</a
-      ><a routerLink="/usuarios/login" (click)="closeMenu()">Iniciar sesión</a
-      ><a routerLink="/usuarios/registrar" (click)="closeMenu()">Crear cuenta →</a>
+    <nav
+      id="mobile-navigation"
+      class="mobile-navigation"
+      [attr.aria-label]="'landing.mobileNav' | t"
+    >
+      <a href="#plataforma" (click)="closeMenu()">{{ 'landing.navPlatform' | t }}</a
+      ><a href="#inteligencia-artificial" (click)="closeMenu()">{{ 'landing.navAi' | t }}</a
+      ><a href="#confianza" (click)="closeMenu()">{{ 'landing.navTrust' | t }}</a
+      ><a routerLink="/usuarios/login" (click)="closeMenu()">{{ 'public.login' | t }}</a
+      ><a routerLink="/usuarios/registrar" (click)="closeMenu()">{{ 'landing.signup' | t }} →</a>
     </nav>
   }
 </header>
 <main id="contenido">
   <div class="page-context container">
     <span
-      >/landing · {{ theme.theme() === 'dark' ? 'Oscuro' : 'Claro' }}
-      <span class="context-divider">/</span> Acceso público</span
-    ><span>Tu tema se guarda · Sin elección, se usa el del sistema</span>
+      >/landing · {{ (theme.theme() === 'dark' ? 'public.themeDark' : 'public.themeLight') | t }}
+      <span class="context-divider">/</span> {{ 'public.publicAccess' | t }}</span
+    ><span>{{ 'landing.themeNote' | t }}</span>
   </div>
   <section class="hero container" aria-labelledby="hero-title">
-    <span class="eyebrow hero-tag">GESTIÓN JURÍDICA · ASISTENCIA IA</span>
-    <h1 id="hero-title">Más claridad para ejercer.<br />Más tiempo para lo esencial.</h1>
-    <p class="hero-description">
-      Clientes, expedientes y documentos en un mismo lugar.<br />Una inteligencia artificial que te
-      asiste, sin sustituir tu criterio.
-    </p>
+    <span class="eyebrow hero-tag">{{ 'landing.heroTag' | t }}</span>
+    <h1 id="hero-title">{{ 'landing.heroTitle1' | t }}<br />{{ 'landing.heroTitle2' | t }}</h1>
+    <p class="hero-description">{{ 'landing.heroText1' | t }}<br />{{ 'landing.heroText2' | t }}</p>
     <div class="button-row">
-      <a class="button primary" routerLink="/usuarios/registrar">Crear mi cuenta</a
+      <a class="button primary" routerLink="/usuarios/registrar">{{
+        'landing.createMyAccount' | t
+      }}</a
       ><a class="button secondary" href="#plataforma"
-        >Conocer la plataforma <span aria-hidden="true">↓</span></a
+        >{{ 'landing.discover' | t }} <span aria-hidden="true">↓</span></a
       >
     </div>
-    <p class="hero-note">Tu cuenta abre la puerta a tu espacio de trabajo.</p>
+    <p class="hero-note">{{ 'landing.heroNote' | t }}</p>
   </section>
-  <section
-    class="product-preview container"
-    aria-label="Vista de ejemplo de un expediente, sin datos reales"
-  >
+  <section class="product-preview container" [attr.aria-label]="'landing.previewLabel' | t">
     <div class="product-window">
-      <aside class="preview-sidebar" aria-label="Menú ilustrativo del producto">
+      <aside class="preview-sidebar" [attr.aria-label]="'landing.previewMenu' | t">
         <span class="brand preview-brand"
           ><span class="brand-mark" aria-hidden="true">a</span>LegalAI</span
         >
         <ul>
-          <li>Resumen</li>
-          <li>Clientes</li>
-          <li class="preview-current">Expedientes</li>
-          <li>Documentos</li>
-          <li>◇ Chat IA</li>
+          <li>{{ 'nav.summary' | t }}</li>
+          <li>{{ 'nav.clients' | t }}</li>
+          <li class="preview-current">{{ 'nav.cases' | t }}</li>
+          <li>{{ 'nav.documents' | t }}</li>
+          <li>◇ {{ 'nav.chat' | t }}</li>
         </ul>
       </aside>
       <div class="preview-content">
         <div class="preview-topline">
-          <span class="eyebrow">EXPEDIENTES / EXP-2026-042</span><span class="pill">En curso</span>
+          <span class="eyebrow">{{ 'landing.previewPath' | t }} / EXP-2026-042</span
+          ><span class="pill">{{ 'landing.previewStatus' | t }}</span>
         </div>
-        <h2>Un expediente. Toda la perspectiva.</h2>
-        <p class="preview-subtitle">Martínez · Reclamación contractual</p>
+        <h2>{{ 'landing.previewTitle' | t }}</h2>
+        <p class="preview-subtitle">{{ 'landing.previewSubtitle' | t }}</p>
         <div class="preview-columns">
           <ul class="document-list">
-            <li><span aria-hidden="true">↗</span> Contrato de servicios.pdf</li>
-            <li><span aria-hidden="true">↗</span> Demanda inicial.docx</li>
-            <li><span aria-hidden="true">↗</span> Anexo de comunicaciones.pdf</li>
+            <li><span aria-hidden="true">↗</span> {{ 'landing.previewDoc1' | t }}</li>
+            <li><span aria-hidden="true">↗</span> {{ 'landing.previewDoc2' | t }}</li>
+            <li><span aria-hidden="true">↗</span> {{ 'landing.previewDoc3' | t }}</li>
           </ul>
           <aside class="insight">
             <h3>
-              <svg class="icon" aria-hidden="true"><use href="#landing-sparkle" /></svg>Lo
-              relevante, a la vista
+              <svg class="icon" aria-hidden="true"><use href="#landing-sparkle" /></svg
+              >{{ 'landing.insightTitle' | t }}
             </h3>
-            <p>El contrato establece un plazo de 30 días para subsanar el incumplimiento.</p>
-            <small>Fuente: Contrato, p. 4 · Revisar propuesta.</small>
+            <p>{{ 'landing.insightText' | t }}</p>
+            <small>{{ 'landing.insightSource' | t }}</small>
           </aside>
         </div>
       </div>
     </div>
     <ol class="preview-caption">
-      <li><span>01</span> Un contexto compartido</li>
-      <li><span>02</span> Documentación conectada</li>
-      <li><span>03</span> Decisiones bajo tu control</li>
+      <li><span>01</span> {{ 'landing.caption1' | t }}</li>
+      <li><span>02</span> {{ 'landing.caption2' | t }}</li>
+      <li><span>03</span> {{ 'landing.caption3' | t }}</li>
     </ol>
   </section>
   <section id="plataforma" class="platform section-surface" aria-labelledby="platform-title">
     <div class="container platform-intro">
       <div>
-        <p class="eyebrow">01 / EL DESPACHO, EN ORDEN</p>
-        <h2 id="platform-title">Menos piezas sueltas.<br />Más visión de conjunto.</h2>
+        <p class="eyebrow">{{ 'landing.platformEyebrow' | t }}</p>
+        <h2 id="platform-title">
+          {{ 'landing.platformTitle1' | t }}<br />{{ 'landing.platformTitle2' | t }}
+        </h2>
       </div>
       <div class="platform-description">
-        <p>
-          Cada asunto tiene su historia. LegalAI conecta las personas, los documentos y las tareas
-          que necesitas para entenderla.
-        </p>
-        <p>De la primera consulta al cierre del expediente, sin perder el hilo.</p>
+        <p>{{ 'landing.platformText1' | t }}</p>
+        <p>{{ 'landing.platformText2' | t }}</p>
       </div>
     </div>
     <div class="platform-features">
       <div class="container">
         <div class="section-heading">
-          <h2>Una base sólida para cada asunto.</h2>
-          <span class="eyebrow">GESTIÓN CENTRALIZADA</span>
+          <h2>{{ 'landing.featuresTitle' | t }}</h2>
+          <span class="eyebrow">{{ 'landing.featuresEyebrow' | t }}</span>
         </div>
         <div class="feature-grid">
           <article class="feature-card">
             <svg class="icon" aria-hidden="true"><use href="#landing-clients" /></svg>
-            <h3>Clientes con contexto</h3>
-            <p>
-              Datos de contacto, asuntos vinculados y una historia de relación siempre accesible.
-            </p>
-            <a href="#proceso">Directorio y búsqueda <span aria-hidden="true">↗</span></a>
+            <h3>{{ 'landing.feature1Title' | t }}</h3>
+            <p>{{ 'landing.feature1Text' | t }}</p>
+            <a href="#proceso"
+              >{{ 'landing.feature1Link' | t }} <span aria-hidden="true">↗</span></a
+            >
           </article>
           <article class="feature-card">
             <svg class="icon" aria-hidden="true"><use href="#landing-case" /></svg>
-            <h3>Expedientes en movimiento</h3>
-            <p>Estados, responsables y próximos pasos para saber qué necesita tu atención.</p>
-            <a href="#proceso">Seguimiento del asunto <span aria-hidden="true">↗</span></a>
+            <h3>{{ 'landing.feature2Title' | t }}</h3>
+            <p>{{ 'landing.feature2Text' | t }}</p>
+            <a href="#proceso"
+              >{{ 'landing.feature2Link' | t }} <span aria-hidden="true">↗</span></a
+            >
           </article>
           <article class="feature-card">
             <svg class="icon" aria-hidden="true"><use href="#landing-documents" /></svg>
-            <h3>Documentos localizables</h3>
-            <p>Una biblioteca con versiones, metadatos y vínculos al expediente correspondiente.</p>
-            <a href="#proceso">Biblioteca compartida <span aria-hidden="true">↗</span></a>
+            <h3>{{ 'landing.feature3Title' | t }}</h3>
+            <p>{{ 'landing.feature3Text' | t }}</p>
+            <a href="#proceso"
+              >{{ 'landing.feature3Link' | t }} <span aria-hidden="true">↗</span></a
+            >
           </article>
         </div>
       </div>
@@ -192,55 +197,50 @@
   >
     <div class="container ai-grid">
       <div class="ai-intro">
-        <p class="eyebrow">02 / INTELIGENCIA QUE ACOMPAÑA</p>
+        <p class="eyebrow">{{ 'landing.aiEyebrow' | t }}</p>
         <h2 id="ai-title">
-          Un punto de partida.<br />Nunca la última<br class="desktop-break" />
-          palabra.
+          {{ 'landing.aiTitle1' | t }}<br />{{ 'landing.aiTitle2' | t }}<br class="desktop-break" />
+          {{ 'landing.aiTitle3' | t }}
         </h2>
-        <p>
-          Consulta tus documentos, prepara borradores, extrae síntesis y organiza citaciones. Recibe
-          propuestas que puedes contrastar, editar y hacer tuyas.
-        </p>
+        <p>{{ 'landing.aiText' | t }}</p>
         <a class="button primary" href="#proceso"
-          >Explorar la asistencia IA <span aria-hidden="true">→</span></a
+          >{{ 'home.aiExplore' | t }} <span aria-hidden="true">→</span></a
         >
       </div>
-      <article class="ai-example" aria-label="Ejemplo ilustrativo de resumen IA">
+      <article class="ai-example" [attr.aria-label]="'landing.aiExampleLabel' | t">
         <div class="pills">
-          <span class="pill">◇ Resumen IA</span><span class="pill">Pendiente de revisión</span>
+          <span class="pill">◇ {{ 'landing.aiExamplePill' | t }}</span
+          ><span class="pill">{{ 'landing.aiExamplePending' | t }}</span>
         </div>
-        <h3>Contrato de servicios</h3>
-        <p class="example-meta">Síntesis · EXP-2026-042 · 12 páginas</p>
+        <h3>{{ 'landing.aiExampleTitle' | t }}</h3>
+        <p class="example-meta">{{ 'landing.aiExampleMeta' | t }}</p>
         <ul>
-          <li>Objeto: prestación de servicios de consultoría.</li>
-          <li>Plazo: 12 meses desde la firma.</li>
-          <li>Revisar: condiciones de resolución anticipada.</li>
+          <li>{{ 'landing.aiExample1' | t }}</li>
+          <li>{{ 'landing.aiExample2' | t }}</li>
+          <li>{{ 'landing.aiExample3' | t }}</li>
         </ul>
-        <p class="example-disclaimer">
-          Verifica cada conclusión en el documento original. La propuesta no constituye
-          asesoramiento jurídico.
-        </p>
+        <p class="example-disclaimer">{{ 'landing.aiExampleDisclaimer' | t }}</p>
       </article>
     </div>
   </section>
   <section id="proceso" class="workflow container" aria-labelledby="workflow-title">
-    <p class="eyebrow">03 / DE LA INFORMACIÓN A LA ACCIÓN</p>
-    <h2 id="workflow-title">Tu forma de trabajar. Mejor conectada.</h2>
+    <p class="eyebrow">{{ 'landing.workflowEyebrow' | t }}</p>
+    <h2 id="workflow-title">{{ 'landing.workflowTitle' | t }}</h2>
     <ol class="workflow-grid">
       <li>
         <span class="step-number">01</span>
-        <h3>Reúne el contexto</h3>
-        <p>Vincula al cliente, abre el expediente y organiza sus documentos.</p>
+        <h3>{{ 'landing.step1Title' | t }}</h3>
+        <p>{{ 'landing.step1Text' | t }}</p>
       </li>
       <li>
         <span class="step-number">02</span>
-        <h3>Construye una propuesta</h3>
-        <p>Consulta la documentación y prepara un primer borrador con apoyo de IA.</p>
+        <h3>{{ 'landing.step2Title' | t }}</h3>
+        <p>{{ 'landing.step2Text' | t }}</p>
       </li>
       <li>
         <span class="step-number">03</span>
-        <h3>Revisa y avanza</h3>
-        <p>Contrasta las fuentes, incorpora tu criterio y da el siguiente paso.</p>
+        <h3>{{ 'landing.step3Title' | t }}</h3>
+        <p>{{ 'landing.step3Text' | t }}</p>
       </li>
     </ol>
   </section>
@@ -249,27 +249,29 @@
       <img
         class="office-image"
         src="images/legalai-office.png?v=2"
-        alt="Sala de reuniones con biblioteca jurídica, mesa de madera y luz natural"
+        [alt]="'landing.officeAlt' | t"
         width="960"
         height="720"
         loading="lazy"
         decoding="async"
       />
       <div>
-        <p class="eyebrow">04 / CONFIANZA POR DISEÑO</p>
-        <h2 id="trust-title">La información importa.<br />Quién accede, también.</h2>
+        <p class="eyebrow">{{ 'landing.trustEyebrow' | t }}</p>
+        <h2 id="trust-title">
+          {{ 'landing.trustTitle1' | t }}<br />{{ 'landing.trustTitle2' | t }}
+        </h2>
         <dl class="trust-points">
           <div>
-            <dt>Acceso con sesión</dt>
-            <dd>Un espacio privado para el trabajo de tu equipo.</dd>
+            <dt>{{ 'landing.trust1Title' | t }}</dt>
+            <dd>{{ 'landing.trust1Text' | t }}</dd>
           </div>
           <div>
-            <dt>Roles y permisos</dt>
-            <dd>Distingue responsabilidades y gestiona el acceso de los usuarios.</dd>
+            <dt>{{ 'landing.trust2Title' | t }}</dt>
+            <dd>{{ 'landing.trust2Text' | t }}</dd>
           </div>
           <div>
-            <dt>Trazabilidad</dt>
-            <dd>Consulta el registro de acciones para seguir la actividad del despacho.</dd>
+            <dt>{{ 'landing.trust3Title' | t }}</dt>
+            <dd>{{ 'landing.trust3Text' | t }}</dd>
           </div>
         </dl>
       </div>
@@ -277,49 +279,39 @@
   </section>
   <section class="faq container" aria-labelledby="faq-title">
     <div>
-      <p class="eyebrow">05 / ANTES DE EMPEZAR</p>
-      <h2 id="faq-title">Respuestas claras.<br />Desde el principio.</h2>
-      <p>Lo esencial sobre tu cuenta y la asistencia jurídica con IA.</p>
+      <p class="eyebrow">{{ 'landing.faqEyebrow' | t }}</p>
+      <h2 id="faq-title">{{ 'landing.faqTitle1' | t }}<br />{{ 'landing.faqTitle2' | t }}</h2>
+      <p>{{ 'landing.faqIntro' | t }}</p>
     </div>
     <div class="faq-list">
       <article>
-        <h3>¿La IA sustituye la revisión profesional?</h3>
-        <p>
-          No. Sus resultados son propuestas. Debes revisar el contenido y contrastar las fuentes
-          antes de utilizarlo.
-        </p>
+        <h3>{{ 'landing.faq1Q' | t }}</h3>
+        <p>{{ 'landing.faq1A' | t }}</p>
       </article>
       <article>
-        <h3>¿Qué ocurre al crear mi cuenta?</h3>
-        <p>
-          Accedes al Dashboard. Los permisos de los usuarios se gestionan desde la administración,
-          no en el registro.
-        </p>
+        <h3>{{ 'landing.faq2Q' | t }}</h3>
+        <p>{{ 'landing.faq2A' | t }}</p>
       </article>
       <article>
-        <h3>¿Puedo cambiar la apariencia?</h3>
-        <p>
-          Sí. Elige Claro, Oscuro o Sistema. Tu preferencia se conserva; sin una elección, se aplica
-          la del sistema.
-        </p>
+        <h3>{{ 'landing.faq3Q' | t }}</h3>
+        <p>{{ 'landing.faq3A' | t }}</p>
       </article>
       <article>
-        <h3>¿Clientes y usuarios son lo mismo?</h3>
-        <p>
-          No. Los clientes son personas o entidades del despacho. Los usuarios son quienes acceden a
-          la plataforma.
-        </p>
+        <h3>{{ 'landing.faq4Q' | t }}</h3>
+        <p>{{ 'landing.faq4A' | t }}</p>
       </article>
     </div>
   </section>
   <section class="closing-cta section-accent" aria-labelledby="cta-title">
     <div class="container">
-      <h2 id="cta-title">El siguiente paso de tu despacho,<br />con una perspectiva más clara.</h2>
-      <p>Empieza por lo esencial: un espacio para todo tu trabajo jurídico.</p>
+      <h2 id="cta-title">{{ 'landing.ctaTitle1' | t }}<br />{{ 'landing.ctaTitle2' | t }}</h2>
+      <p>{{ 'landing.ctaText' | t }}</p>
       <div class="button-row">
         <a class="button primary" routerLink="/usuarios/registrar"
-          >Crear cuenta <span aria-hidden="true">→</span></a
-        ><a class="button secondary" routerLink="/usuarios/login">Ya tengo cuenta</a>
+          >{{ 'landing.signup' | t }} <span aria-hidden="true">→</span></a
+        ><a class="button secondary" routerLink="/usuarios/login">{{
+          'landing.haveAccount' | t
+        }}</a>
       </div>
     </div>
   </section>
@@ -327,25 +319,30 @@
 <footer class="public-footer section-surface">
   <div class="container">
     <div class="footer-top">
-      <a class="brand" routerLink="/landing" aria-label="LegalAI, inicio"
+      <a class="brand" routerLink="/landing" [attr.aria-label]="'public.brandLabel' | t"
         ><span class="brand-mark" aria-hidden="true">a</span>LegalAI</a
       >
-      <nav aria-label="Navegación del pie">
-        <a href="#plataforma">Plataforma</a
-        ><a href="#inteligencia-artificial">Inteligencia artificial</a
-        ><a href="#confianza">Confianza</a><a routerLink="/usuarios/login">Iniciar sesión</a>
+      <nav [attr.aria-label]="'landing.footerNav' | t">
+        <a href="#plataforma">{{ 'landing.navPlatform' | t }}</a
+        ><a href="#inteligencia-artificial">{{ 'landing.navAi' | t }}</a
+        ><a href="#confianza">{{ 'landing.navTrust' | t }}</a
+        ><a routerLink="/usuarios/login">{{ 'public.login' | t }}</a>
       </nav>
     </div>
     <div class="footer-bottom">
-      <p>© 2026 LegalAI · Gestión jurídica con criterio.</p>
-      <ul aria-label="Información pendiente">
-        <li>Privacidad <span class="sr-only">(pendiente)</span></li>
-        <li>Condiciones <span class="sr-only">(pendiente)</span></li>
-        <li>Contacto <span class="sr-only">(pendiente)</span></li>
+      <p>{{ 'notFound.footer' | t }}</p>
+      <ul [attr.aria-label]="'landing.pendingInfo' | t">
+        <li>
+          {{ 'public.privacy' | t }} <span class="sr-only">{{ 'landing.pending' | t }}</span>
+        </li>
+        <li>
+          {{ 'public.terms' | t }} <span class="sr-only">{{ 'landing.pending' | t }}</span>
+        </li>
+        <li>
+          {{ 'landing.contact' | t }} <span class="sr-only">{{ 'landing.pending' | t }}</span>
+        </li>
       </ul>
     </div>
-    <p class="footer-pending">
-      Información de privacidad, condiciones y contacto pendiente de publicación.
-    </p>
+    <p class="footer-pending">{{ 'landing.footerPending' | t }}</p>
   </div>
 </footer>
