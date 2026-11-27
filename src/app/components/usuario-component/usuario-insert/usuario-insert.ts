@@ -10,6 +10,8 @@ import { Router, RouterLink } from '@angular/router';
 import { LoginService } from '../../../services/login-service';
 import { ThemeService } from '../../../services/theme-service';
 import { NavigationHistoryService } from '../../../services/navigation-history.service';
+import { I18N_PIPES } from '../../../shared/i18n/i18n.pipes';
+import { I18nService } from '../../../services/i18n.service';
 import { PublicAuthFrame } from '../../../shared/public-auth/public-auth-frame';
 import { RegisterRequest } from '../../../models/request/register-request';
 
@@ -24,7 +26,7 @@ function maxUtf8Bytes(control: AbstractControl): ValidationErrors | null {
 
 @Component({
   selector: 'app-usuario-insert',
-  imports: [ReactiveFormsModule, RouterLink, PublicAuthFrame],
+  imports: [ReactiveFormsModule, RouterLink, PublicAuthFrame, ...I18N_PIPES],
   templateUrl: './usuario-insert.html',
   styleUrls: ['../../../shared/public-auth/public-form.css', './usuario-insert.css'],
 })
@@ -47,6 +49,7 @@ export class UsuarioInsertComponent {
     { validators: matching },
   );
   private readonly cd = inject(ChangeDetectorRef);
+  private readonly i18n = inject(I18nService);
   get passwordBytes(): number {
     return new TextEncoder().encode(this.form.controls.password.value).length;
   }
@@ -77,7 +80,7 @@ export class UsuarioInsertComponent {
         this.loading = false;
         this.message = this.loginService.errorMessage(
           error,
-          'No fue posible completar el registro.',
+          this.i18n.t('register.errorFallback'),
         );
         this.cd.markForCheck();
       },

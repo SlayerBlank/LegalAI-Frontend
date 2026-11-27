@@ -6,10 +6,12 @@ import { ThemeService } from '../../../services/theme-service';
 import { NavigationHistoryService } from '../../../services/navigation-history.service';
 import { PublicAuthFrame } from '../../../shared/public-auth/public-auth-frame';
 import { LoginRequest } from '../../../models/request/login-request';
+import { I18N_PIPES } from '../../../shared/i18n/i18n.pipes';
+import { I18nService } from '../../../services/i18n.service';
 
 @Component({
   selector: 'app-usuario-login',
-  imports: [ReactiveFormsModule, RouterLink, PublicAuthFrame],
+  imports: [ReactiveFormsModule, RouterLink, PublicAuthFrame, ...I18N_PIPES],
   templateUrl: './usuario-login.html',
   styleUrls: ['../../../shared/public-auth/public-form.css', './usuario-login.css'],
 })
@@ -25,6 +27,7 @@ export class UsuarioLoginComponent {
   });
   private readonly cd = inject(ChangeDetectorRef);
   private readonly route = inject(ActivatedRoute);
+  private readonly i18n = inject(I18nService);
   get passwordBytes(): number {
     return new TextEncoder().encode(this.form.controls.password.value).length;
   }
@@ -51,7 +54,10 @@ export class UsuarioLoginComponent {
       },
       error: (error: unknown) => {
         this.loading = false;
-        this.message = this.loginService.errorMessage(error, 'No fue posible iniciar sesión.');
+        this.message = this.loginService.errorMessage(
+          error,
+          this.i18n.t('login.errorFallback'),
+        );
         this.cd.markForCheck();
       },
     });

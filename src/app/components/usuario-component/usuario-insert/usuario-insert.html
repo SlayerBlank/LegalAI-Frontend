@@ -3,25 +3,25 @@
     <button
       class="history-back"
       type="button"
-      aria-label="Volver a la página anterior"
+      [attr.aria-label]="'auth.backLabel' | t"
       (click)="goBack()"
     >
-      ← Volver
+      {{ 'auth.back' | t }}
     </button>
-    <p class="form-eyebrow">EMPIEZA CON LO ESENCIAL</p>
-    <h1 class="form-title">Crea tu cuenta.</h1>
-    <p class="form-intro">Tu espacio de trabajo jurídico empieza aquí.</p>
+    <p class="form-eyebrow">{{ 'register.eyebrow' | t }}</p>
+    <h1 class="form-title">{{ 'register.title' | t }}</h1>
+    <p class="form-intro">{{ 'register.intro' | t }}</p>
   </div>
   <form
     [formGroup]="form"
     (ngSubmit)="submit()"
     [attr.aria-busy]="loading"
-    aria-label="Crear cuenta"
+    [attr.aria-label]="'register.formLabel' | t"
     novalidate
   >
     <fieldset [disabled]="loading">
       <div class="field">
-        <label for="register-name">Nombre completo</label
+        <label for="register-name">{{ 'register.fullName' | t }}</label
         ><input
           id="register-name"
           formControlName="fullName"
@@ -33,12 +33,12 @@
         />
         @if (form.controls.fullName.touched && form.controls.fullName.invalid) {
           <p id="register-name-note" class="field-error">
-            El nombre es obligatorio y admite hasta 150 caracteres.
+            {{ 'register.nameError' | t }}
           </p>
         }
       </div>
       <div class="field">
-        <label for="register-email">Email</label
+        <label for="register-email">{{ 'auth.email' | t }}</label
         ><input
           id="register-email"
           type="email"
@@ -53,14 +53,14 @@
         />
         @if (form.controls.email.touched && form.controls.email.invalid) {
           <p id="register-email-note" class="field-error">
-            Introduce un correo válido de hasta 150 caracteres.
+            {{ 'register.emailError' | t }}
           </p>
         } @else if (form.controls.email.valid) {
-          <p id="register-email-note" class="field-note">✓ Formato de email válido</p>
+          <p id="register-email-note" class="field-note">{{ 'auth.emailValid' | t }}</p>
         }
       </div>
       <div class="field">
-        <label for="register-password">Contraseña</label>
+        <label for="register-password">{{ 'auth.password' | t }}</label>
         <div class="password-field">
           <input
             id="register-password"
@@ -73,7 +73,7 @@
           /><button
             class="password-toggle"
             type="button"
-            [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+            [attr.aria-label]="(showPassword ? 'auth.hidePassword' : 'auth.showPassword') | t"
             [attr.aria-pressed]="showPassword"
             aria-controls="register-password"
             (click)="showPassword = !showPassword"
@@ -88,25 +88,24 @@
           </button>
         </div>
         <p id="register-password-note" class="field-note">
-          {{ passwordBytes }} / 72 bytes UTF-8 · Mínimo 8 caracteres. Algunos caracteres ocupan
-          varios bytes.
+          {{ 'register.passwordNote' | t: { bytes: passwordBytes } }}
         </p>
         @if (form.controls.password.touched && form.controls.password.invalid) {
           <p id="register-password-error" class="field-error">
             @if (form.controls.password.hasError('required')) {
-              La contraseña es obligatoria.
+              {{ 'auth.passwordRequired' | t }}
             } @else if (form.controls.password.hasError('maxBytes')) {
-              La contraseña no puede superar 72 bytes UTF-8.
+              {{ 'register.passwordMaxBytes' | t }}
             } @else if (form.controls.password.hasError('minlength')) {
-              La contraseña debe tener al menos 8 caracteres.
+              {{ 'register.passwordMin' | t }}
             } @else {
-              La contraseña no puede superar 100 caracteres.
+              {{ 'register.passwordMax' | t }}
             }
           </p>
         }
       </div>
       <div class="field">
-        <label for="register-confirm">Confirmar contraseña</label>
+        <label for="register-confirm">{{ 'register.confirm' | t }}</label>
         <div class="password-field">
           <input
             id="register-confirm"
@@ -123,15 +122,13 @@
             class="password-toggle"
             type="button"
             [attr.aria-label]="
-              showConfirmPassword
-                ? 'Ocultar confirmación de contraseña'
-                : 'Mostrar confirmación de contraseña'
+              (showConfirmPassword ? 'register.hideConfirm' : 'register.showConfirm') | t
             "
             [attr.aria-pressed]="showConfirmPassword"
             aria-controls="register-confirm"
             (click)="showConfirmPassword = !showConfirmPassword"
           >
-            {{ showConfirmPassword ? 'Ocultar' : 'Mostrar' }}
+            {{ (showConfirmPassword ? 'register.hide' : 'register.show') | t }}
           </button>
         </div>
         @if (
@@ -140,15 +137,15 @@
         ) {
           <p id="register-confirm-note" class="field-error">
             @if (form.controls.confirmPassword.hasError('required')) {
-              Confirma tu contraseña.
+              {{ 'register.confirmRequired' | t }}
             } @else {
-              Las contraseñas no coinciden.
+              {{ 'register.mismatch' | t }}
             }
           </p>
         }
       </div>
       <p class="password-guidance">
-        No compartas tus credenciales. Tu contraseña no puede superar 72 bytes UTF-8.
+        {{ 'register.guidance' | t }}
       </p>
       <div
         class="status-panel"
@@ -158,31 +155,29 @@
         aria-atomic="true"
       >
         @if (loading) {
-          <strong>Creando tu cuenta…</strong>
-          <p>Estamos procesando tu solicitud.</p>
+          <strong>{{ 'register.loadingTitle' | t }}</strong>
+          <p>{{ 'register.loadingText' | t }}</p>
         } @else if (message) {
-          <strong>No se pudo crear la cuenta</strong>
+          <strong>{{ 'register.errorTitle' | t }}</strong>
           <p>{{ message }}</p>
         } @else if (form.valid) {
-          <strong>✓ Datos listos para continuar</strong>
-          <p>Al completar el registro, entrarás al Dashboard.</p>
+          <strong>{{ 'register.readyTitle' | t }}</strong>
+          <p>{{ 'register.readyText' | t }}</p>
         } @else {
-          <strong>Formulario incompleto</strong>
-          <p>Completa tus datos y confirma la contraseña para continuar.</p>
+          <strong>{{ 'auth.incompleteTitle' | t }}</strong>
+          <p>{{ 'register.incompleteText' | t }}</p>
         }
       </div>
       <button class="submit" type="submit" [disabled]="loading">
-        {{ loading ? 'Creando tu cuenta…' : 'Crear cuenta y entrar →' }}
+        {{ (loading ? 'register.loadingTitle' : 'register.submit') | t }}
       </button>
     </fieldset>
   </form>
   <p class="legal-copy">
-    Al crear tu cuenta, aceptas las Condiciones y confirmas que has leído la Política de
-    privacidad.<small
-      >Documentos legales pendientes de publicación y revisión antes del despliegue público.</small
-    >
+    {{ 'register.legal' | t }}<small>{{ 'register.legalPending' | t }}</small>
   </p>
   <p class="switch">
-    ¿Ya tienes cuenta? <a routerLink="/usuarios/login">Inicia sesión</a>
+    {{ 'register.haveAccount' | t }}
+    <a routerLink="/usuarios/login">{{ 'register.login' | t }}</a>
   </p></app-public-auth-frame
 >
