@@ -7,6 +7,7 @@ import { LoginRequest } from '../models/request/login-request';
 import { RegisterRequest } from '../models/request/register-request';
 import { AuthResponse } from '../models/response/auth-response';
 import { CurrentUserResponse } from '../models/response/current-user-response';
+import { translate } from './i18n.service';
 
 export type SessionState = 'initializing' | 'authenticated' | 'anonymous';
 
@@ -63,12 +64,12 @@ export class LoginService {
   errorMessage(error: unknown, fallback: string): string {
     const backendMessage = this.backendMessage(error);
     if (error instanceof HttpErrorResponse) {
-      if (error.status === 409) return `Conflicto (409): ${backendMessage ?? fallback}`;
-      if (error.status === 0) return 'No fue posible conectar con el servidor. Revisa que Spring Boot esté ejecutándose.';
-      if (error.status === 401) return backendMessage ?? 'Las credenciales no son válidas.';
-      if (error.status === 403) return backendMessage ?? 'No tienes permisos para realizar esta operación.';
-      if (error.status >= 500) return backendMessage ?? 'El servidor no pudo completar la operación.';
-      if (error.status === 400) return backendMessage ?? 'Revisa los datos enviados.';
+      if (error.status === 409) return translate('errors.conflict', { message: backendMessage ?? fallback });
+      if (error.status === 0) return translate('errors.serverDown');
+      if (error.status === 401) return backendMessage ?? translate('errors.badCredentials');
+      if (error.status === 403) return backendMessage ?? translate('errors.forbidden');
+      if (error.status >= 500) return backendMessage ?? translate('errors.500');
+      if (error.status === 400) return backendMessage ?? translate('errors.400');
     }
     if (error instanceof Error && error.message) return error.message;
     return backendMessage ?? fallback;

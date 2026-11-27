@@ -3,21 +3,16 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable, finalize } from 'rxjs';
 import { ManagementState } from './management-state';
+import { translate } from '../services/i18n.service';
 
 export function managementError(error: unknown): string {
-  if (!(error instanceof HttpErrorResponse)) return 'No se pudo completar la operación.';
-  if (error.status === 0) return 'No fue posible conectar con el servidor. Inténtalo de nuevo.';
-  const defaults: Record<number, string> = {
-    400: 'Revisa los datos enviados.',
-    401: 'La sesión no es válida. Inicia sesión de nuevo.',
-    403: 'No tienes autorización para esta operación.',
-    404: 'El recurso ya no está disponible.',
-    409: 'El recurso está en uso o existe un conflicto.',
-    500: 'El servidor no pudo completar la operación.',
-  };
-  const message =
-    typeof error.error?.message === 'string' ? error.error.message : defaults[error.status];
-  return `${error.status}: ${message || 'No se pudo completar la operación.'}`;
+  if (!(error instanceof HttpErrorResponse)) return translate('errors.generic');
+  if (error.status === 0) return translate('errors.network');
+  const known = [400, 401, 403, 404, 409, 500];
+  const fallback = known.includes(error.status) ? translate(`errors.${error.status}`) : '';
+  // El mensaje del backend tiene prioridad: lo escribe el servidor y no se traduce aquí.
+  const message = typeof error.error?.message === 'string' ? error.error.message : fallback;
+  return `${error.status}: ${message || translate('errors.generic')}`;
 }
 
 @Directive()

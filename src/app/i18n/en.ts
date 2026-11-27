@@ -1094,4 +1094,17 @@ export const EN: Record<keyof typeof ES, string> = {
   'cites.empty': 'There are no references for this answer or the filters returned no results.',
   'cites.hint': 'These are document chunks consulted by the RAG, not verified citations of laws or case law. relevanceScore equals 1 − cosine distance; it is not a confidence measure. The backend does not provide pages for this resource.',
   'cites.errSelect': 'Select a session and an assistant answer.',
+  // Mensajes de error comunes
+  'errors.generic': 'The operation could not be completed.',
+  'errors.network': 'Could not connect to the server. Please try again.',
+  'errors.400': 'Check the data you sent.',
+  'errors.401': 'The session is not valid. Please log in again.',
+  'errors.403': 'You are not authorized for this operation.',
+  'errors.404': 'The resource is no longer available.',
+  'errors.409': 'The resource is in use or there is a conflict.',
+  'errors.500': 'The server could not complete the operation.',
+  'errors.conflict': 'Conflict (409): {message}',
+  'errors.serverDown': 'Could not connect to the server. Check that Spring Boot is running.',
+  'errors.badCredentials': 'The credentials are not valid.',
+  'errors.forbidden': 'You don\'t have permission to perform this operation.',
 };

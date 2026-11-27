@@ -1100,4 +1100,17 @@ export const ES = {
   'cites.empty': 'No hay referencias para esta respuesta o los filtros no devolvieron resultados.',
   'cites.hint': 'Son fragmentos documentales consultados por el RAG, no citas verificadas de normas o jurisprudencia. relevanceScore equivale a 1 − distancia coseno; no es una medida de confianza. El backend no proporciona páginas en este recurso.',
   'cites.errSelect': 'Selecciona una sesión y una respuesta del asistente.',
+  // Mensajes de error comunes
+  'errors.generic': 'No se pudo completar la operación.',
+  'errors.network': 'No fue posible conectar con el servidor. Inténtalo de nuevo.',
+  'errors.400': 'Revisa los datos enviados.',
+  'errors.401': 'La sesión no es válida. Inicia sesión de nuevo.',
+  'errors.403': 'No tienes autorización para esta operación.',
+  'errors.404': 'El recurso ya no está disponible.',
+  'errors.409': 'El recurso está en uso o existe un conflicto.',
+  'errors.500': 'El servidor no pudo completar la operación.',
+  'errors.conflict': 'Conflicto (409): {message}',
+  'errors.serverDown': 'No fue posible conectar con el servidor. Revisa que Spring Boot esté ejecutándose.',
+  'errors.badCredentials': 'Las credenciales no son válidas.',
+  'errors.forbidden': 'No tienes permisos para realizar esta operación.',
 } as const;
