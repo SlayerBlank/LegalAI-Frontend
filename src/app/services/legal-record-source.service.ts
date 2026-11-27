@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { environment } from '../../environments/environment';
+import { API_BASE_URL } from '../core/http/api.config';
 
 export interface CaseOption {
   caseId: number;
@@ -16,7 +16,7 @@ export interface DocumentOption {
 @Injectable({ providedIn: 'root' })
 export class LegalRecordSourceService {
   private readonly http = inject(HttpClient);
-  private readonly api = environment.apiBaseUrl;
+  private readonly api = API_BASE_URL;
 
   cases() {
     return this.http.get<CaseOption[]>(`${this.api}/cases`);

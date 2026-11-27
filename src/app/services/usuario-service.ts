@@ -1,15 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { API_BASE_URL } from '../core/http/api.config';
 import { CurrentUserResponse } from '../models/response/current-user-response';
 import { UserResponse, UserUpdateRequest } from '../models/management';
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
   private readonly http = inject(HttpClient);
-  private readonly url = `${environment.apiBaseUrl}/users`;
+  private readonly url = `${API_BASE_URL}/users`;
   getCurrentUser(): Observable<CurrentUserResponse> {
-    return this.http.get<CurrentUserResponse>(`${environment.apiBaseUrl}/users/me`);
+    return this.http.get<CurrentUserResponse>(`${API_BASE_URL}/users/me`);
   }
   list(): Observable<UserResponse[]> {
     return this.http.get<UserResponse[]>(this.url);

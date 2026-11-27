@@ -14,7 +14,7 @@ Placeholder visual y estructural para la plataforma de gestión legal LegalAI. I
 ## Instalación y ejecución
 
 ```bash
-npm install
+npm ci
 npm start
 ```
 
@@ -23,8 +23,24 @@ La aplicación estará disponible en `http://localhost:4200/`.
 Para compilar:
 
 ```bash
-npm run build
+npm run build -- --configuration production
 ```
+
+## Render Static Site
+
+El [Blueprint](./render.yaml) utiliza Node.js `24.16.0` y publica
+`dist/legalai-frontend/browser`. En una configuración manual, usa
+`npm ci --include=dev && npm run build -- --configuration production` y
+agrega una regla **Rewrite** de `/*` a `/index.html` para Angular Router.
+
+La compilación de producción llama a `https://legalai-arqweb-01eb.up.railway.app/api`.
+Spring Boot debe permitir por CORS el origen HTTPS que Render asigne al sitio
+y cualquier dominio personalizado que se use. Las solicitudes preflight
+`OPTIONS` deben admitir los encabezados `Authorization` y `Content-Type`
+y los métodos `GET`, `POST`, `PUT`, `PATCH` y `DELETE`. En desarrollo,
+el navegador llama a `http://localhost:4200/api` y el proxy reenvía a
+`http://localhost:8080/api` con el encabezado `Origin: http://localhost:5173`
+definido en el proxy existente.
 
 ## Estructura
 
@@ -86,7 +102,7 @@ Usar `main` como rama estable y ramas `feature/<modulo>-<tarea>`. Cada cambio de
 
 ## Preparación para Spring Boot
 
-`provideHttpClient(withInterceptors([jwtInterceptor]))` está configurado. La URL base local es `/api` y [proxy.conf.json](./proxy.conf.json) la dirige a `http://localhost:8080` durante `ng serve`. `LoginService` conserva `accessToken` y `tokenType` en `sessionStorage`; esto permite restaurar la sesión, pero deja el token accesible a JavaScript y debe revisarse como decisión de seguridad antes de producción. No hay refresh token ni logout HTTP.
+`provideHttpClient(withXhr(), withInterceptors([jwtInterceptor]))` está configurado. La URL base local es `/api` y [proxy.conf.js](./proxy.conf.js) la dirige a `http://localhost:8080` durante `ng serve`. `LoginService` conserva `accessToken` y `tokenType` en `sessionStorage`; esto permite restaurar la sesión, pero deja el token accesible a JavaScript y debe revisarse como decisión de seguridad antes de producción. No hay refresh token ni logout HTTP.
 
 ## Reorganización y trabajo colaborativo
 

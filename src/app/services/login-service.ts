@@ -2,7 +2,7 @@ import { HttpBackend, HttpClient, HttpErrorResponse } from '@angular/common/http
 import { Injectable, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, finalize, map, Observable, of, shareReplay, tap } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { API_BASE_URL } from '../core/http/api.config';
 import { LoginRequest } from '../models/request/login-request';
 import { RegisterRequest } from '../models/request/register-request';
 import { AuthResponse } from '../models/response/auth-response';
@@ -26,11 +26,11 @@ export class LoginService {
   }
 
   login(request: LoginRequest): Observable<AuthResponse> {
-    return this.rawHttp.post<AuthResponse>(`${environment.apiBaseUrl}/auth/login`, request).pipe(tap((response) => this.saveSession(response)));
+    return this.rawHttp.post<AuthResponse>(`${API_BASE_URL}/auth/login`, request).pipe(tap((response) => this.saveSession(response)));
   }
 
   register(request: RegisterRequest): Observable<AuthResponse> {
-    return this.rawHttp.post<AuthResponse>(`${environment.apiBaseUrl}/auth/register`, request).pipe(tap((response) => this.saveSession(response)));
+    return this.rawHttp.post<AuthResponse>(`${API_BASE_URL}/auth/register`, request).pipe(tap((response) => this.saveSession(response)));
   }
 
   getAccessToken(): string | null {
@@ -48,7 +48,7 @@ export class LoginService {
     if (this.restoreRequest) return this.restoreRequest;
     const token = this.getAccessToken();
     if (!token) { this.state.set('anonymous'); return of(false); }
-    this.restoreRequest = this.rawHttp.get<CurrentUserResponse>(`${environment.apiBaseUrl}/users/me`, { headers: { Authorization: `Bearer ${token}` } }).pipe(
+    this.restoreRequest = this.rawHttp.get<CurrentUserResponse>(`${API_BASE_URL}/users/me`, { headers: { Authorization: `Bearer ${token}` } }).pipe(
       tap((user) => { this.currentUser.set(user); this.state.set('authenticated'); }),
       map(() => true),
       catchError(() => { this.clearSession(); return of(false); }),

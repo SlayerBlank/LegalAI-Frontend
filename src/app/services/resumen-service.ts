@@ -1,14 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { map } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { API_BASE_URL } from '../core/http/api.config';
 import { SummaryFilterResponse, SummaryResponse } from '../models/response/summary-response';
 import { SummaryRequest } from '../models/request/summary-request';
 
 @Injectable({ providedIn: 'root' })
 export class ResumenService {
   private readonly http = inject(HttpClient);
-  private readonly url = `${environment.apiBaseUrl}/summaries`;
+  private readonly url = `${API_BASE_URL}/summaries`;
 
   list() {
     return this.http.get<SummaryResponse[]>(this.url);

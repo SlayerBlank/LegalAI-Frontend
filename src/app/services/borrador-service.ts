@@ -1,14 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { map } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { API_BASE_URL } from '../core/http/api.config';
 import { DraftFilterResponse, DraftResponse } from '../models/response/draft-response';
 import { DraftRequest } from '../models/request/draft-request';
 
 @Injectable({ providedIn: 'root' })
 export class BorradorService {
   private readonly http = inject(HttpClient);
-  private readonly url = `${environment.apiBaseUrl}/drafts`;
+  private readonly url = `${API_BASE_URL}/drafts`;
 
   list() {
     return this.http.get<DraftResponse[]>(this.url);
