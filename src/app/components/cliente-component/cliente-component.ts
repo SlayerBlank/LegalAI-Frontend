@@ -6,10 +6,12 @@ import { ClientResponse, ClientRequest, ClientCaseResponse } from '../../models/
 import { ClienteService } from '../../services/cliente-service';
 import { ManagementHttpState } from '../../shared/management-http-state';
 import { ManagementDialogDirective } from '../../shared/management-dialog.directive';
+import { I18N_PIPES } from '../../shared/i18n/i18n.pipes';
+import { I18nService } from '../../services/i18n.service';
 @Component({
   selector: 'app-cliente',
   standalone: true,
-  imports: [FormsModule, ManagementDialogDirective],
+  imports: [FormsModule, ManagementDialogDirective, ...I18N_PIPES],
   templateUrl: './cliente-component.html',
   styleUrls: [
     '../../shared/management.css',
@@ -19,6 +21,7 @@ import { ManagementDialogDirective } from '../../shared/management-dialog.direct
 })
 export class ClienteComponent extends ManagementHttpState<ClientResponse> implements OnInit {
   private readonly api = inject(ClienteService);
+  private readonly i18n = inject(I18nService);
   clients: ClientResponse[] = [];
   clientCases: ClientCaseResponse[] = [];
   /** Documentos por cliente (GET /clients/document-count); null = no disponible, nunca 0. */
@@ -115,7 +118,7 @@ export class ClienteComponent extends ManagementHttpState<ClientResponse> implem
           : [...this.clients, value];
         this.editing = null;
         this.resetPage();
-        this.notice = 'Cliente guardado correctamente.';
+        this.notice = this.i18n.t('clients.savedNotice');
       },
     );
   }
@@ -131,7 +134,7 @@ export class ClienteComponent extends ManagementHttpState<ClientResponse> implem
       this.clients = this.clients.filter((c) => c.clientId !== id);
       this.pending = null;
       this.page = Math.min(this.page, this.pages(this.filtered));
-      this.notice = 'Cliente eliminado correctamente.';
+      this.notice = this.i18n.t('clients.deletedNotice');
     });
   }
   @HostListener('document:keydown.escape') dismiss() {
