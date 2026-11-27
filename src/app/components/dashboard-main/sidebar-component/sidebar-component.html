@@ -5,7 +5,7 @@
   [attr.aria-hidden]="compact() && !open() ? 'true' : null"
   [attr.role]="compact() && open() ? 'dialog' : null"
   [attr.aria-modal]="compact() && open() ? 'true' : null"
-  aria-label="Navegación del espacio de trabajo"
+  [attr.aria-label]="'sidebar.navLabel' | t"
 >
   <div class="sidebar-heading">
     <div class="brand-row">
@@ -13,22 +13,22 @@
         class="brand"
         routerLink="/dashboard"
         (click)="closeRequested.emit()"
-        aria-label="LegalAI, resumen"
+        [attr.aria-label]="'sidebar.brandLabel' | t"
         ><span class="brand-mark" aria-hidden="true">a</span>LegalAI</a
       ><button
         class="close-sidebar"
         type="button"
-        aria-label="Cerrar navegación"
+        [attr.aria-label]="'sidebar.closeNav' | t"
         (click)="closeRequested.emit()"
       >
         ×
       </button>
     </div>
-    <p class="workspace-label">ESPACIO DE TRABAJO</p>
-    <strong class="workspace-name">Mi espacio de trabajo</strong>
+    <p class="workspace-label">{{ 'sidebar.workspaceLabel' | t }}</p>
+    <strong class="workspace-name">{{ 'sidebar.workspaceName' | t }}</strong>
   </div>
   <div class="sidebar-scroll">
-    <nav aria-label="Navegación principal">
+    <nav [attr.aria-label]="'sidebar.mainNav' | t">
       <div class="nav-group">
         @for (link of mainLinks; track link.path) {
           <a
@@ -43,7 +43,7 @@
           >
         }
       </div>
-      <p class="group-label">ASISTENCIA INTELIGENTE</p>
+      <p class="group-label">{{ 'sidebar.aiGroup' | t }}</p>
       <div class="nav-group">
         @for (link of aiLinks; track link.path) {
           <a
@@ -52,12 +52,14 @@
             [routerLinkActiveOptions]="activeMatch"
             ariaCurrentWhenActive="page"
             (click)="closeRequested.emit()"
-            ><app-workspace-icon [name]="link.icon" /><span>{{ link.title }}</span></a
+            ><app-workspace-icon [name]="link.icon" /><span>{{
+              link.titleKey ? (link.titleKey | t) : link.title
+            }}</span></a
           >
         }
       </div>
       @if (login.currentUser()?.roleName === 'ADMIN') {
-        <p class="group-label">ADMINISTRACIÓN</p>
+        <p class="group-label">{{ 'sidebar.adminGroup' | t }}</p>
         <div class="nav-group">
           @for (link of adminLinks; track link.path) {
             <a
@@ -66,22 +68,25 @@
               [routerLinkActiveOptions]="activeMatch"
               ariaCurrentWhenActive="page"
               (click)="closeRequested.emit()"
-              ><app-workspace-icon [name]="link.icon" /><span>{{ link.title }}</span></a
+              ><app-workspace-icon [name]="link.icon" /><span>{{
+              link.titleKey ? (link.titleKey | t) : link.title
+            }}</span></a
             >
           }
         </div>
       }
     </nav>
-    <section class="help-card" aria-label="Uso responsable de la IA">
-      <h2>Tu criterio, siempre primero.</h2>
-      <p>La IA propone. Tú revisas y decides.</p>
+    <section class="help-card" [attr.aria-label]="'sidebar.helpRegion' | t">
+      <h2>{{ 'sidebar.helpTitle' | t }}</h2>
+      <p>{{ 'sidebar.helpText' | t }}</p>
       <button
         type="button"
         disabled
-        title="Centro de ayuda pendiente"
-        aria-label="Centro de ayuda: funcionalidad pendiente"
+        [title]="'sidebar.helpPendingTitle' | t"
+        [attr.aria-label]="'sidebar.helpPendingLabel' | t"
       >
-        Centro de ayuda <span aria-hidden="true">↗</span><small>Próximamente</small>
+        {{ 'sidebar.helpCenter' | t }} <span aria-hidden="true">↗</span
+        ><small>{{ 'sidebar.soon' | t }}</small>
       </button>
     </section>
   </div>
@@ -101,13 +106,13 @@
       <div class="user-meta">
         <span>{{
           user.roleName === 'ADMIN'
-            ? 'Administrador'
+            ? ('sidebar.roleAdmin' | t)
             : user.roleName === 'USER'
-              ? 'Usuario'
+              ? ('sidebar.roleUser' | t)
               : user.roleName
         }}</span
         ><span aria-hidden="true">·</span
-        ><button type="button" (click)="logout()">Cerrar sesión</button>
+        ><button type="button" (click)="logout()">{{ 'sidebar.logout' | t }}</button>
       </div>
       @if (profileOpen) {
         <section
@@ -137,7 +142,7 @@
         </section>
       }
     } @else {
-      <p class="profile-unavailable">Perfil no disponible</p>
+      <p class="profile-unavailable">{{ 'sidebar.profileUnavailable' | t }}</p>
     }
   </div>
 </aside>
