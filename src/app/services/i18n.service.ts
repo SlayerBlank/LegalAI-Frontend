@@ -100,17 +100,14 @@ export class I18nService {
     return `${this.formatNumber(bytes / (1024 * 1024), 1)} MB`;
   }
 
-  /**
-   * La aplicación usa siempre español. El selector de idioma se retiró de la interfaz porque
-   * todavía hay pantallas sin traducir. Se borra el idioma que se hubiera guardado antes,
-   * para que nadie quede con la página mitad en inglés.
-   */
   private initialLanguage(): Language {
     try {
-      localStorage.removeItem(STORAGE_KEY);
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved === 'es' || saved === 'en') return saved;
     } catch {
-      // Sin acceso a localStorage: no hay nada que limpiar.
+      // Sin acceso a localStorage: se usa el idioma por defecto.
     }
+    // La aplicación nace en español; el usuario elige inglés con el selector.
     return 'es';
   }
 
