@@ -1,4 +1,4 @@
-import { DOCUMENT, DatePipe } from '@angular/common';
+import { DOCUMENT } from '@angular/common';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -17,16 +17,18 @@ import { DeleteRecordDialog } from '../../shared/legal-records/delete-record-dia
 import { RecordFilter, RecordFilterValue } from '../../shared/legal-records/record-filter';
 import { nonBlank, recordDateMatches, recordError } from '../../shared/legal-records/record-form';
 import { RecordWorkspace } from '../../shared/legal-records/record-workspace';
+import { I18N_PIPES } from '../../shared/i18n/i18n.pipes';
+import { I18nService } from '../../services/i18n.service';
 
 @Component({
   selector: 'app-resumen',
   imports: [
-    DatePipe,
     ReactiveFormsModule,
     MatButtonModule,
     MatDialogModule,
     MatProgressBarModule,
     RecordFilter,
+    ...I18N_PIPES,
   ],
   templateUrl: './resumen-component.html',
   styleUrls: ['../../shared/legal-records/legal-records.css', './resumen-component.css'],
@@ -38,6 +40,7 @@ export class ResumenComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly browserDocument = inject(DOCUMENT);
   private readonly fb = inject(FormBuilder).nonNullable;
+  private readonly i18n = inject(I18nService);
   private documentRequest?: Subscription;
 
   protected readonly workspace = new RecordWorkspace<SummaryResponse>(
@@ -88,7 +91,7 @@ export class ResumenComponent {
       .subscribe({
         next: (cases) => this.cases.set(cases),
         error: (error: unknown) =>
-          this.caseError.set(recordError(error, 'No se pudieron cargar los expedientes.')),
+          this.caseError.set(recordError(error, this.i18n.t('records.errCases'))),
       });
   }
 
@@ -104,14 +107,14 @@ export class ResumenComponent {
     if (summary.caseId !== null) {
       return (
         this.cases().find((item) => item.caseId === summary.caseId)?.title ??
-        `Expediente #${summary.caseId}`
+        this.i18n.t('records.caseFallback', { id: summary.caseId })
       );
     }
-    return `Documento #${summary.documentId}`;
+    return this.i18n.t('records.documentFallback', { id: summary.documentId ?? '' });
   }
 
   protected documentName(id: number) {
-    return this.documents().find((item) => item.documentId === id)?.fileName ?? `Documento #${id}`;
+    return this.documents().find((item) => item.documentId === id)?.fileName ?? this.i18n.t('records.documentFallback', { id });
   }
 
   protected create() {
@@ -123,7 +126,7 @@ export class ResumenComponent {
     this.workspace.run(
       this.api.get(id),
       (summary) => this.show(summary),
-      'No se pudo abrir el resumen.',
+      this.i18n.t('summaries.errOpen'),
     );
   }
 
@@ -141,9 +144,9 @@ export class ResumenComponent {
       }),
       (summary) => {
         this.show(summary);
-        this.workspace.saved(summary, 'Resumen guardado.');
+        this.workspace.saved(summary, this.i18n.t('summaries.savedNotice'));
       },
-      'No se pudo guardar el resumen.',
+      this.i18n.t('summaries.errSave'),
     );
   }
 
@@ -158,9 +161,9 @@ export class ResumenComponent {
           this.api.remove(summary.summaryId),
           () => {
             this.close();
-            this.workspace.removed(summary.summaryId, 'Resumen eliminado.');
+            this.workspace.removed(summary.summaryId, this.i18n.t('summaries.deletedNotice'));
           },
-          'No se pudo eliminar el resumen.',
+          this.i18n.t('summaries.errDelete'),
         );
       });
   }
@@ -176,7 +179,7 @@ export class ResumenComponent {
         link.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
       },
-      'No se pudo descargar el documento original.',
+      this.i18n.t('summaries.errDownload'),
     );
   }
 
@@ -270,11 +273,11 @@ export class ResumenComponent {
       .subscribe({
         next: (documents) => this.documents.set(documents),
         error: (error: unknown) =>
-          this.documentError.set(recordError(error, 'No se pudieron cargar los documentos.')),
+          this.documentError.set(recordError(error, this.i18n.t('summaries.errDocuments'))),
       });
   }
 
   private canLeave() {
-    return !this.form.dirty || window.confirm('¿Descartar los cambios sin guardar?');
+    return !this.form.dirty || window.confirm(this.i18n.t('records.discard'));
   }
 }
