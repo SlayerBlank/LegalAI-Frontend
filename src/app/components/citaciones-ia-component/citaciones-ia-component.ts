@@ -13,6 +13,7 @@ import { CitacionesIaService, CitedFragment } from '../../services/citaciones-ia
 import { ManagementHttpState, managementError } from '../../shared/management-http-state';
 import { ManagementDialogDirective } from '../../shared/management-dialog.directive';
 import { I18N_PIPES } from '../../shared/i18n/i18n.pipes';
+import { I18nService } from '../../services/i18n.service';
 
 @Component({
   selector: 'app-citaciones-ia',
@@ -32,6 +33,7 @@ export class CitacionesIaComponent
   private readonly api = inject(CitacionesIaService);
   private readonly destroy = inject(DestroyRef);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly i18n = inject(I18nService);
 
   sessions: ChatSessionResponseDTO[] = [];
   messages: ChatMessageDTO[] = [];
@@ -176,7 +178,7 @@ export class CitacionesIaComponent
       messageId <= 0
     ) {
       this.citations = [];
-      this.error = 'Selecciona una sesión y una respuesta del asistente.';
+      this.error = this.i18n.t('cites.errSelect');
       return;
     }
 

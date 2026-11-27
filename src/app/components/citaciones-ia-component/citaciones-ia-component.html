@@ -1,7 +1,7 @@
 <header>
   <div>
-    <h1>Citaciones IA</h1>
-    <p>Fuentes documentales asociadas a las respuestas del asistente.</p>
+    <h1>{{ 'cites.title' | t }}</h1>
+    <p>{{ 'cites.subtitle' | t }}</p>
   </div>
   <button
     class="primary"
@@ -9,7 +9,7 @@
     (click)="loadCitations()"
     [disabled]="loading || busy || !selectedMessageId"
   >
-    Actualizar fuentes
+    {{ 'cites.refresh' | t }}
   </button>
 </header>
 
@@ -17,28 +17,32 @@
   <div class="notice" role="status">{{ notice }}</div>
 }
 @if (loading) {
-  <div class="notice" role="status" aria-live="polite">Consultando fuentes de ejemplo...</div>
+  <div class="notice" role="status" aria-live="polite">
+    {{ 'cites.loadingSources' | t }}
+  </div>
 }
 @if (busy) {
-  <div class="notice" role="status" aria-live="polite">Cargando mensajes de ejemplo...</div>
+  <div class="notice" role="status" aria-live="polite">
+    {{ 'cites.loadingMessages' | t }}
+  </div>
 }
 @if (error) {
   <div class="notice error" role="alert">
     {{ error }}
     <button type="button" (click)="loadSessions()" [disabled]="loading || busy">
-      Volver a cargar
+      {{ 'common.reload' | t }}
     </button>
   </div>
 }
 
 @if (loaded && !loading) {
   @if (sessions.length === 0) {
-    <section class="panel empty" role="status">No hay sesiones de ejemplo disponibles.</section>
+    <section class="panel empty" role="status">{{ 'cites.noSessions' | t }}</section>
   } @else {
-    <section class="panel citation-context" aria-label="Seleccionar respuesta">
+    <section class="panel citation-context" [attr.aria-label]="'cites.selectAnswer' | t">
       <div class="context-fields">
         <label>
-          Sesión de chat
+          {{ 'cites.session' | t }}
           <select
             name="sessionId"
             [(ngModel)]="selectedSessionId"
@@ -47,13 +51,14 @@
           >
             @for (session of sessions; track session.sessionId) {
               <option [value]="session.sessionId">
-                {{ session.title || 'Sesión' }} · Expediente #{{ session.caseId }}
+                {{ session.title || ('cites.sessionFallback' | t) }} ·
+                {{ 'cites.caseRef' | t: { id: session.caseId } }}
               </option>
             }
           </select>
         </label>
         <label>
-          Respuesta del asistente
+          {{ 'cites.answer' | t }}
           <select
             name="messageId"
             [(ngModel)]="selectedMessageId"
@@ -62,7 +67,8 @@
           >
             @for (message of messages; track message.messageId) {
               <option [value]="message.messageId">
-                Respuesta #{{ message.messageId }} · {{ message.createdAt }}
+                {{ 'cites.answerRef' | t: { id: message.messageId } }} ·
+                {{ message.createdAt | ldate }}
               </option>
             }
           </select>
@@ -72,42 +78,49 @@
       @if (selectedSession; as session) {
         <div class="context-summary">
           <div>
-            <p class="eyebrow">CONTEXTO DE LA RESPUESTA</p>
-            <h2>{{ session.title || 'Sesión sin título' }}</h2>
+            <p class="eyebrow">{{ 'cites.contextEyebrow' | t }}</p>
+            <h2>{{ session.title || ('cites.untitled' | t) }}</h2>
             <p>
-              Sesión #{{ session.sessionId }} · Expediente #{{ session.caseId }} ·
-              {{ session.messageCount }} mensajes
+              {{
+                'cites.sessionSummary'
+                  | t
+                    : {
+                        session: session.sessionId,
+                        case: session.caseId,
+                        count: session.messageCount,
+                      }
+              }}
             </p>
           </div>
           @if (session.documentScopeRequired && session.documentId === null) {
-            <span class="badge inactive">Documento original no disponible</span>
+            <span class="badge inactive">{{ 'cites.originalUnavailable' | t }}</span>
           } @else if (session.documentId !== null) {
-            <span class="badge">Documento #{{ session.documentId }}</span>
+            <span class="badge">{{ 'cites.documentRef' | t: { id: session.documentId } }}</span>
           } @else {
-            <span class="badge">Alcance del expediente</span>
+            <span class="badge">{{ 'cites.caseScope' | t }}</span>
           }
         </div>
       }
 
       @if (selectedMessage; as message) {
         <div class="answer-preview">
-          <span>Respuesta #{{ message.messageId }}</span>
+          <span>{{ 'cites.answerRef' | t: { id: message.messageId } }}</span>
           <p>{{ message.content }}</p>
         </div>
       } @else if (!busy) {
-        <p class="empty-message">Esta sesión no tiene respuestas del asistente para consultar.</p>
+        <p class="empty-message">{{ 'cites.noAnswers' | t }}</p>
       }
     </section>
 
-    <section class="stats" aria-label="Resumen de fuentes consultadas">
+    <section class="stats" [attr.aria-label]="'cites.stats' | t">
       <article class="stat">
-        <span>Total de referencias</span><strong>{{ citations.length }}</strong>
+        <span>{{ 'cites.total' | t }}</span><strong>{{ citations.length }}</strong>
       </article>
       <article class="stat">
-        <span>Documentos vinculados</span><strong>{{ linkedDocumentCount }}</strong>
+        <span>{{ 'cites.linked' | t }}</span><strong>{{ linkedDocumentCount }}</strong>
       </article>
       <article class="stat">
-        <span>Referencias conservadas</span><strong>{{ retainedCount }}</strong>
+        <span>{{ 'cites.retained' | t }}</span><strong>{{ retainedCount }}</strong>
       </article>
     </section>
 
@@ -115,36 +128,36 @@
       <div class="toolbar">
         <input
           class="search"
-          aria-label="Buscar referencias"
-          placeholder="Buscar por ID de referencia, documento o fragmento…"
+          [attr.aria-label]="'cites.search' | t"
+          [placeholder]="'cites.searchPlaceholder' | t"
           [(ngModel)]="query"
           (ngModelChange)="resetPage()"
           [disabled]="loading || busy"
         />
         <select
-          aria-label="Filtrar por estado del documento"
+          [attr.aria-label]="'cites.filterLabel' | t"
           [(ngModel)]="filter"
           (ngModelChange)="resetPage()"
           [disabled]="loading || busy"
         >
-          <option value="">Todos los documentos</option>
-          <option value="linked">Documento vinculado</option>
-          <option value="retained">Referencia conservada</option>
+          <option value="">{{ 'cites.allDocuments' | t }}</option>
+          <option value="linked">{{ 'cites.filterLinked' | t }}</option>
+          <option value="retained">{{ 'cites.filterRetained' | t }}</option>
         </select>
       </div>
 
       @if (busy) {
-        <div class="notice" role="status">Cargando fuentes...</div>
+        <div class="notice" role="status">{{ 'cites.loading' | t }}</div>
       } @else {
         <div class="table-scroll">
           <table>
             <thead>
               <tr>
-                <th scope="col">Citation ID</th>
-                <th scope="col">Message ID</th>
-                <th scope="col">Document ID</th>
-                <th scope="col">Chunk ID</th>
-                <th scope="col">Relevance score</th>
+                <th scope="col">{{ 'cites.colCitation' | t }}</th>
+                <th scope="col">{{ 'cites.colMessage' | t }}</th>
+                <th scope="col">{{ 'cites.colDocument' | t }}</th>
+                <th scope="col">{{ 'cites.colChunk' | t }}</th>
+                <th scope="col">{{ 'cites.colScore' | t }}</th>
                 <th scope="col">{{ 'cite.colActions' | t }}</th>
               </tr>
             </thead>
@@ -155,7 +168,7 @@
                   <td>#{{ citation.messageId }}</td>
                   <td>
                     @if (citation.documentId === null) {
-                      <span class="badge inactive">Documento eliminado</span>
+                      <span class="badge inactive">{{ 'cites.documentDeleted' | t }}</span>
                     } @else {
                       <span class="badge">#{{ citation.documentId }}</span>
                     }
@@ -163,9 +176,9 @@
                   <td>{{ citation.chunkId ?? '—' }}</td>
                   <td class="score">
                     @if (citation.relevanceScore === null) {
-                      <span>No disponible</span>
+                      <span>{{ 'cites.notAvailable' | t }}</span>
                     } @else {
-                      {{ citation.relevanceScore | number: '1.3-3' }}
+                      {{ citation.relevanceScore | lnumber: 3 }}
                     }
                   </td>
                   <td>
@@ -181,7 +194,7 @@
               } @empty {
                 <tr>
                   <td colspan="6" class="empty">
-                    No hay referencias para esta respuesta o los filtros no devolvieron resultados.
+                    {{ 'cites.empty' | t }}
                   </td>
                 </tr>
               }
@@ -189,24 +202,23 @@
           </table>
         </div>
         <footer class="pager">
-          <span>{{ filtered.length }} resultados · Página {{ page }} de {{ pages(filtered) }}</span>
+          <span
+            >{{ 'common.results' | t: { count: filtered.length } }} ·
+            {{ 'common.pageOf' | t: { page: page, pages: pages(filtered) } }}</span
+          >
           <div class="row-actions">
             <button type="button" (click)="page = page - 1" [disabled]="page === 1">
-              ← Anterior
+              {{ 'common.previous' | t }}
             </button>
             <button type="button" (click)="page = page + 1" [disabled]="page >= pages(filtered)">
-              Siguiente →
+              {{ 'common.next' | t }}
             </button>
           </div>
         </footer>
       }
     </section>
 
-    <p class="hint">
-      Son fragmentos documentales consultados por el RAG, no citas verificadas de normas o
-      jurisprudencia. <code>relevanceScore</code> equivale a 1 − distancia coseno; no es una medida
-      de confianza. El backend no proporciona páginas en este recurso.
-    </p>
+    <p class="hint">{{ 'cites.hint' | t }}</p>
   }
 }
 
