@@ -6,10 +6,12 @@ import { LoginService } from '../../services/login-service';
 import { ClienteService } from '../../services/cliente-service';
 import { WorkspaceIcon } from './workspace-icon';
 import { DashboardQueriesComponent } from './dashboard-queries/dashboard-queries';
+import { I18N_PIPES } from '../../shared/i18n/i18n.pipes';
+import { I18nService } from '../../services/i18n.service';
 @Component({
   selector: 'app-dashboard-home',
   standalone: true,
-  imports: [RouterLink, WorkspaceIcon, DashboardQueriesComponent],
+  imports: [RouterLink, WorkspaceIcon, DashboardQueriesComponent, ...I18N_PIPES],
   templateUrl: './dashboard-home.html',
   styleUrls: ['./dashboard-home.css', './dashboard-home-responsive.css'],
 })
@@ -18,16 +20,20 @@ export class DashboardHomeComponent implements OnInit {
   private readonly clients = inject(ClienteService);
   private readonly cd = inject(ChangeDetectorRef);
   private readonly destroy = inject(DestroyRef);
+  private readonly i18n = inject(I18nService);
   clientCount: number | null = null;
   clientStatus: 'idle' | 'loading' | 'ready' | 'error' = 'idle';
-  readonly caseStates = ['Abiertos', 'En curso', 'Cerrados', 'Archivados'];
+  readonly caseStates = [
+    'home.stateOpen',
+    'home.stateInProgress',
+    'home.stateClosed',
+    'home.stateArchived',
+  ];
   get greeting(): string {
     const hour = new Date().getHours();
-    return hour >= 6 && hour < 12
-      ? 'Buenos días'
-      : hour >= 12 && hour < 20
-        ? 'Buenas tardes'
-        : 'Buenas noches';
+    const key =
+      hour >= 6 && hour < 12 ? 'home.morning' : hour >= 12 && hour < 20 ? 'home.afternoon' : 'home.evening';
+    return this.i18n.t(key);
   }
   get firstName(): string {
     return this.loginService.currentUser()?.fullName?.trim().split(/\s+/)[0] ?? '';

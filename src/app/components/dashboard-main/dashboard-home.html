@@ -1,61 +1,63 @@
 <section class="dashboard" aria-labelledby="dashboard-title">
   <header class="dashboard-heading">
     <div>
-      <p class="eyebrow">TU ESPACIO DE TRABAJO</p>
+      <p class="eyebrow">{{ 'home.eyebrow' | t }}</p>
       <h1 id="dashboard-title">{{ greeting }}{{ firstName ? ', ' + firstName : '' }}.</h1>
-      <p class="intro">Tu despacho, de un vistazo. Esto es lo que necesita tu atención hoy.</p>
+      <p class="intro">{{ 'home.intro' | t }}</p>
     </div>
     <div class="header-action">
       <button class="new-case" type="button" disabled aria-describedby="new-case-note">
-        <span aria-hidden="true">+</span> Nuevo expediente</button
-      ><span id="new-case-note">Creación de expedientes próximamente</span>
+        <span aria-hidden="true">+</span> {{ 'home.newCase' | t }}</button
+      ><span id="new-case-note">{{ 'home.newCaseNote' | t }}</span>
     </div>
   </header>
-  <div class="metrics" aria-label="Resumen del espacio de trabajo">
+  <div class="metrics" [attr.aria-label]="'home.metrics' | t">
     <article class="metric">
       <div class="metric-heading">
-        <h2>Expedientes activos</h2>
+        <h2>{{ 'home.activeCases' | t }}</h2>
         <app-workspace-icon name="cases" />
       </div>
       <strong class="metric-value">—</strong>
-      <p>Resumen de expedientes próximamente</p>
-      <a routerLink="/expedientes">Ver expedientes <span aria-hidden="true">↗</span></a>
+      <p>{{ 'home.activeCasesSoon' | t }}</p>
+      <a routerLink="/expedientes">{{ 'home.viewCases' | t }} <span aria-hidden="true">↗</span></a>
     </article>
     <article class="metric">
       <div class="metric-heading">
-        <h2>Clientes del despacho</h2>
+        <h2>{{ 'home.clients' | t }}</h2>
         <app-workspace-icon name="clients" />
       </div>
       <strong class="metric-value" [attr.aria-busy]="clientStatus === 'loading'">{{
         clientCount ?? '—'
       }}</strong>
       @if (clientStatus === 'loading') {
-        <p role="status">Consultando tus clientes…</p>
+        <p role="status">{{ 'home.clientsLoading' | t }}</p>
       } @else if (clientStatus === 'error') {
-        <p role="alert">No se pudo consultar el conteo.</p>
-        <button class="text-action" type="button" (click)="loadClients()">Reintentar</button>
+        <p role="alert">{{ 'home.clientsError' | t }}</p>
+        <button class="text-action" type="button" (click)="loadClients()">
+          {{ 'home.retry' | t }}
+        </button>
       } @else {
-        <p>En tu espacio de trabajo</p>
-        <a routerLink="/clientes">Ver clientes <span aria-hidden="true">↗</span></a>
+        <p>{{ 'home.inWorkspace' | t }}</p>
+        <a routerLink="/clientes">{{ 'home.viewClients' | t }} <span aria-hidden="true">↗</span></a>
       }
     </article>
     <article class="metric">
       <div class="metric-heading">
-        <h2>Tareas pendientes</h2>
+        <h2>{{ 'home.pendingTasks' | t }}</h2>
         <app-workspace-icon name="tasks" />
       </div>
       <strong class="metric-value">—</strong>
-      <p>Seguimiento de tareas próximamente</p>
-      <span class="pending-label">Próximamente</span>
+      <p>{{ 'home.tasksSoon' | t }}</p>
+      <span class="pending-label">{{ 'home.soon' | t }}</span>
     </article>
     <article class="metric">
       <div class="metric-heading">
-        <h2>Propuestas IA por revisar</h2>
+        <h2>{{ 'home.aiReview' | t }}</h2>
         <app-workspace-icon name="ai" />
       </div>
       <strong class="metric-value">—</strong>
-      <p>El resumen aún no está disponible</p>
-      <span class="pending-label">Próximamente</span>
+      <p>{{ 'home.aiReviewSoon' | t }}</p>
+      <span class="pending-label">{{ 'home.soon' | t }}</span>
     </article>
   </div>
   <app-dashboard-queries />
@@ -63,48 +65,43 @@
     <div class="main-column">
       <section class="panel agenda" aria-labelledby="agenda-title">
         <div class="panel-heading">
-          <h2 id="agenda-title">Tu agenda de hoy.</h2>
-          <span class="status-tag">Próximamente</span>
+          <h2 id="agenda-title">{{ 'home.agendaTitle' | t }}</h2>
+          <span class="status-tag">{{ 'home.soon' | t }}</span>
         </div>
         <div class="empty-state">
           <span class="empty-icon"><app-workspace-icon name="calendar" /></span>
           <div>
-            <h3>Tu agenda, en este espacio.</h3>
-            <p>Próximamente podrás consultar tus eventos y citas del día.</p>
+            <h3>{{ 'home.agendaEmptyTitle' | t }}</h3>
+            <p>{{ 'home.agendaEmptyText' | t }}</p>
           </div>
         </div>
       </section>
       <section class="panel" aria-labelledby="tasks-title">
         <div class="panel-heading">
-          <h2 id="tasks-title">Tareas pendientes</h2>
+          <h2 id="tasks-title">{{ 'home.pendingTasks' | t }}</h2>
           <app-workspace-icon name="tasks" />
         </div>
         <div class="empty-state">
           <span class="empty-icon"><app-workspace-icon name="tasks" /></span>
           <div>
-            <h3>Un lugar para el siguiente paso.</h3>
-            <p>
-              Organiza tus próximos pasos. El seguimiento de tareas estará disponible próximamente.
-            </p>
+            <h3>{{ 'home.tasksEmptyTitle' | t }}</h3>
+            <p>{{ 'home.tasksEmptyText' | t }}</p>
           </div>
         </div>
       </section>
       <section class="panel" aria-labelledby="activity-title">
         <div class="panel-heading">
-          <h2 id="activity-title">Actividad reciente</h2>
+          <h2 id="activity-title">{{ 'home.activityTitle' | t }}</h2>
           <app-workspace-icon name="audit" />
         </div>
         <div class="empty-state">
           <span class="empty-icon"><app-workspace-icon name="clock" /></span>
           <div>
-            <h3>El contexto de lo que cambia.</h3>
-            <p>
-              Aquí podrás seguir los cambios de tu espacio de trabajo. Esta vista estará disponible
-              próximamente.
-            </p>
+            <h3>{{ 'home.activityEmptyTitle' | t }}</h3>
+            <p>{{ 'home.activityEmptyText' | t }}</p>
             @if (loginService.currentUser()?.roleName === 'ADMIN') {
               <a class="text-action" routerLink="/auditoria"
-                >Ir al módulo de auditoría <span aria-hidden="true">↗</span></a
+                >{{ 'home.goToAudit' | t }} <span aria-hidden="true">↗</span></a
               >
             }
           </div>
@@ -113,28 +110,25 @@
     </div>
     <div class="side-column">
       <section class="panel" aria-labelledby="case-status-title">
-        <div class="panel-heading"><h2 id="case-status-title">Expedientes por estado</h2></div>
-        <p class="panel-description">El resumen por estado estará disponible próximamente.</p>
+        <div class="panel-heading"><h2 id="case-status-title">{{ 'home.caseStatusTitle' | t }}</h2></div>
+        <p class="panel-description">{{ 'home.caseStatusSoon' | t }}</p>
         <dl class="case-states">
           @for (state of caseStates; track state) {
             <div>
-              <dt>{{ state }}</dt>
-              <dd aria-label="Dato no disponible">—</dd>
+              <dt>{{ state | t }}</dt>
+              <dd [attr.aria-label]="'home.noData' | t">—</dd>
             </div>
           }
         </dl>
-        <p class="data-note">Aún no disponible</p>
+        <p class="data-note">{{ 'home.notAvailable' | t }}</p>
       </section>
       <section class="ai-card" aria-labelledby="ai-card-title">
         <span class="ai-icon"><app-workspace-icon name="ai" /></span>
-        <p class="eyebrow">ASISTENCIA INTELIGENTE</p>
-        <h2 id="ai-card-title">Una segunda lectura,<br />a tu disposición.</h2>
-        <p>
-          Reúne el contexto, contrasta las fuentes y prepara tus próximos pasos. La IA propone; tu
-          criterio profesional decide.
-        </p>
-        <a routerLink="/chat-ia">Explorar la asistencia IA <span aria-hidden="true">→</span></a
-        ><small>Las herramientas se incorporan de forma progresiva.</small>
+        <p class="eyebrow">{{ 'home.aiEyebrow' | t }}</p>
+        <h2 id="ai-card-title">{{ 'home.aiTitle1' | t }}<br />{{ 'home.aiTitle2' | t }}</h2>
+        <p>{{ 'home.aiText' | t }}</p>
+        <a routerLink="/chat-ia">{{ 'home.aiExplore' | t }} <span aria-hidden="true">→</span></a
+        ><small>{{ 'home.aiProgressive' | t }}</small>
       </section>
     </div>
   </div>

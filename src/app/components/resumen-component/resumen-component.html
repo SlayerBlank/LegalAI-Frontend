@@ -1,23 +1,23 @@
 <section aria-labelledby="summaries-heading">
   <header class="page-heading">
     <div>
-      <h1 id="summaries-heading">Resúmenes</h1>
-      <p class="description">Síntesis de documentos y expedientes para consulta rápida.</p>
+      <h1 id="summaries-heading">{{ 'summaries.title' | t }}</h1>
+      <p class="description">{{ 'summaries.subtitle' | t }}</p>
     </div>
     <button mat-flat-button type="button" [disabled]="workspace.busy()" (click)="create()">
-      + Nuevo resumen
+      {{ 'summaries.new' | t }}
     </button>
   </header>
 
   <div class="toolbar summary-toolbar">
     <button mat-button type="button" [disabled]="workspace.busy()" (click)="reload()">
-      Actualizar lista
+      {{ 'records.reload' | t }}
     </button>
   </div>
   <app-record-filter
     [cases]="cases()"
-    heading="Filtros por expediente, tipo y fechas"
-    label="Tipo de resumen"
+    [heading]="'summaries.filterHeading' | t"
+    [label]="'summaries.typeLabel' | t"
     suggestionId="summary-type-filter"
     [options]="types()"
     [disabled]="workspace.busy()"
@@ -29,7 +29,7 @@
     <mat-progress-bar
       class="record-progress"
       mode="indeterminate"
-      aria-label="Procesando resúmenes"
+      [attr.aria-label]="'summaries.processing' | t"
     />
   }
   @if (workspace.error()) {
@@ -37,7 +37,9 @@
   }
   @if (caseError()) {
     <p class="error" role="alert">
-      {{ caseError() }} <button mat-button type="button" (click)="loadCases()">Reintentar</button>
+      {{ caseError() }} <button mat-button type="button" (click)="loadCases()">
+        {{ 'common.retry' | t }}
+      </button>
     </p>
   }
   @if (workspace.feedback()) {
@@ -48,18 +50,18 @@
     <div class="summary-sidebar">
       @if (editing()) {
         <section class="panel" aria-labelledby="summary-settings">
-          <h2 id="summary-settings" class="panel-heading">Preparar una síntesis</h2>
+          <h2 id="summary-settings" class="panel-heading">{{ 'summaries.prepare' | t }}</h2>
           @if (!cases().length && !caseError() && !selected()) {
             <p class="notice source-notice">
-              Crea primero un expediente con esta cuenta para guardar una síntesis.
+              {{ 'summaries.createCaseFirst' | t }}
             </p>
           }
           <fieldset class="summary-fields" [disabled]="workspace.busy()">
             <label
-              >Expediente
+              >{{ 'records.case' | t }}
               <select formControlName="caseId">
                 <option [ngValue]="null">
-                  {{ cases().length ? 'Selecciona un expediente' : 'Sin expedientes disponibles' }}
+                  {{ (cases().length ? 'records.selectCase' : 'records.noCases') | t }}
                 </option>
                 @if (selected(); as summary) {
                   @if (summary.caseId !== null && !hasCase(summary.caseId)) {
@@ -72,10 +74,10 @@
               </select>
             </label>
             <label
-              >Documento
+              >{{ 'summaries.document' | t }}
               <select formControlName="documentId" aria-describedby="summary-source-hint">
                 <option [ngValue]="null">
-                  {{ loadingDocuments() ? 'Cargando documentos…' : 'Sin documento' }}
+                  {{ (loadingDocuments() ? 'summaries.loadingDocuments' : 'summaries.noDocument') | t }}
                 </option>
                 @if (form.controls.documentId.value; as id) {
                   @if (!hasDocument(id)) {
@@ -88,15 +90,14 @@
               </select>
             </label>
             <small class="full-width" id="summary-source-hint"
-              >Puedes guardar una síntesis del expediente completo o vincularla a un
-              documento.</small
+              >{{ 'summaries.sourceHint' | t }}</small
             >
             <label class="full-width"
-              >Tipo de resumen
+              >{{ 'summaries.typeLabel' | t }}
               <input
                 formControlName="summaryType"
                 list="summary-types"
-                placeholder="Por ejemplo, Ejecutivo"
+                [placeholder]="'summaries.typePlaceholder' | t"
                 maxlength="100"
                 required
               />
@@ -109,14 +110,16 @@
             @if (documentError()) {
               <p class="error" role="alert">
                 {{ documentError() }}
-                <button mat-button type="button" (click)="reloadDocuments()">Reintentar</button>
+                <button mat-button type="button" (click)="reloadDocuments()">
+                  {{ 'common.retry' | t }}
+                </button>
               </p>
             }
           </fieldset>
         </section>
       }
       <aside class="panel record-list" aria-labelledby="summaries-list-heading">
-        <h2 id="summaries-list-heading">Síntesis recientes</h2>
+        <h2 id="summaries-list-heading">{{ 'summaries.recent' | t }}</h2>
         @for (summary of workspace.records(); track summary.summaryId) {
           <button
             type="button"
@@ -127,15 +130,15 @@
           >
             <strong>{{ summary.summaryType }}</strong>
             <small>{{ sourceLabel(summary) }}</small>
-            <small>{{ summary.createdAt | date: 'dd/MM/yyyy · HH:mm' }}</small>
+            <small>{{ summary.createdAt | ldate }}</small>
           </button>
         } @empty {
           @if (!workspace.busy() && !workspace.error()) {
             <p class="description">
               {{
                 workspace.filtered()
-                  ? 'No hay resúmenes para esos filtros.'
-                  : 'Todavía no tienes resúmenes.'
+                  ? ('summaries.emptyFiltered' | t)
+                  : ('summaries.empty' | t)
               }}
             </p>
           }
@@ -147,9 +150,9 @@
       @if (editing()) {
         <header class="panel-heading">
           <div>
-            <h2>{{ selected()?.summaryType || 'Nuevo resumen' }}</h2>
+            <h2>{{ selected()?.summaryType || ('summaries.newTitle' | t) }}</h2>
             @if (selected(); as summary) {
-              <small>Creado el {{ summary.createdAt | date: 'dd/MM/yyyy · HH:mm' }}</small>
+              <small>{{ 'summaries.createdAt' | t: { date: (summary.createdAt | ldate) } }}</small>
             }
           </div>
           @if (selected(); as summary) {
@@ -159,7 +162,7 @@
               [disabled]="workspace.busy()"
               (click)="remove(summary)"
             >
-              Eliminar
+              {{ 'common.delete' | t }}
             </button>
           }
         </header>
@@ -167,18 +170,18 @@
         <fieldset [disabled]="workspace.busy()">
           <div class="fields">
             <label class="full-width"
-              >Contenido
+              >{{ 'drafts.content' | t }}
               <textarea class="editor" formControlName="content" required></textarea>
             </label>
           </div>
           @if (form.touched && form.invalid) {
             <p class="error" role="alert">
-              Indica un expediente o un documento, el tipo y el contenido.
+              {{ 'summaries.formError' | t }}
             </p>
           }
           <div class="actions">
             <button mat-flat-button type="submit" [disabled]="workspace.busy()">
-              Guardar resumen
+              {{ 'summaries.save' | t }}
             </button>
             @if (form.controls.documentId.value; as documentId) {
               <button
@@ -187,17 +190,17 @@
                 [disabled]="workspace.busy()"
                 (click)="download(documentId)"
               >
-                Descargar original
+                {{ 'summaries.downloadOriginal' | t }}
               </button>
             }
             <button mat-button type="button" [disabled]="workspace.busy()" (click)="cancel()">
-              Cerrar editor
+              {{ 'records.closeEditor' | t }}
             </button>
           </div>
         </fieldset>
       } @else {
-        <h2>Preparar una síntesis</h2>
-        <p class="description">Selecciona un resumen de la lista o crea uno para empezar.</p>
+        <h2>{{ 'summaries.prepare' | t }}</h2>
+        <p class="description">{{ 'summaries.editorHint' | t }}</p>
       }
     </article>
   </form>

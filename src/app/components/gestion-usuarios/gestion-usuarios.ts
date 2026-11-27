@@ -9,6 +9,7 @@ import { LoginService } from '../../services/login-service';
 import { ManagementHttpState } from '../../shared/management-http-state';
 import { ManagementDialogDirective } from '../../shared/management-dialog.directive';
 import { I18N_PIPES } from '../../shared/i18n/i18n.pipes';
+import { I18nService } from '../../services/i18n.service';
 @Component({
   selector: 'app-gestion-usuarios',
   standalone: true,
@@ -24,6 +25,7 @@ export class GestionUsuariosComponent extends ManagementHttpState<UserResponse> 
   private readonly api = inject(UsuarioService);
   private readonly roleApi = inject(RolService);
   private readonly login = inject(LoginService);
+  private readonly i18n = inject(I18nService);
   users: UserResponse[] = [];
   roles: RoleResponse[] = [];
   ngOnInit() {
@@ -84,7 +86,7 @@ export class GestionUsuariosComponent extends ManagementHttpState<UserResponse> 
         this.users = this.users.map((u) => (u.userId === value.userId ? value : u));
         this.editing = null;
         this.resetPage();
-        this.notice = 'Usuario actualizado correctamente.';
+        this.notice = this.i18n.t('users.updatedNotice');
       },
     );
   }
@@ -106,7 +108,7 @@ export class GestionUsuariosComponent extends ManagementHttpState<UserResponse> 
         'loading',
         (rows) => {
           this.users = rows;
-          this.notice = 'Usuario desactivado correctamente.';
+          this.notice = this.i18n.t('users.deactivatedNotice');
         },
         () => (this.users = []),
       );

@@ -15,6 +15,23 @@ export type TranslationParams = Record<string, string | number>;
 /** Clave conocida o compuesta en tiempo de ejecución (p. ej. 'status.' + estado). */
 export type AnyTranslationKey = TranslationKey | (string & {});
 
+/** Instancia activa del servicio, para traducir desde funciones que no pueden usar inject(). */
+let activeI18n: I18nService | null = null;
+
+/**
+ * Traduce con el idioma activo desde código que no es un componente ni un servicio
+ * (por ejemplo, managementError). Si el servicio aún no existe, usa español.
+ */
+export function translate(key: AnyTranslationKey, params?: TranslationParams): string {
+  if (activeI18n) return activeI18n.t(key, params);
+  const text = DICTIONARIES.es[key as TranslationKey] ?? key;
+  return params
+    ? text.replace(/\{(\w+)\}/g, (match, name: string) =>
+        name in params ? String(params[name]) : match,
+      )
+    : text;
+}
+
 /**
  * Internacionalización (i18n) y localización (l10n) en tiempo de ejecución.
  * El idioma es una señal: al cambiarlo se actualizan las vistas sin recargar.
@@ -32,6 +49,7 @@ export class I18nService {
 
   constructor() {
     this.apply(this.language());
+    activeI18n = this;
   }
 
   /** Traduce una clave e interpola {parametros}. Si falta en el idioma, usa español. */

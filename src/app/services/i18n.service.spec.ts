@@ -6,6 +6,8 @@ import { LanguageSwitcherComponent } from '../shared/i18n/language-switcher';
 import { RegionSwitcherComponent } from '../shared/i18n/region-switcher';
 import { EN } from '../i18n/en';
 import { ES } from '../i18n/es';
+import { HttpErrorResponse } from '@angular/common/http';
+import { managementError } from '../shared/management-http-state';
 
 describe('I18nService (i18n + l10n)', () => {
   beforeEach(() => {
@@ -38,6 +40,18 @@ describe('I18nService (i18n + l10n)', () => {
   it('restaura el idioma guardado', () => {
     localStorage.setItem('legalai-language', 'en');
     expect(TestBed.inject(I18nService).language()).toBe('en');
+  });
+
+  it('los mensajes de error comunes siguen el idioma elegido', () => {
+    const i18n = TestBed.inject(I18nService);
+    const notFound = new HttpErrorResponse({ status: 404 });
+    expect(managementError(notFound)).toBe('404: El recurso ya no está disponible.');
+    i18n.setLanguage('en');
+    expect(managementError(notFound)).toBe('404: The resource is no longer available.');
+    expect(managementError(new HttpErrorResponse({ status: 0 }))).toContain('Could not connect');
+    // El mensaje del backend tiene prioridad y no se traduce.
+    const fromServer = new HttpErrorResponse({ status: 409, error: { message: 'En uso' } });
+    expect(managementError(fromServer)).toBe('409: En uso');
   });
 
   it('interpola parámetros y deja intactos los que faltan', () => {

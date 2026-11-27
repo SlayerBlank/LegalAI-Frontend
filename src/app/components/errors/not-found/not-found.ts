@@ -3,10 +3,11 @@ import { RouterLink } from '@angular/router';
 import { LoginService } from '../../../services/login-service';
 import { PublicHeader } from '../../../shared/public-auth/public-header';
 import { PublicThemeSwitcher } from '../../../shared/public-auth/public-theme-switcher';
+import { I18N_PIPES } from '../../../shared/i18n/i18n.pipes';
 @Component({
   selector: 'app-not-found',
   standalone: true,
-  imports: [RouterLink, PublicHeader, PublicThemeSwitcher],
+  imports: [RouterLink, PublicHeader, PublicThemeSwitcher, ...I18N_PIPES],
   templateUrl: './not-found.html',
   styleUrls: ['../../../shared/public-auth/public-tokens.css', './not-found.css'],
 })

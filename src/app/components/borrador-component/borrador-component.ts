@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -13,17 +12,19 @@ import { DeleteRecordDialog } from '../../shared/legal-records/delete-record-dia
 import { RecordFilter, RecordFilterValue } from '../../shared/legal-records/record-filter';
 import { nonBlank, recordDateMatches, recordError } from '../../shared/legal-records/record-form';
 import { RecordWorkspace } from '../../shared/legal-records/record-workspace';
+import { I18N_PIPES } from '../../shared/i18n/i18n.pipes';
+import { I18nService } from '../../services/i18n.service';
 
 @Component({
   selector: 'app-borrador',
   imports: [
-    DatePipe,
     FormsModule,
     ReactiveFormsModule,
     MatButtonModule,
     MatDialogModule,
     MatProgressBarModule,
     RecordFilter,
+    ...I18N_PIPES,
   ],
   templateUrl: './borrador-component.html',
   styleUrls: ['../../shared/legal-records/legal-records.css', './borrador-component.css'],
@@ -34,6 +35,7 @@ export class BorradorComponent {
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder).nonNullable;
+  private readonly i18n = inject(I18nService);
 
   protected readonly workspace = new RecordWorkspace<DraftResponse>((draft) => draft.draftId);
   protected readonly cases = signal<CaseOption[]>([]);
@@ -82,7 +84,7 @@ export class BorradorComponent {
       .subscribe({
         next: (cases) => this.cases.set(cases),
         error: (error: unknown) =>
-          this.caseError.set(recordError(error, 'No se pudieron cargar los expedientes.')),
+          this.caseError.set(recordError(error, this.i18n.t('records.errCases'))),
       });
   }
 
@@ -91,7 +93,7 @@ export class BorradorComponent {
   }
 
   protected caseTitle(id: number) {
-    return this.cases().find((item) => item.caseId === id)?.title ?? `Expediente #${id}`;
+    return this.cases().find((item) => item.caseId === id)?.title ?? this.i18n.t('records.caseFallback', { id });
   }
 
   protected open(id: number) {
@@ -99,7 +101,7 @@ export class BorradorComponent {
     this.workspace.run(
       this.api.get(id),
       (draft) => this.show(draft),
-      'No se pudo abrir el borrador.',
+      this.i18n.t('drafts.errOpen'),
     );
   }
 
@@ -124,10 +126,10 @@ export class BorradorComponent {
         this.show(draft);
         this.workspace.saved(
           draft,
-          reviewed ? 'Borrador marcado como revisado.' : 'Borrador guardado.',
+          this.i18n.t(reviewed ? 'drafts.reviewedNotice' : 'drafts.savedNotice'),
         );
       },
-      'No se pudo guardar el borrador.',
+      this.i18n.t('drafts.errSave'),
     );
   }
 
@@ -142,9 +144,9 @@ export class BorradorComponent {
           this.api.remove(draft.draftId),
           () => {
             this.close();
-            this.workspace.removed(draft.draftId, 'Borrador eliminado.');
+            this.workspace.removed(draft.draftId, this.i18n.t('drafts.deletedNotice'));
           },
-          'No se pudo eliminar el borrador.',
+          this.i18n.t('drafts.errDelete'),
         );
       });
   }
@@ -191,6 +193,6 @@ export class BorradorComponent {
   }
 
   private canLeave() {
-    return !this.form.dirty || window.confirm('¿Descartar los cambios sin guardar?');
+    return !this.form.dirty || window.confirm(this.i18n.t('records.discard'));
   }
 }

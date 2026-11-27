@@ -1,57 +1,59 @@
 <header>
   <div>
-    <h1>Gestión de usuarios</h1>
-    <p>Consulta y administra los usuarios de tu equipo.</p>
+    <h1>{{ 'users.title' | t }}</h1>
+    <p>{{ 'users.subtitle' | t }}</p>
   </div>
 </header>
 @if (notice) {
   <div class="notice" role="status">{{ notice }}</div>
 }
 @if (loading) {
-  <div class="notice" role="status" aria-live="polite">Cargando datos...</div>
+  <div class="notice" role="status" aria-live="polite">{{ 'common.loading' | t }}</div>
 }
 @if (busy) {
-  <div class="notice" role="status" aria-live="polite">Procesando solicitud...</div>
+  <div class="notice" role="status" aria-live="polite">{{ 'common.processing' | t }}</div>
 }
 @if (error) {
   <div class="notice error" role="alert">
     {{ error }}
-    <button type="button" (click)="load()" [disabled]="loading || busy">Volver a cargar</button>
+    <button type="button" (click)="load()" [disabled]="loading || busy">
+      {{ 'common.reload' | t }}
+    </button>
   </div>
 }
 @if (loaded && !loading) {
-  <section class="stats" aria-label="Estadísticas de usuarios">
+  <section class="stats" [attr.aria-label]="'users.stats' | t">
     <article class="stat">
-      <span>♙ Total de usuarios</span><strong>{{ users.length }}</strong>
+      <span>{{ 'users.total' | t }}</span><strong>{{ users.length }}</strong>
     </article>
     <article class="stat">
-      <span>Usuarios activos</span><strong>{{ activeCount }}</strong>
+      <span>{{ 'users.active' | t }}</span><strong>{{ activeCount }}</strong>
     </article>
     <article class="stat">
-      <span>Usuarios inactivos</span><strong>{{ inactiveCount }}</strong>
+      <span>{{ 'users.inactive' | t }}</span><strong>{{ inactiveCount }}</strong>
     </article>
     <article class="stat">
-      <span>Roles disponibles</span><strong>{{ roles.length }}</strong>
+      <span>{{ 'users.roles' | t }}</span><strong>{{ roles.length }}</strong>
     </article>
   </section>
   <section class="panel">
     <div class="toolbar">
       <input
         class="search"
-        aria-label="Buscar usuarios"
-        placeholder="Buscar por nombre o correo…"
+        [attr.aria-label]="'users.search' | t"
+        [placeholder]="'users.searchPlaceholder' | t"
         [(ngModel)]="query"
         (ngModelChange)="resetPage()"
-      /><select aria-label="Filtrar por estado" [(ngModel)]="filter" (ngModelChange)="resetPage()">
-        <option value="">Todos los estados</option>
-        <option value="ACTIVE">Activo</option>
-        <option value="INACTIVE">Inactivo</option></select
+      /><select [attr.aria-label]="'users.filterStatus' | t" [(ngModel)]="filter" (ngModelChange)="resetPage()">
+        <option value="">{{ 'users.allStatuses' | t }}</option>
+        <option value="ACTIVE">{{ 'users.statusACTIVE' | t }}</option>
+        <option value="INACTIVE">{{ 'users.statusINACTIVE' | t }}</option></select
       ><select
-        aria-label="Filtrar por rol"
+        [attr.aria-label]="'users.filterRole' | t"
         [(ngModel)]="secondaryFilter"
         (ngModelChange)="resetPage()"
       >
-        <option value="">Todos los roles</option>
+        <option value="">{{ 'users.allRoles' | t }}</option>
         @for (role of roles; track role.roleId) {
           <option [value]="role.roleId.toString()">
             {{ role.name }}
@@ -63,11 +65,11 @@
       <table>
         <thead>
           <tr>
-            <th>Usuario</th>
-            <th>Rol</th>
-            <th>Estado</th>
-            <th>Creación</th>
-            <th>Acciones</th>
+            <th>{{ 'users.colUser' | t }}</th>
+            <th>{{ 'users.colRole' | t }}</th>
+            <th>{{ 'users.colStatus' | t }}</th>
+            <th>{{ 'users.colCreated' | t }}</th>
+            <th>{{ 'users.colActions' | t }}</th>
           </tr>
         </thead>
         <tbody>
@@ -79,14 +81,14 @@
               <td>{{ user.roleName }}</td>
               <td>
                 <span class="badge" [class.inactive]="user.status === 'INACTIVE'">{{
-                  user.status === 'ACTIVE' ? 'Activo' : 'Inactivo'
+                  'users.status' + user.status | t
                 }}</span>
               </td>
-              <td>{{ user.createdAt }}</td>
+              <td>{{ user.createdAt | ldate }}</td>
               <td>
                 <div class="row-actions">
-                  <button (click)="showDetail(user)">Ver detalle</button
-                  ><button (click)="openForm(user)">Editar</button
+                  <button (click)="showDetail(user)">{{ 'common.viewDetail' | t }}</button
+                  ><button (click)="openForm(user)">{{ 'common.edit' | t }}</button
                   ><a
                     class="row-link"
                     routerLink="/auditoria"
@@ -98,24 +100,30 @@
                     [disabled]="busy || !canDeactivate(user)"
                     (click)="confirmDeactivate(user)"
                   >
-                    Desactivar
+                    {{ 'users.deactivate' | t }}
                   </button>
                 </div>
               </td>
             </tr>
           } @empty {
             <tr>
-              <td colspan="5" class="empty">No se encontraron usuarios con estos filtros.</td>
+              <td colspan="5" class="empty">{{ 'users.empty' | t }}</td>
             </tr>
           }
         </tbody>
       </table>
     </div>
     <footer class="pager">
-      <span>{{ filtered.length }} resultados · Página {{ page }} de {{ pages(filtered) }}</span>
+      <span
+        >{{ 'common.results' | t: { count: filtered.length } }} ·
+        {{ 'common.pageOf' | t: { page: page, pages: pages(filtered) } }}</span
+      >
       <div class="row-actions">
-        <button (click)="page = page - 1" [disabled]="page === 1">← Anterior</button
-        ><button (click)="page = page + 1" [disabled]="page >= pages(filtered)">Siguiente →</button>
+        <button (click)="page = page - 1" [disabled]="page === 1">
+          {{ 'common.previous' | t }}</button
+        ><button (click)="page = page + 1" [disabled]="page >= pages(filtered)">
+          {{ 'common.next' | t }}
+        </button>
       </div>
     </footer>
   </section>
@@ -131,32 +139,32 @@
       (click)="$event.stopPropagation()"
     >
       <div class="dialog-head">
-        <h2 id="user-detail-title">Detalle de usuario</h2>
-        <button type="button" aria-label="Cerrar diálogo" (click)="close()">×</button>
+        <h2 id="user-detail-title">{{ 'users.detailTitle' | t }}</h2>
+        <button type="button" [attr.aria-label]="'common.close' | t" (click)="close()">×</button>
       </div>
       <h2>{{ user.fullName }}</h2>
       <dl>
         <dt>ID</dt>
         <dd>{{ user.userId }}</dd>
-        <dt>Correo</dt>
+        <dt>{{ 'users.email' | t }}</dt>
         <dd>{{ user.email }}</dd>
-        <dt>Rol</dt>
+        <dt>{{ 'users.colRole' | t }}</dt>
         <dd>{{ user.roleName }}</dd>
-        <dt>Estado</dt>
-        <dd>{{ user.status === 'ACTIVE' ? 'Activo' : 'Inactivo' }}</dd>
-        <dt>Creación</dt>
-        <dd>{{ user.createdAt }}</dd>
-        <dt>Actualización</dt>
-        <dd>{{ user.updatedAt }}</dd>
+        <dt>{{ 'users.colStatus' | t }}</dt>
+        <dd>{{ 'users.status' + user.status | t }}</dd>
+        <dt>{{ 'users.colCreated' | t }}</dt>
+        <dd>{{ user.createdAt | ldate }}</dd>
+        <dt>{{ 'users.updated' | t }}</dt>
+        <dd>{{ user.updatedAt | ldate }}</dd>
       </dl>
       @if (error) {
         <p class="notice error" role="alert">{{ error }}</p>
       }
       @if (busy) {
-        <p role="status">Procesando solicitud...</p>
+        <p role="status">{{ 'common.processing' | t }}</p>
       }
       <div class="actions">
-        <button class="primary" (click)="openForm(user)">Editar usuario</button>
+        <button class="primary" (click)="openForm(user)">{{ 'users.edit' | t }}</button>
       </div>
     </section>
   </div>
@@ -172,21 +180,21 @@
       (click)="$event.stopPropagation()"
     >
       <div class="dialog-head">
-        <h2 id="user-form-title">Editar usuario</h2>
-        <button type="button" aria-label="Cerrar diálogo" (click)="close()">×</button>
+        <h2 id="user-form-title">{{ 'users.edit' | t }}</h2>
+        <button type="button" [attr.aria-label]="'common.close' | t" (click)="close()">×</button>
       </div>
       <form #form="ngForm" (ngSubmit)="form.valid && save()">
         <fieldset [disabled]="busy">
           <div class="form-grid">
             <label class="wide"
-              >Nombre completo<input
+              >{{ 'users.fullName' | t }}<input
                 name="fullName"
                 [(ngModel)]="user.fullName"
                 required
                 pattern=".*\S.*"
                 maxlength="150" /></label
             ><label class="wide"
-              >Correo electrónico<input
+              >{{ 'users.emailLong' | t }}<input
                 name="email"
                 type="email"
                 [(ngModel)]="user.email"
@@ -194,23 +202,23 @@
                 maxlength="150"
                 required
                 email /></label
-            ><label>Rol<input [value]="user.roleName" readonly /></label
-            ><label>Estado<input [value]="user.status" readonly /></label>
+            ><label>{{ 'users.colRole' | t }}<input [value]="user.roleName" readonly /></label
+            ><label
+              >{{ 'users.colStatus' | t
+              }}<input [value]="'users.status' + user.status | t" readonly
+            /></label>
           </div>
-          <p class="hint">
-            Solo se permite cambiar el nombre. El correo es la identidad de acceso; no hay
-            operaciones para cambiar rol o estado desde este formulario.
-          </p>
+          <p class="hint">{{ 'users.editHint' | t }}</p>
           @if (error) {
             <p class="notice error" role="alert">{{ error }}</p>
           }
           @if (busy) {
-            <p role="status">Procesando solicitud...</p>
+            <p role="status">{{ 'common.processing' | t }}</p>
           }
           <div class="actions">
-            <button type="button" (click)="close()">Cancelar</button
+            <button type="button" (click)="close()">{{ 'common.cancel' | t }}</button
             ><button class="primary" type="submit" [disabled]="form.invalid || busy">
-              Guardar cambios
+              {{ 'users.save' | t }}
             </button>
           </div>
         </fieldset>
@@ -229,22 +237,21 @@
       (click)="$event.stopPropagation()"
     >
       <div class="dialog-head">
-        <h2 id="deactivate-title">¿Desactivar usuario?</h2>
-        <button type="button" aria-label="Cerrar diálogo" (click)="close()">×</button>
+        <h2 id="deactivate-title">{{ 'users.deactivateTitle' | t }}</h2>
+        <button type="button" [attr.aria-label]="'common.close' | t" (click)="close()">×</button>
       </div>
-      <p>
-        Se desactivará la cuenta de {{ user.fullName }}. Se conservan sus datos y su correo; su
-        token dejará de autenticar. No hay operación de reactivación disponible.
-      </p>
+      <p>{{ 'users.deactivateText' | t: { name: user.fullName } }}</p>
       @if (error) {
         <p class="notice error" role="alert">{{ error }}</p>
       }
       @if (busy) {
-        <p role="status">Procesando solicitud...</p>
+        <p role="status">{{ 'common.processing' | t }}</p>
       }
       <div class="actions">
-        <button (click)="close()">Cancelar</button
-        ><button class="danger" [disabled]="busy" (click)="deactivate()">Desactivar usuario</button>
+        <button (click)="close()">{{ 'common.cancel' | t }}</button
+        ><button class="danger" [disabled]="busy" (click)="deactivate()">
+          {{ 'users.deactivateSubmit' | t }}
+        </button>
       </div>
     </section>
   </div>

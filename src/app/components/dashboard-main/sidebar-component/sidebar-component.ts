@@ -51,22 +51,22 @@ export class SidebarComponent {
   private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
   profileOpen = false;
   readonly mainLinks: WorkspaceLink[] = [
-    { title: 'Resumen', path: '/dashboard', icon: 'summary' },
-    { title: 'Clientes', path: '/clientes', icon: 'clients' },
-    { title: 'Expedientes', path: '/expedientes', icon: 'cases' },
-    { title: 'Documentos', path: '/documentos', icon: 'documents' },
+    { title: 'Resumen', titleKey: 'nav.summary', path: '/dashboard', icon: 'summary' },
+    { title: 'Clientes', titleKey: 'nav.clients', path: '/clientes', icon: 'clients' },
+    { title: 'Expedientes', titleKey: 'nav.cases', path: '/expedientes', icon: 'cases' },
+    { title: 'Documentos', titleKey: 'nav.documents', path: '/documentos', icon: 'documents' },
     { title: 'Reportes', titleKey: 'reports.nav', path: '/reportes', icon: 'reports', prefix: true },
   ];
   readonly aiLinks: WorkspaceLink[] = [
-    { title: 'Chat IA', path: '/chat-ia', icon: 'ai' },
-    { title: 'Borradores', path: '/borradores', icon: 'drafts' },
-    { title: 'Resúmenes', path: '/resumenes', icon: 'summaries' },
-    { title: 'Citaciones IA', path: '/citaciones-ia', icon: 'citations' },
+    { title: 'Chat IA', titleKey: 'nav.chat', path: '/chat-ia', icon: 'ai' },
+    { title: 'Borradores', titleKey: 'nav.drafts', path: '/borradores', icon: 'drafts' },
+    { title: 'Resúmenes', titleKey: 'nav.summaries', path: '/resumenes', icon: 'summaries' },
+    { title: 'Citaciones IA', titleKey: 'nav.citations', path: '/citaciones-ia', icon: 'citations' },
   ];
   readonly adminLinks: WorkspaceLink[] = [
-    { title: 'Gestión de usuarios', path: '/gestionusuarios', icon: 'users' },
-    { title: 'Roles y permisos', path: '/roles', icon: 'roles' },
-    { title: 'Auditoría', path: '/auditoria', icon: 'audit' },
+    { title: 'Gestión de usuarios', titleKey: 'nav.users', path: '/gestionusuarios', icon: 'users' },
+    { title: 'Roles y permisos', titleKey: 'nav.roles', path: '/roles', icon: 'roles' },
+    { title: 'Auditoría', titleKey: 'nav.audit', path: '/auditoria', icon: 'audit' },
   ];
   constructor() {
     effect(() => {

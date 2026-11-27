@@ -1,7 +1,9 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { CaseOption } from '../../services/legal-record-source.service';
+import { I18N_PIPES } from '../i18n/i18n.pipes';
+import { I18nService } from '../../services/i18n.service';
 
 export interface RecordFilterValue {
   caseId: number | null;
@@ -12,7 +14,7 @@ export interface RecordFilterValue {
 
 @Component({
   selector: 'app-record-filter',
-  imports: [FormsModule, MatButtonModule],
+  imports: [FormsModule, MatButtonModule, ...I18N_PIPES],
   styleUrl: './legal-records.css',
   template: `
     <details class="filters">
@@ -20,10 +22,10 @@ export interface RecordFilterValue {
       <form class="filter-fields" (ngSubmit)="apply()">
         <fieldset [disabled]="disabled()">
           <label
-            >Expediente
+            >{{ 'records.case' | t }}
             <select name="case" [(ngModel)]="caseId" [disabled]="!cases().length">
               <option [ngValue]="null">
-                {{ cases().length ? 'Todos los expedientes' : 'Sin expedientes disponibles' }}
+                {{ (cases().length ? 'records.allCases' : 'records.noCases') | t }}
               </option>
               @for (item of cases(); track item.caseId) {
                 <option [ngValue]="item.caseId">{{ item.title }}</option>
@@ -39,12 +41,14 @@ export interface RecordFilterValue {
               }
             </datalist>
           </label>
-          <label>Desde <input type="date" name="from" [(ngModel)]="from" /></label>
-          <label>Hasta <input type="date" name="to" [(ngModel)]="to" /></label>
+          <label>{{ 'records.from' | t }} <input type="date" name="from" [(ngModel)]="from" /></label>
+          <label>{{ 'records.to' | t }} <input type="date" name="to" [(ngModel)]="to" /></label>
           <div class="actions">
-            <button mat-flat-button [disabled]="disabled()" type="submit">Aplicar</button>
+            <button mat-flat-button [disabled]="disabled()" type="submit">
+              {{ 'records.apply' | t }}
+            </button>
             <button mat-button [disabled]="disabled()" type="button" (click)="reset()">
-              Limpiar
+              {{ 'records.clear' | t }}
             </button>
           </div>
         </fieldset>
@@ -70,10 +74,11 @@ export class RecordFilter {
   protected from = '';
   protected to = '';
   protected readonly error = signal('');
+  private readonly i18n = inject(I18nService);
 
   protected apply() {
     if (this.from && this.to && this.from > this.to) {
-      this.error.set('La fecha inicial debe ser anterior o igual a la final.');
+      this.error.set(this.i18n.t('records.errRange'));
       return;
     }
     this.error.set('');

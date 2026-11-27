@@ -3,25 +3,25 @@
     <button
       class="history-back"
       type="button"
-      aria-label="Volver a la página anterior"
+      [attr.aria-label]="'auth.backLabel' | t"
       (click)="goBack()"
     >
-      ← Volver
+      {{ 'auth.back' | t }}
     </button>
-    <p class="form-eyebrow">BIENVENIDA DE NUEVO</p>
-    <h1 class="form-title">Vuelve a tu despacho.</h1>
-    <p class="form-intro">Inicia sesión para continuar con tus asuntos.</p>
+    <p class="form-eyebrow">{{ 'login.eyebrow' | t }}</p>
+    <h1 class="form-title">{{ 'login.title' | t }}</h1>
+    <p class="form-intro">{{ 'login.intro' | t }}</p>
   </div>
   <form
     [formGroup]="form"
     (ngSubmit)="submit()"
     [attr.aria-busy]="loading"
-    aria-label="Iniciar sesión"
+    [attr.aria-label]="'login.formLabel' | t"
     novalidate
   >
     <fieldset [disabled]="loading">
       <div class="field">
-        <label for="login-email">Email</label
+        <label for="login-email">{{ 'auth.email' | t }}</label
         ><input
           id="login-email"
           type="email"
@@ -34,13 +34,13 @@
           aria-describedby="login-email-note"
         />
         @if (form.controls.email.touched && form.controls.email.invalid) {
-          <p id="login-email-note" class="field-error">Introduce un correo válido.</p>
+          <p id="login-email-note" class="field-error">{{ 'login.emailError' | t }}</p>
         } @else if (form.controls.email.valid) {
-          <p id="login-email-note" class="field-note">✓ Formato de email válido</p>
+          <p id="login-email-note" class="field-note">{{ 'auth.emailValid' | t }}</p>
         }
       </div>
       <div class="field">
-        <label for="login-password">Contraseña</label>
+        <label for="login-password">{{ 'auth.password' | t }}</label>
         <div class="password-field">
           <input
             id="login-password"
@@ -53,7 +53,7 @@
           /><button
             class="password-toggle"
             type="button"
-            [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+            [attr.aria-label]="(showPassword ? 'auth.hidePassword' : 'auth.showPassword') | t"
             [attr.aria-pressed]="showPassword"
             aria-controls="login-password"
             (click)="showPassword = !showPassword"
@@ -68,15 +68,15 @@
           </button>
         </div>
         @if (form.controls.password.touched && form.controls.password.invalid) {
-          <p id="login-password-note" class="field-error">La contraseña es obligatoria.</p>
+          <p id="login-password-note" class="field-error">{{ 'auth.passwordRequired' | t }}</p>
         } @else {
           <p id="login-password-note" class="field-note">
-            {{ passwordBytes }} bytes UTF-8 introducidos.
+            {{ 'login.passwordBytes' | t: { bytes: passwordBytes } }}
           </p>
         }
       </div>
       <p class="password-guidance">
-        La contraseña se comprueba al iniciar sesión. No compartas tus credenciales.
+        {{ 'login.guidance' | t }}
       </p>
       <div
         class="status-panel"
@@ -86,32 +86,30 @@
         aria-atomic="true"
       >
         @if (loading) {
-          <strong>Iniciando sesión…</strong>
-          <p>Estamos validando tus credenciales.</p>
+          <strong>{{ 'login.loadingTitle' | t }}</strong>
+          <p>{{ 'login.loadingText' | t }}</p>
         } @else if (message) {
-          <strong>No se pudo iniciar sesión</strong>
+          <strong>{{ 'login.errorTitle' | t }}</strong>
           <p>{{ message }}</p>
         } @else if (form.valid) {
-          <strong>✓ Formulario listo</strong>
-          <p>Cuando se validen tus credenciales, accederás a tu espacio de trabajo.</p>
+          <strong>{{ 'login.readyTitle' | t }}</strong>
+          <p>{{ 'login.readyText' | t }}</p>
         } @else {
-          <strong>Formulario incompleto</strong>
-          <p>Introduce tu email y contraseña para continuar.</p>
+          <strong>{{ 'auth.incompleteTitle' | t }}</strong>
+          <p>{{ 'login.incompleteText' | t }}</p>
         }
       </div>
       <button class="submit" type="submit" [disabled]="loading">
-        {{ loading ? 'Iniciando sesión…' : 'Iniciar sesión →' }}
+        {{ (loading ? 'login.loadingTitle' : 'login.submit') | t }}
       </button>
     </fieldset>
   </form>
   <p class="switch">
-    ¿Es tu primera vez en LegalAI? <a routerLink="/usuarios/registrar">Crea una cuenta</a>
+    {{ 'login.firstTime' | t }}
+    <a routerLink="/usuarios/registrar">{{ 'login.createAccount' | t }}</a>
   </p>
   <section class="security" aria-labelledby="security-title">
-    <h2 id="security-title">Un espacio privado, una sesión personal.</h2>
-    <p>
-      Clientes, expedientes y documentos requieren autenticación. Cierra la sesión si utilizas un
-      equipo compartido.
-    </p>
+    <h2 id="security-title">{{ 'login.securityTitle' | t }}</h2>
+    <p>{{ 'login.securityText' | t }}</p>
   </section></app-public-auth-frame
 >

@@ -5,11 +5,12 @@ import { LoginService } from '../../../services/login-service';
 import { ThemePreference, ThemeService } from '../../../services/theme-service';
 import { LanguageSwitcherComponent } from '../../../shared/i18n/language-switcher';
 import { RegionSwitcherComponent } from '../../../shared/i18n/region-switcher';
-import { MusicToggleComponent } from '../../../shared/i18n/music-toggle';
+import { I18N_PIPES } from '../../../shared/i18n/i18n.pipes';
+import { I18nService } from '../../../services/i18n.service';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [LanguageSwitcherComponent, RegionSwitcherComponent],
+  imports: [LanguageSwitcherComponent, RegionSwitcherComponent, ...I18N_PIPES],
   templateUrl: './navbar-component.html',
   styleUrl: './navbar-component.css',
 })
@@ -18,13 +19,14 @@ export class NavbarComponent {
   readonly menuOpen = input(false);
   readonly theme = inject(ThemeService);
   readonly loginService = inject(LoginService);
+  private readonly i18n = inject(I18nService);
   private readonly router = inject(Router);
   readonly currentPath = signal(this.path());
   readonly now = signal(new Date());
-  readonly options: { value: ThemePreference; label: string }[] = [
-    { value: 'light', label: 'Claro' },
-    { value: 'dark', label: 'Oscuro' },
-    { value: 'system', label: 'Sistema' },
+  readonly options: { value: ThemePreference; labelKey: string }[] = [
+    { value: 'light', labelKey: 'navbar.themeLight' },
+    { value: 'dark', labelKey: 'navbar.themeDark' },
+    { value: 'system', labelKey: 'navbar.themeSystem' },
   ];
   constructor() {
     this.router.events.pipe(takeUntilDestroyed()).subscribe((event) => {
@@ -44,10 +46,11 @@ export class NavbarComponent {
     }
   }
   get selectedTheme(): string {
-    return this.options.find((option) => option.value === this.theme.preference())!.label;
+    const option = this.options.find((item) => item.value === this.theme.preference())!;
+    return this.i18n.t(option.labelKey);
   }
   get today(): string {
-    const parts = new Intl.DateTimeFormat('es', {
+    const parts = new Intl.DateTimeFormat(this.i18n.locale(), {
       weekday: 'short',
       day: 'numeric',
       month: 'short',
