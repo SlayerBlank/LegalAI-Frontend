@@ -1,18 +1,19 @@
 <header class="public-header">
-  <a class="brand" routerLink="/landing" aria-label="LegalAI, inicio"
+  <a class="brand" routerLink="/landing" [attr.aria-label]="'public.brandLabel' | t"
     ><span class="brand-mark" aria-hidden="true">a</span>LegalAI</a
   >
   <p class="route-context">
-    {{ pathLabel() }} · {{ theme.theme() === 'dark' ? 'Oscuro' : 'Claro' }} · Acceso público
+    {{ pathLabel() }} · {{ (theme.theme() === 'dark' ? 'public.themeDark' : 'public.themeLight') | t }} ·
+    {{ 'public.publicAccess' | t }}
   </p>
   <div class="header-actions">
     @if (notFound()) {
       <a class="access-button" [routerLink]="workspace() ? '/dashboard' : '/usuarios/login'">{{
-        workspace() ? 'Ir al Dashboard' : 'Iniciar sesión'
+        (workspace() ? 'public.goDashboard' : 'public.login') | t
       }}</a>
     } @else {
       <a class="home-link" routerLink="/landing"
-        ><span aria-hidden="true">←</span> Volver al inicio</a
+        ><span aria-hidden="true">←</span> {{ 'public.backHome' | t }}</a
       ><app-language-switcher /><app-region-switcher /><app-music-toggle /><app-public-theme-switcher />
     }
   </div>

@@ -1,42 +1,43 @@
-<a class="skip-link" href="#auth-form-content">Saltar al formulario</a
+<a class="skip-link" href="#auth-form-content">{{ 'public.skipForm' | t }}</a
 ><app-public-header [pathLabel]="pathLabel()" />
 <main class="auth-layout">
   <aside class="institution" aria-labelledby="institution-title">
-    <p class="eyebrow">LEGALAI / UN ESPACIO PARA TU PRÁCTICA</p>
-    <h2 id="institution-title">Cada asunto merece<br />una mirada clara.</h2>
+    <p class="eyebrow">{{ 'public.eyebrow' | t }}</p>
+    <h2 id="institution-title">{{ 'public.title1' | t }}<br />{{ 'public.title2' | t }}</h2>
     <p class="institution-copy">
-      Reúne el contexto. Organiza el trabajo.<br />Decide con tu criterio profesional.
+      {{ 'public.copy1' | t }}<br />{{ 'public.copy2' | t }}
     </p>
-    <article class="example-card" aria-label="Ejemplo ilustrativo de expediente">
-      <div class="example-meta"><span>EXP-2026-042</span><span>EN CURSO</span></div>
-      <h3>Lo importante, conectado.</h3>
+    <article class="example-card" [attr.aria-label]="'public.exampleLabel' | t">
+      <div class="example-meta"><span>EXP-2026-042</span><span>{{ 'public.exampleStatus' | t }}</span></div>
+      <h3>{{ 'public.exampleTitle' | t }}</h3>
       <dl>
         <div>
-          <dt>Cliente</dt>
+          <dt>{{ 'public.exampleClient' | t }}</dt>
           <dd>Lucía Martínez</dd>
         </div>
         <div>
-          <dt>Responsable</dt>
+          <dt>{{ 'public.exampleOwner' | t }}</dt>
           <dd>María Vega</dd>
         </div>
         <div>
-          <dt>Documentación</dt>
-          <dd>8 archivos vinculados</dd>
+          <dt>{{ 'public.exampleDocs' | t }}</dt>
+          <dd>{{ 'public.exampleFiles' | t }}</dd>
         </div>
       </dl>
       <p class="example-note">
-        ◇ Asistencia IA disponible · Revisión profesional siempre necesaria.
+        {{ 'public.exampleNote' | t }}
       </p>
     </article>
-    <p class="institution-bottom">Clientes · Expedientes · Documentos · Asistencia IA</p>
+    <p class="institution-bottom">{{ 'public.modules' | t }}</p>
   </aside>
-  <section id="auth-form-content" class="form-panel" aria-label="Acceso a LegalAI">
+  <section id="auth-form-content" class="form-panel" [attr.aria-label]="'public.formLabel' | t">
     <div class="form-inner"><ng-content /></div>
   </section>
 </main>
 <footer class="auth-footer">
   <span
-    >© 2026 LegalAI · <span title="Pendiente de publicación">Privacidad</span> ·
-    <span title="Pendiente de publicación">Condiciones</span></span
-  ><span>Tu tema se conserva. Sin elección, se usa el del sistema.</span>
+    >© 2026 LegalAI ·
+    <span [title]="'public.pendingPublication' | t">{{ 'public.privacy' | t }}</span> ·
+    <span [title]="'public.pendingPublication' | t">{{ 'public.terms' | t }}</span></span
+  ><span>{{ 'public.themeNote' | t }}</span>
 </footer>
