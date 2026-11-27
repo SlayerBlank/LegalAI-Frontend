@@ -1,33 +1,36 @@
 <header>
   <div>
-    <h1>Roles y permisos</h1>
-    <p>Consulta los roles y las reglas de acceso del sistema.</p>
+    <h1>{{ 'roles.title' | t }}</h1>
+    <p>{{ 'roles.subtitle' | t }}</p>
   </div>
-  <button class="primary" (click)="openForm()" [disabled]="loading || busy">+ Nuevo rol</button>
+  <button class="primary" (click)="openForm()" [disabled]="loading || busy">
+    {{ 'roles.new' | t }}
+  </button>
 </header>
 @if (notice) {
   <div class="notice" role="status">{{ notice }}</div>
 }
 @if (loading) {
-  <div class="notice" role="status">Cargando roles...</div>
+  <div class="notice" role="status">{{ 'roles.loading' | t }}</div>
 }
 @if (busy) {
-  <div class="notice" role="status">Procesando solicitud...</div>
+  <div class="notice" role="status">{{ 'common.processing' | t }}</div>
 }
 @if (error) {
   <div class="notice error" role="alert">
-    {{ error }} <button (click)="load()" [disabled]="loading || busy">Volver a cargar</button>
+    {{ error }} <button (click)="load()" [disabled]="loading || busy">
+      {{ 'common.reload' | t }}
+    </button>
   </div>
 }
 @if (loaded && !loading) {
   @if (users === null) {
     <p class="notice" role="status">
-      No fue posible cargar los usuarios. Los conteos no están disponibles; se bloquea renombrar o
-      eliminar roles hasta poder verificar sus asociaciones.
-      <button (click)="load()" [disabled]="busy">Reintentar</button>
+      {{ 'roles.usersUnavailable' | t }}
+      <button (click)="load()" [disabled]="busy">{{ 'common.retry' | t }}</button>
     </p>
   }
-  <div class="role-grid" aria-label="Seleccionar rol">
+  <div class="role-grid" [attr.aria-label]="'roles.select' | t">
     @for (role of roles; track role.roleId) {
       <button
         class="role"
@@ -42,14 +45,16 @@
           <span>{{ role.description }}</span>
         }
         <span>{{
-          count(role) === null ? 'Conteo no disponible' : count(role) + ' usuarios asignados'
+          count(role) === null
+            ? ('roles.countUnavailable' | t)
+            : ('roles.assignedUsers' | t: { count: count(role)! })
         }}</span>
         @if (fundamental(role)) {
-          <span class="badge">Rol fundamental</span>
+          <span class="badge">{{ 'roles.fundamental' | t }}</span>
         }
       </button>
     } @empty {
-      <div class="panel empty">No hay roles registrados.</div>
+      <div class="panel empty">{{ 'roles.empty' | t }}</div>
     }
   </div>
   @if (selected; as role) {
@@ -57,48 +62,45 @@
       <div class="toolbar">
         <div>
           <h2>{{ role.name }}</h2>
-          <p>{{ role.description || 'Sin descripción' }}</p>
+          <p>{{ role.description || ('common.noDescription' | t) }}</p>
         </div>
         <div class="row-actions">
-          <button (click)="showDetail(role)" [disabled]="busy">Ver detalle</button
-          ><button (click)="openForm(role)" [disabled]="busy">Editar rol</button
+          <button (click)="showDetail(role)" [disabled]="busy">
+            {{ 'common.viewDetail' | t }}</button
+          ><button (click)="openForm(role)" [disabled]="busy">{{ 'roles.edit' | t }}</button
           ><button
             class="danger"
             (click)="confirmRemove(role)"
             [disabled]="busy || !canRemove(role)"
           >
-            Eliminar
+            {{ 'common.delete' | t }}
           </button>
         </div>
       </div>
       <div class="section-title">
-        <h2>Matriz informativa de acceso</h2>
-        <p>Reglas verificadas en el servidor. Esta pantalla no permite modificar permisos.</p>
+        <h2>{{ 'roles.matrixTitle' | t }}</h2>
+        <p>{{ 'roles.matrixText' | t }}</p>
       </div>
       <div class="table-scroll">
         <table>
           <thead>
             <tr>
-              <th>Recurso</th>
-              <th>Requisito</th>
+              <th>{{ 'roles.colResource' | t }}</th>
+              <th>{{ 'roles.colRequirement' | t }}</th>
             </tr>
           </thead>
           <tbody>
             @for (permission of permissions; track permission.resource) {
               <tr>
-                <td>{{ permission.resource }}</td>
-                <td>{{ permission.requirement }}</td>
+                <td>{{ permission.resource | t }}</td>
+                <td>{{ permission.requirement | t }}</td>
               </tr>
             }
           </tbody>
         </table>
       </div>
     </section>
-    <p class="hint">
-      Un rol nuevo no recibe acceso administrativo. Los permisos dependen de las reglas configuradas
-      en el servidor. ADMIN y USER no pueden renombrarse ni eliminarse. Los roles asignados solo
-      admiten cambiar su descripción.
-    </p>
+    <p class="hint">{{ 'roles.hint' | t }}</p>
   }
 }
 @if (detail && selected; as role) {
@@ -112,22 +114,22 @@
       (click)="$event.stopPropagation()"
     >
       <div class="dialog-head">
-        <h2 id="role-detail-title">Detalle del rol</h2>
-        <button type="button" aria-label="Cerrar diálogo" (click)="close()">×</button>
+        <h2 id="role-detail-title">{{ 'roles.detailTitle' | t }}</h2>
+        <button type="button" [attr.aria-label]="'common.close' | t" (click)="close()">×</button>
       </div>
       <dl>
         <dt>ID</dt>
         <dd>{{ role.roleId }}</dd>
-        <dt>Nombre</dt>
+        <dt>{{ 'roles.name' | t }}</dt>
         <dd>{{ role.name }}</dd>
-        <dt>Descripción</dt>
-        <dd>{{ role.description || 'Sin descripción' }}</dd>
-        <dt>Usuarios asignados</dt>
-        <dd>{{ count(role) ?? 'No disponible' }}</dd>
+        <dt>{{ 'roles.description' | t }}</dt>
+        <dd>{{ role.description || ('common.noDescription' | t) }}</dd>
+        <dt>{{ 'roles.usersAssigned' | t }}</dt>
+        <dd>{{ count(role) ?? ('common.notAvailable' | t) }}</dd>
       </dl>
-      <p>El conteo incluye cuentas inactivas.</p>
+      <p>{{ 'roles.countNote' | t }}</p>
       <div class="actions">
-        <button (click)="openForm(role)" [disabled]="busy">Editar rol</button>
+        <button (click)="openForm(role)" [disabled]="busy">{{ 'roles.edit' | t }}</button>
       </div>
     </section>
   </div>
@@ -143,26 +145,23 @@
       (click)="$event.stopPropagation()"
     >
       <div class="dialog-head">
-        <h2 id="role-form-title">{{ role.roleId ? 'Editar rol' : 'Nuevo rol' }}</h2>
-        <button type="button" aria-label="Cerrar diálogo" (click)="close()">×</button>
+        <h2 id="role-form-title">{{ (role.roleId ? 'roles.edit' : 'roles.newTitle') | t }}</h2>
+        <button type="button" [attr.aria-label]="'common.close' | t" (click)="close()">×</button>
       </div>
       <form #form="ngForm" (ngSubmit)="form.valid && save()">
         <fieldset [disabled]="busy">
           <div class="form-grid">
             <label class="wide"
-              >Nombre del rol *<input
+              >{{ 'roles.nameRequired' | t }}<input
                 name="name"
                 [(ngModel)]="role.name"
                 required
                 pattern="[A-Za-z][A-Za-z0-9_]*"
                 maxlength="50"
                 [readonly]="lockedName(role)"
-              /><small
-                >Sin prefijo ROLE_. Se normaliza a mayúsculas. Los roles fundamentales y asignados
-                conservan su nombre.</small
-              ></label
+              /><small>{{ 'roles.nameHint' | t }}</small></label
             ><label class="wide"
-              >Descripción<textarea
+              >{{ 'roles.description' | t }}<textarea
                 name="description"
                 [(ngModel)]="role.description"
                 maxlength="255"
@@ -170,17 +169,17 @@
               ></textarea>
             </label>
           </div>
-          <p class="hint">Crear un rol no lo asigna a usuarios ni configura permisos.</p>
+          <p class="hint">{{ 'roles.createHint' | t }}</p>
           @if (error) {
             <p class="notice error" role="alert">{{ error }}</p>
           }
           @if (busy) {
-            <p role="status">Guardando rol...</p>
+            <p role="status">{{ 'roles.saving' | t }}</p>
           }
           <div class="actions">
-            <button type="button" (click)="close()">Cancelar</button
+            <button type="button" (click)="close()">{{ 'common.cancel' | t }}</button
             ><button type="submit" class="primary" [disabled]="form.invalid || busy">
-              Guardar rol
+              {{ 'roles.save' | t }}
             </button>
           </div>
         </fieldset>
@@ -199,22 +198,21 @@
       (click)="$event.stopPropagation()"
     >
       <div class="dialog-head">
-        <h2 id="role-delete-title">¿Eliminar rol?</h2>
-        <button type="button" aria-label="Cerrar diálogo" (click)="close()">×</button>
+        <h2 id="role-delete-title">{{ 'roles.deleteTitle' | t }}</h2>
+        <button type="button" [attr.aria-label]="'common.close' | t" (click)="close()">×</button>
       </div>
-      <p>
-        Se eliminará el rol {{ role.name }}. El servidor rechazará la operación si está asignado o
-        protegido. No se eliminan usuarios.
-      </p>
+      <p>{{ 'roles.deleteText' | t: { name: role.name } }}</p>
       @if (error) {
         <p class="notice error" role="alert">{{ error }}</p>
       }
       @if (busy) {
-        <p role="status">Eliminando rol...</p>
+        <p role="status">{{ 'roles.deleting' | t }}</p>
       }
       <div class="actions">
-        <button (click)="close()" [disabled]="busy">Cancelar</button
-        ><button class="danger" (click)="remove()" [disabled]="busy">Eliminar rol</button>
+        <button (click)="close()" [disabled]="busy">{{ 'common.cancel' | t }}</button
+        ><button class="danger" (click)="remove()" [disabled]="busy">
+          {{ 'roles.deleteSubmit' | t }}
+        </button>
       </div>
     </section>
   </div>

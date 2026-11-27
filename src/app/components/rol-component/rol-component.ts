@@ -6,10 +6,12 @@ import { RolService } from '../../services/rol-service';
 import { UsuarioService } from '../../services/usuario-service';
 import { ManagementHttpState } from '../../shared/management-http-state';
 import { ManagementDialogDirective } from '../../shared/management-dialog.directive';
+import { I18N_PIPES } from '../../shared/i18n/i18n.pipes';
+import { I18nService } from '../../services/i18n.service';
 @Component({
   selector: 'app-rol',
   standalone: true,
-  imports: [FormsModule, ManagementDialogDirective],
+  imports: [FormsModule, ManagementDialogDirective, ...I18N_PIPES],
   templateUrl: './rol-component.html',
   styleUrls: [
     '../../shared/management.css',
@@ -20,15 +22,16 @@ import { ManagementDialogDirective } from '../../shared/management-dialog.direct
 export class RolComponent extends ManagementHttpState<RoleResponse> implements OnInit {
   private readonly api = inject(RolService);
   private readonly userApi = inject(UsuarioService);
+  private readonly i18n = inject(I18nService);
   roles: RoleResponse[] = [];
   users: UserResponse[] | null = null;
   detail = false;
   readonly permissions = [
-    { resource: 'Perfil propio: GET /api/users/me', requirement: 'Usuario activo autenticado' },
-    { resource: 'Clientes y expedientes', requirement: 'Usuario activo autenticado y propietario' },
-    { resource: 'Administración de usuarios', requirement: 'ROLE_ADMIN' },
-    { resource: 'Gestión de roles', requirement: 'ROLE_ADMIN' },
-    { resource: 'Auditoría: /api/audit-logs', requirement: 'ROLE_ADMIN' },
+    { resource: 'roles.permProfile', requirement: 'roles.reqActive' },
+    { resource: 'roles.permClients', requirement: 'roles.reqOwner' },
+    { resource: 'roles.permUsers', requirement: 'roles.reqAdmin' },
+    { resource: 'roles.permRoles', requirement: 'roles.reqAdmin' },
+    { resource: 'roles.permAudit', requirement: 'roles.reqAdmin' },
   ];
   ngOnInit() {
     this.load();
@@ -94,8 +97,7 @@ export class RolComponent extends ManagementHttpState<RoleResponse> implements O
           : [...this.roles, value];
         this.selected = value;
         this.editing = null;
-        this.notice =
-          'Rol guardado correctamente. Sus accesos dependen de las reglas del servidor.';
+        this.notice = this.i18n.t('roles.savedNotice');
       },
     );
   }
@@ -112,7 +114,7 @@ export class RolComponent extends ManagementHttpState<RoleResponse> implements O
       this.selected = this.roles[0] ?? null;
       this.pending = null;
       this.detail = false;
-      this.notice = 'Rol eliminado correctamente.';
+      this.notice = this.i18n.t('roles.deletedNotice');
     });
   }
   @HostListener('document:keydown.escape') override close() {
