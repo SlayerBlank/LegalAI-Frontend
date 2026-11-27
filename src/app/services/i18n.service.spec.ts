@@ -35,9 +35,10 @@ describe('I18nService (i18n + l10n)', () => {
     expect(TestBed.inject(DOCUMENT).documentElement.lang).toBe('en');
   });
 
-  it('restaura el idioma guardado', () => {
+  it('siempre arranca en español y borra un idioma guardado antes', () => {
     localStorage.setItem('legalai-language', 'en');
-    expect(TestBed.inject(I18nService).language()).toBe('en');
+    expect(TestBed.inject(I18nService).language()).toBe('es');
+    expect(localStorage.getItem('legalai-language')).toBeNull();
   });
 
   it('interpola parámetros y deja intactos los que faltan', () => {

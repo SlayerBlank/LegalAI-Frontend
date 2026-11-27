@@ -11,6 +11,7 @@ import {
 } from '../../models/documento';
 import { LoginService } from '../../services/login-service';
 import { jwtInterceptor } from '../../services/jwt.interceptor';
+import { I18nService } from '../../services/i18n.service';
 
 const legalCase: CaseResponse = {
   caseId: 5,
@@ -336,7 +337,8 @@ describe('DocumentoComponent - transporte HTTP aislado', () => {
   });
 
   it('muestra la pantalla en inglés con fechas en formato en-US', async () => {
-    localStorage.setItem('legalai-language', 'en');
+    // El idioma ya no se restaura desde localStorage: se cambia con el servicio.
+    TestBed.inject(I18nService).setLanguage('en');
     try {
       const f = mount();
       await f.whenStable();

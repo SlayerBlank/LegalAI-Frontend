@@ -3,13 +3,12 @@ import { NavigationEnd, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LoginService } from '../../../services/login-service';
 import { ThemePreference, ThemeService } from '../../../services/theme-service';
-import { LanguageSwitcherComponent } from '../../../shared/i18n/language-switcher';
 import { RegionSwitcherComponent } from '../../../shared/i18n/region-switcher';
 import { MusicToggleComponent } from '../../../shared/i18n/music-toggle';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [LanguageSwitcherComponent, RegionSwitcherComponent],
+  imports: [RegionSwitcherComponent],
   templateUrl: './navbar-component.html',
   styleUrl: './navbar-component.css',
 })
