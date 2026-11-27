@@ -2,10 +2,12 @@ import { DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable, materialize, take } from 'rxjs';
 import { recordError } from './record-form';
+import { I18nService } from '../../services/i18n.service';
 
 // Keeps the full rows available when the API returns only a filter projection.
 export class RecordWorkspace<T> {
   private readonly destroyRef = inject(DestroyRef);
+  private readonly i18n = inject(I18nService);
   private readonly rows = signal<T[]>([]);
   private readonly matchingIds = signal<Set<number> | null>(null);
   private activeFilter: (() => Observable<Set<number>>) | null = null;
@@ -29,7 +31,7 @@ export class RecordWorkspace<T> {
         this.rows.set(rows);
         if (this.activeFilter) this.filter(this.activeFilter);
       },
-      'No se pudo cargar la lista.',
+      this.i18n.t('records.errLoad'),
     );
   }
 
@@ -40,7 +42,7 @@ export class RecordWorkspace<T> {
         this.activeFilter = request;
         this.matchingIds.set(ids);
       },
-      'No se pudieron aplicar los filtros.',
+      this.i18n.t('records.errFilter'),
     );
   }
 
